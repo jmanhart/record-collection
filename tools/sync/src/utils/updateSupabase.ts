@@ -27,21 +27,47 @@ export async function updateSupabaseRecords(records: DiscogsRecord[]) {
       `📦 Preparing to insert ${records.length} records into Supabase...`
     );
 
-    // ✅ Ensure `supabase_image_url` is correctly formatted and IDs match
-    const cleanedRecords = records.map((record) => ({
-      id: record.basic_information.id, // Set id to match release_id
-      release_id: record.basic_information.id,
-      title: record.basic_information.title || "Unknown Title",
-      artist: record.basic_information.artists?.[0]?.name || "Unknown Artist",
-      image_url: record.basic_information.cover_image || "",
-      supabase_image_url: record.supabase_image_url
-        ? `${SUPABASE_STORAGE_URL}${record.basic_information.id}.jpeg`
-        : null,
-    }));
+    // First, fetch existing records to check their image status
+    const { data: existingRecords, error: fetchError } = await supabase
+      .from(TABLE_NAME)
+      .select("id, release_id, supabase_image_url");
 
-    // ✅ Insert/update records, using id for conflict resolution
+    if (fetchError) {
+      logError("❌ Error fetching existing records:", fetchError);
+      return;
+    }
+
+    const existingImageMap = new Map(
+      existingRecords.map((r) => [r.id, r.supabase_image_url])
+    );
+
+    // Clean records and preserve existing image URLs
+    const cleanedRecords = records.map((record) => {
+      const releaseId = record.basic_information.id;
+      const existingImageUrl = existingImageMap.get(releaseId);
+
+      // Log if we're missing a cover image
+      if (!record.basic_information.cover_image) {
+        logWarn(
+          `⚠️ No cover image URL for "${record.basic_information.title}" (ID: ${releaseId})`
+        );
+      }
+
+      return {
+        id: releaseId,
+        release_id: releaseId,
+        title: record.basic_information.title || "Unknown Title",
+        artist: record.basic_information.artists?.[0]?.name || "Unknown Artist",
+        image_url: record.basic_information.cover_image || "",
+        // Keep existing image URL if available, otherwise expect .jpeg format
+        supabase_image_url:
+          existingImageUrl || `${SUPABASE_STORAGE_URL}${releaseId}.jpeg`,
+      };
+    });
+
+    // Insert/update records, using id for conflict resolution
     const { error } = await supabase.from(TABLE_NAME).upsert(cleanedRecords, {
-      onConflict: "id", // Use id for conflict resolution
+      onConflict: "id",
     });
 
     if (error) {
@@ -49,6 +75,12 @@ export async function updateSupabaseRecords(records: DiscogsRecord[]) {
     }
 
     logInfo("✅ Supabase update successful!");
+
+    // Log statistics about image status
+    const missingImages = cleanedRecords.filter((r) => !r.image_url).length;
+    if (missingImages > 0) {
+      logWarn(`⚠️ Found ${missingImages} records without Discogs cover images`);
+    }
   } catch (error) {
     logError("❌ Error updating Supabase records:", error);
   }

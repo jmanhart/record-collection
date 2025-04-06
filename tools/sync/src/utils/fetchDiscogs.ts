@@ -134,32 +134,62 @@ export async function fetchDiscogsRecords(): Promise<DiscogsRecord[]> {
     logInfo(`📸 Found ${missingImageRecords.length} records missing images.`);
 
     // Step 4: Process missing images for existing records
-    for (const record of missingImageRecords) {
-      const release = allRecords.find(
-        (r) => r.basic_information.id === record.release_id
+    if (missingImageRecords.length > 0) {
+      logInfo(
+        `🔄 Processing ${missingImageRecords.length} records with missing images...`
       );
-      if (!release) continue;
 
-      const discogsImageUrl = release.basic_information?.cover_image || "";
-      if (!discogsImageUrl) continue;
-
-      const uploadedUrl = await uploadImageToSupabase(
-        discogsImageUrl,
-        record.release_id
-      );
-      if (uploadedUrl) {
-        await supabase
-          .from("records")
-          .update({ supabase_image_url: uploadedUrl })
-          .eq("release_id", record.release_id);
-
-        logInfo(
-          `🖼️ Image was missing for ${release.basic_information.title}. Downloaded & updated in Supabase.`
+      for (const record of missingImageRecords) {
+        const release = allRecords.find(
+          (r) => r.basic_information.id === record.release_id
         );
-      } else {
-        logWarn(
-          `⚠️ Image was missing for ${release.basic_information.title}, but failed to upload.`
-        );
+
+        if (!release) {
+          logWarn(
+            `⚠️ Could not find Discogs data for record ${record.title} (ID: ${record.release_id})`
+          );
+          continue;
+        }
+
+        const discogsImageUrl = release.basic_information?.cover_image;
+        if (!discogsImageUrl) {
+          logWarn(
+            `⚠️ No cover image available for ${record.title} (ID: ${record.release_id})`
+          );
+          continue;
+        }
+
+        try {
+          const uploadedUrl = await uploadImageToSupabase(
+            discogsImageUrl,
+            record.release_id
+          );
+
+          if (uploadedUrl) {
+            const { error: updateError } = await supabase
+              .from("records")
+              .update({ supabase_image_url: uploadedUrl })
+              .eq("release_id", record.release_id);
+
+            if (updateError) {
+              logError(
+                `❌ Failed to update image URL for ${record.title}:`,
+                updateError
+              );
+              continue;
+            }
+
+            logInfo(
+              `✅ Successfully updated image for ${record.title} (ID: ${record.release_id})`
+            );
+          } else {
+            logWarn(
+              `⚠️ Failed to upload image for ${record.title} (ID: ${record.release_id})`
+            );
+          }
+        } catch (error) {
+          logError(`❌ Error processing image for ${record.title}:`, error);
+        }
       }
     }
 
@@ -171,15 +201,25 @@ export async function fetchDiscogsRecords(): Promise<DiscogsRecord[]> {
 
       // First, insert the records
       const recordsToInsert = newRecords
-        .filter((release) => release.basic_information?.id) // Only include records with release_id
+        .filter((release) => {
+          if (!release.basic_information?.id) {
+            logWarn(
+              `⚠️ Skipping record without release_id: ${
+                release.basic_information?.title || "Unknown"
+              }`
+            );
+            return false;
+          }
+          return true;
+        })
         .map((release) => ({
-          id: release.basic_information.id, // Set id to match release_id
+          id: release.basic_information.id,
           release_id: release.basic_information.id,
           title: release.basic_information.title || "Unknown Title",
           artist:
             release.basic_information.artists?.[0]?.name || "Unknown Artist",
           image_url: release.basic_information.cover_image || "",
-          supabase_image_url: null, // Will be updated after image upload
+          supabase_image_url: null,
         }));
 
       if (recordsToInsert.length === 0) {
@@ -192,6 +232,7 @@ export async function fetchDiscogsRecords(): Promise<DiscogsRecord[]> {
       logInfo(
         `📦 Inserting ${recordsToInsert.length} valid records into Supabase...`
       );
+
       const { error: upsertError } = await supabase
         .from("records")
         .upsert(recordsToInsert);
@@ -205,32 +246,48 @@ export async function fetchDiscogsRecords(): Promise<DiscogsRecord[]> {
       // Then, process and upload images for new records
       logInfo("📸 Processing images for new records...");
       for (const release of newRecords) {
-        if (!release.basic_information?.id) continue; // Skip records without release_id
+        if (!release.basic_information?.id) continue;
 
-        const discogsImageUrl = release.basic_information.cover_image || "";
+        const discogsImageUrl = release.basic_information.cover_image;
         if (!discogsImageUrl) {
           logWarn(
-            `⚠️ No image URL found for ${
-              release.basic_information.title || "Unknown Title"
-            }`
+            `⚠️ No image URL found for ${release.basic_information.title} (ID: ${release.basic_information.id})`
           );
           continue;
         }
 
-        const uploadedUrl = await uploadImageToSupabase(
-          discogsImageUrl,
-          release.basic_information.id
-        );
-        if (uploadedUrl) {
-          await supabase
-            .from("records")
-            .update({ supabase_image_url: uploadedUrl })
-            .eq("release_id", release.basic_information.id);
+        try {
+          const uploadedUrl = await uploadImageToSupabase(
+            discogsImageUrl,
+            release.basic_information.id
+          );
 
-          logInfo(`✅ Image uploaded for ${release.basic_information.title}`);
-        } else {
-          logWarn(
-            `⚠️ Failed to upload image for ${release.basic_information.title}`
+          if (uploadedUrl) {
+            const { error: updateError } = await supabase
+              .from("records")
+              .update({ supabase_image_url: uploadedUrl })
+              .eq("release_id", release.basic_information.id);
+
+            if (updateError) {
+              logError(
+                `❌ Failed to update image URL for ${release.basic_information.title}:`,
+                updateError
+              );
+              continue;
+            }
+
+            logInfo(
+              `✅ Image uploaded for ${release.basic_information.title} (ID: ${release.basic_information.id})`
+            );
+          } else {
+            logWarn(
+              `⚠️ Failed to upload image for ${release.basic_information.title} (ID: ${release.basic_information.id})`
+            );
+          }
+        } catch (error) {
+          logError(
+            `❌ Error processing image for ${release.basic_information.title}:`,
+            error
           );
         }
       }
