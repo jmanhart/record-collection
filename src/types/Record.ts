@@ -1,36 +1,17 @@
 export interface Record {
-  id: string;
+  id: number;
   title: string;
   artist: string;
-  releaseYear: number;
-  coverImage: string;
-  genres: string[];
-  styles: string[];
-  format: {
-    name: string;
-    descriptions: string[];
-    quantity: number;
-  };
-  label: string;
-  catalogNumber?: string;
-  listenCount?: number;
-  notes?: string;
-  purchaseInfo?: {
-    location: string;
-    date: string;
-    price?: number;
-  };
-  discogsId?: string;
+  coverImage?: string;
+  supabase_image_url?: string;
   dateAdded: string;
+  format_name?: string;
+  format_descriptions?: string[];
+  format_quantity?: number;
+  genres?: string[];
+  styles?: string[];
+  year?: number;
 }
 
-export type SortField =
-  | "title"
-  | "artist"
-  | "releaseYear"
-  | "dateAdded"
-  | "listenCount"
-  | "format"
-  | "genre";
-
+export type SortField = "dateAdded" | "artist" | "title" | "year";
 export type SortOrder = "asc" | "desc";

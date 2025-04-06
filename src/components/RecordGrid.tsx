@@ -13,9 +13,11 @@ interface RecordGridProps {
 export function RecordGrid({ records, isLoading }: RecordGridProps) {
   const { error } = useRecords();
   const [selectedRecord, setSelectedRecord] = useState<Record | null>(null);
-  const [sortField, setSortField] = useState<SortField>("dateAdded");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
+  const [sortField, setSortField] = useState<SortField>("artist");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFormat, setSelectedFormat] = useState<string>("all");
+  const [selectedGenre, setSelectedGenre] = useState<string>("all");
 
   if (isLoading) {
     return <div className={styles.loading}>Loading records...</div>;
@@ -27,14 +29,31 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
     );
   }
 
-  // Filter records based on search query
+  // Get unique formats and genres
+  const formats = Array.from(new Set(records.map((r) => r.format_name)))
+    .filter(Boolean)
+    .sort();
+  const genres = Array.from(
+    new Set(records.flatMap((r) => r.genres || []))
+  ).sort();
+
+  // Filter records based on search query and categories
   const filteredRecords = records.filter((record) => {
-    if (!searchQuery) return true;
-    const searchLower = searchQuery.toLowerCase();
-    return (
-      record.title.toLowerCase().includes(searchLower) ||
-      record.artist.toLowerCase().includes(searchLower)
-    );
+    // Search filter
+    const matchesSearch =
+      !searchQuery ||
+      record.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      record.artist.toLowerCase().includes(searchQuery.toLowerCase());
+
+    // Format filter
+    const matchesFormat =
+      selectedFormat === "all" || record.format_name === selectedFormat;
+
+    // Genre filter
+    const matchesGenre =
+      selectedGenre === "all" || (record.genres || []).includes(selectedGenre);
+
+    return matchesSearch && matchesFormat && matchesGenre;
   });
 
   // Sort the filtered records
@@ -49,15 +68,6 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
     return aValue < bValue ? -1 * modifier : aValue > bValue ? 1 * modifier : 0;
   });
 
-  const handleSort = (field: SortField) => {
-    if (field === sortField) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortOrder("asc");
-    }
-  };
-
   return (
     <div className={styles.container}>
       <div className={styles.controls}>
@@ -65,14 +75,13 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
           <label>Sort by:</label>
           <select
             value={sortField}
-            onChange={(e) => handleSort(e.target.value as SortField)}
+            onChange={(e) => setSortField(e.target.value as SortField)}
             className={styles.select}
           >
             <option value="dateAdded">Date Added</option>
             <option value="artist">Artist</option>
             <option value="title">Title</option>
-            <option value="releaseYear">Year</option>
-            <option value="listenCount">Listen Count</option>
+            <option value="year">Year</option>
           </select>
           <button
             onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
@@ -82,6 +91,35 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
             {sortOrder === "asc" ? "↑" : "↓"}
           </button>
         </div>
+
+        <div className={styles.filterControls}>
+          <select
+            value={selectedFormat}
+            onChange={(e) => setSelectedFormat(e.target.value)}
+            className={styles.select}
+          >
+            <option value="all">All Formats</option>
+            {formats.map((format) => (
+              <option key={format} value={format}>
+                {format}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={selectedGenre}
+            onChange={(e) => setSelectedGenre(e.target.value)}
+            className={styles.select}
+          >
+            <option value="all">All Genres</option>
+            {genres.map((genre) => (
+              <option key={genre} value={genre}>
+                {genre}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <Search
           value={searchQuery}
           onChange={setSearchQuery}
@@ -101,7 +139,6 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
 
       {selectedRecord && (
         <div className={styles.modal}>
-          {/* We'll implement the record detail modal later */}
           <div className={styles.modalContent}>
             <h2>{selectedRecord.title}</h2>
             <button onClick={() => setSelectedRecord(null)}>Close</button>
