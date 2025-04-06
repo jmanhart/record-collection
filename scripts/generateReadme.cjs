@@ -46,17 +46,6 @@ async function generateReadme() {
     "npm run dev",
     "```",
     "",
-    "Visit `http://localhost:5173` in your browser.",
-    "",
-    "## Environment Variables",
-    "",
-    "Create a `.env` file with your Supabase credentials:",
-    "",
-    "```",
-    "VITE_SUPABASE_URL=your_supabase_project_url",
-    "VITE_SUPABASE_ANON_KEY=your_supabase_anon_key",
-    "```",
-    "",
     "## Collection",
     "",
     `Total Records: ${records.length}`,
@@ -95,8 +84,8 @@ async function generateReadme() {
   const fullContent = sections.join("\n") + "\n";
 
   console.log("Writing to README.md...");
-  console.log("Content length:", fullContent.length);
-  console.log("Number of lines:", fullContent.split("\n").length);
+  console.log(`Content length: ${fullContent.length} bytes`);
+  console.log(`Number of lines: ${fullContent.split("\n").length}`);
 
   try {
     // Use synchronous write
@@ -105,18 +94,6 @@ async function generateReadme() {
       flag: "w",
     });
     console.log("README.md has been updated successfully!");
-
-    // Verify using synchronous read
-    const content = fs.readFileSync(
-      path.join(__dirname, "..", "README.md"),
-      "utf8"
-    );
-    console.log("File size:", content.length, "bytes");
-    console.log("Number of lines in file:", content.split("\n").length);
-    console.log("\nFirst 10 lines:");
-    console.log(content.split("\n").slice(0, 10).join("\n"));
-    console.log("\nLast 10 lines:");
-    console.log(content.split("\n").slice(-10).join("\n"));
   } catch (err) {
     console.error("Error with README:", err);
     throw err;
