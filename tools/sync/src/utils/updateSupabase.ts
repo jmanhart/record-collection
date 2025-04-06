@@ -27,17 +27,21 @@ export async function updateSupabaseRecords(records: DiscogsRecord[]) {
       `📦 Preparing to insert ${records.length} records into Supabase...`
     );
 
-    // ✅ Ensure `supabase_image_url` is correctly formatted
+    // ✅ Ensure `supabase_image_url` is correctly formatted and IDs match
     const cleanedRecords = records.map((record) => ({
-      ...record,
+      id: record.basic_information.id, // Set id to match release_id
+      release_id: record.basic_information.id,
+      title: record.basic_information.title || "Unknown Title",
+      artist: record.basic_information.artists?.[0]?.name || "Unknown Artist",
+      image_url: record.basic_information.cover_image || "",
       supabase_image_url: record.supabase_image_url
-        ? `${SUPABASE_STORAGE_URL}${record.release_id}.jpeg`
-        : null, // Ensure correct formatting
+        ? `${SUPABASE_STORAGE_URL}${record.basic_information.id}.jpeg`
+        : null,
     }));
 
-    // ✅ Insert/update records, avoiding duplicates
+    // ✅ Insert/update records, using id for conflict resolution
     const { error } = await supabase.from(TABLE_NAME).upsert(cleanedRecords, {
-      onConflict: ["release_id"],
+      onConflict: "id", // Use id for conflict resolution
     });
 
     if (error) {
