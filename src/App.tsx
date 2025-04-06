@@ -3,37 +3,34 @@ import { RecordGrid } from "./components/RecordGrid";
 import { useRecords } from "./hooks/useRecords";
 import "./styles/global.css";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+const queryClient = new QueryClient();
 
 function AppContent() {
-  const { records } = useRecords();
+  const { records, isLoading, error } = useRecords();
+
+  if (error) {
+    return <div>Error loading records</div>;
+  }
 
   return (
     <div className="app">
-      <header>
-        <h1>My Record Collection</h1>
-        <p className="record-count">{records.length} records in collection</p>
+      <header className="header">
+        <h1>Record Collection</h1>
+        <p className="record-count">
+          {records?.length || 0} records in collection
+        </p>
       </header>
-      <main>
-        <RecordGrid />
+      <main className="main">
+        <RecordGrid records={records || []} isLoading={isLoading} />
       </main>
     </div>
   );
 }
 
-function App() {
+export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AppContent />
     </QueryClientProvider>
   );
 }
-
-export default App;

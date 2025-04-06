@@ -1,14 +1,21 @@
 import { useState } from "react";
 import { useRecords } from "../hooks/useRecords";
 import { RecordCard } from "./RecordCard";
+import { Search } from "./ui/Search";
 import type { Record, SortField, SortOrder } from "../types/Record";
 import styles from "./RecordGrid.module.css";
 
-export const RecordGrid = () => {
-  const { records, isLoading, error } = useRecords();
+interface RecordGridProps {
+  records: Record[];
+  isLoading: boolean;
+}
+
+export function RecordGrid({ records, isLoading }: RecordGridProps) {
+  const { error } = useRecords();
   const [selectedRecord, setSelectedRecord] = useState<Record | null>(null);
   const [sortField, setSortField] = useState<SortField>("dateAdded");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
+  const [searchQuery, setSearchQuery] = useState("");
 
   if (isLoading) {
     return <div className={styles.loading}>Loading records...</div>;
@@ -20,7 +27,18 @@ export const RecordGrid = () => {
     );
   }
 
-  const sortedRecords = [...records].sort((a, b) => {
+  // Filter records based on search query
+  const filteredRecords = records.filter((record) => {
+    if (!searchQuery) return true;
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      record.title.toLowerCase().includes(searchLower) ||
+      record.artist.toLowerCase().includes(searchLower)
+    );
+  });
+
+  // Sort the filtered records
+  const sortedRecords = [...filteredRecords].sort((a, b) => {
     const aValue = a[sortField];
     const bValue = b[sortField];
     const modifier = sortOrder === "asc" ? 1 : -1;
@@ -59,10 +77,16 @@ export const RecordGrid = () => {
           <button
             onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
             className={styles.sortButton}
+            aria-label="Toggle sort direction"
           >
             {sortOrder === "asc" ? "↑" : "↓"}
           </button>
         </div>
+        <Search
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search by title or artist..."
+        />
       </div>
 
       <div className={styles.grid}>
@@ -86,4 +110,4 @@ export const RecordGrid = () => {
       )}
     </div>
   );
-};
+}

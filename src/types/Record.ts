@@ -5,7 +5,12 @@ export interface Record {
   releaseYear: number;
   coverImage: string;
   genres: string[];
-  format: string;
+  styles: string[];
+  format: {
+    name: string;
+    descriptions: string[];
+    quantity: number;
+  };
   label: string;
   catalogNumber?: string;
   listenCount?: number;
@@ -24,5 +29,8 @@ export type SortField =
   | "artist"
   | "releaseYear"
   | "dateAdded"
-  | "listenCount";
+  | "listenCount"
+  | "format"
+  | "genre";
+
 export type SortOrder = "asc" | "desc";

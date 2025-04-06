@@ -11,6 +11,14 @@ export interface DiscogsRecord {
     title: string;
     artists: Array<{ name: string }>;
     cover_image?: string;
+    formats: Array<{
+      name: string;
+      descriptions?: string[];
+      qty?: string;
+    }>;
+    year?: number;
+    genres?: string[];
+    styles?: string[];
   };
 }
 
@@ -57,6 +65,10 @@ export async function fetchDiscogsRecords(): Promise<DiscogsRecord[]> {
                 title: sampleRecord.basic_information.title,
                 artists: sampleRecord.basic_information.artists,
                 cover_image: sampleRecord.basic_information.cover_image,
+                formats: sampleRecord.basic_information.formats,
+                genres: sampleRecord.basic_information.genres,
+                styles: sampleRecord.basic_information.styles,
+                year: sampleRecord.basic_information.year,
               },
             },
             null,
@@ -68,6 +80,9 @@ export async function fetchDiscogsRecords(): Promise<DiscogsRecord[]> {
         logInfo(`🔍 ID Details for "${sampleRecord.basic_information.title}":
   - Collection Item ID (id): ${sampleRecord.id}
   - Release ID (basic_information.id): ${sampleRecord.basic_information.id}
+  - Format: ${JSON.stringify(sampleRecord.basic_information.formats?.[0] || {})}
+  - Genres: ${JSON.stringify(sampleRecord.basic_information.genres || [])}
+  - Styles: ${JSON.stringify(sampleRecord.basic_information.styles || [])}
 `);
       }
 

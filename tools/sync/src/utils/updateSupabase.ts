@@ -45,6 +45,7 @@ export async function updateSupabaseRecords(records: DiscogsRecord[]) {
     const cleanedRecords = records.map((record) => {
       const releaseId = record.basic_information.id;
       const existingImageUrl = existingImageMap.get(releaseId);
+      const format = record.basic_information.formats?.[0] || {};
 
       // Log if we're missing a cover image
       if (!record.basic_information.cover_image) {
@@ -62,6 +63,12 @@ export async function updateSupabaseRecords(records: DiscogsRecord[]) {
         // Keep existing image URL if available, otherwise expect .jpeg format
         supabase_image_url:
           existingImageUrl || `${SUPABASE_STORAGE_URL}${releaseId}.jpeg`,
+        genres: record.basic_information.genres || [],
+        styles: record.basic_information.styles || [],
+        format_name: format.name || "Unknown",
+        format_descriptions: format.descriptions || [],
+        format_quantity: parseInt(format.qty || "1", 10),
+        year: record.basic_information.year,
       };
     });
 
