@@ -1,0 +1,96 @@
+.card {
+  background-color: var(--card-background);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.imageContainer {
+  position: relative;
+  padding-top: 100%; /* 1:1 Aspect Ratio */
+  background-color: var(--secondary-color);
+}
+
+.image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  font-size: 3rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+.errorIndicator {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  color: #ff4444;
+  font-size: 1.5rem;
+}
+
+.info {
+  padding: 1rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.artist {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+  color: #888;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.year {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.listens {
+  margin: 0.5rem 0 0;
+  font-size: 0.8rem;
+  color: var(--accent-color);
+}
+
+.debug {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  font-family: monospace;
+  word-break: break-all;
+  font-size: 0.75rem;
+  color: #888;
+}
