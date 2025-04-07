@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as Sentry from "@sentry/react";
 import { RecordGrid } from "./components/RecordGrid";
 import { useRecords } from "./hooks/useRecords";
 import "./styles/global.css";
@@ -27,10 +28,15 @@ function AppContent() {
   );
 }
 
+// Keep the error boundary for production error handling
+const SentryErrorBoundary = Sentry.ErrorBoundary;
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AppContent />
+      <SentryErrorBoundary fallback={<div>An error has occurred</div>}>
+        <AppContent />
+      </SentryErrorBoundary>
     </QueryClientProvider>
   );
 }

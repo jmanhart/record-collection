@@ -1,8 +1,19 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as Sentry from "@sentry/react";
 import "./styles/global.css";
 import App from "./App";
+
+// Initialize Sentry
+Sentry.init({
+  dsn: import.meta.env.VITE_SENTRY_DSN,
+  integrations: [],
+  // Performance Monitoring
+  tracesSampleRate: 1.0,
+  // Set to production when deploying
+  environment: import.meta.env.MODE,
+});
 
 const queryClient = new QueryClient({
   defaultOptions: {
