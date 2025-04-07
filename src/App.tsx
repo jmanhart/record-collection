@@ -1,12 +1,14 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as Sentry from "@sentry/react";
 import { RecordGrid } from "./components/RecordGrid";
+import { RecordDetail } from "./components/RecordDetail";
 import { useRecords } from "./hooks/useRecords";
 import "./styles/global.css";
 
 const queryClient = new QueryClient();
 
-function AppContent() {
+function RecordList() {
   const { records, isLoading, error } = useRecords();
 
   if (error) {
@@ -34,9 +36,12 @@ const SentryErrorBoundary = Sentry.ErrorBoundary;
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <SentryErrorBoundary fallback={<div>An error has occurred</div>}>
-        <AppContent />
-      </SentryErrorBoundary>
+      <Router>
+        <Routes>
+          <Route path="/" element={<RecordList />} />
+          <Route path="/records/:id" element={<RecordDetail />} />
+        </Routes>
+      </Router>
     </QueryClientProvider>
   );
 }

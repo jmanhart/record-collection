@@ -1,0 +1,155 @@
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+}
+
+.backLink {
+  display: inline-block;
+  margin-bottom: 2rem;
+  color: var(--text-color);
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+.backLink:hover {
+  text-decoration: underline;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.cover {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.info {
+  padding: 1rem 0;
+}
+
+.info h1 {
+  font-size: 2rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.info h2 {
+  font-size: 1.5rem;
+  margin: 0 0 1rem 0;
+  color: var(--text-muted-color);
+}
+
+.info p {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+}
+
+.article {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.articleHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.articleHeader h3 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.articleControls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.editButton,
+.saveButton,
+.cancelButton {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.editButton {
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+}
+
+.saveButton {
+  background-color: var(--success-color, #22c55e);
+  border: 1px solid var(--success-color, #22c55e);
+  color: white;
+}
+
+.cancelButton {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+}
+
+.editButton:hover {
+  border-color: var(--border-hover-color);
+  background-color: var(--bg-hover-color);
+}
+
+.saveButton:hover {
+  background-color: var(--success-hover-color, #16a34a);
+  border-color: var(--success-hover-color, #16a34a);
+}
+
+.cancelButton:hover {
+  background-color: var(--bg-hover-color);
+}
+
+.error {
+  color: var(--error-color, #ef4444);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--error-color, #ef4444);
+  border-radius: 4px;
+  background-color: var(--error-bg-color, #fee2e2);
+}
+
+.loading {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-muted-color);
+}
+
+.placeholder {
+  color: var(--text-muted-color);
+  font-style: italic;
+}
+
+.markdown {
+  background-color: var(--bg-color);
+  padding: 1rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+@media (max-width: 768px) {
+  .header {
+    grid-template-columns: 1fr;
+  }
+
+  .cover {
+    max-width: 300px;
+    margin: 0 auto;
+  }
+}
