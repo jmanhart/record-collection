@@ -2,7 +2,7 @@ import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { useRecords } from "../hooks/useRecords";
 import { useArticle } from "../hooks/useArticle";
-import MDEditor from "@uiw/react-md-editor";
+import ReactMarkdown from "react-markdown";
 import styles from "./RecordDetail.module.css";
 
 export function RecordDetail() {
@@ -46,16 +46,14 @@ export function RecordDetail() {
 
       {(isLoadingArticle || article) && (
         <div className={styles.article}>
-          <div className={styles.articleHeader}>
-            <h3>Review & Notes</h3>
-          </div>
+          <div className={styles.articleHeader}></div>
 
           {isLoadingArticle ? (
             <div className={styles.loading}>Loading...</div>
           ) : (
             article && (
               <div className={styles.markdown}>
-                <MDEditor.Markdown source={article.content} />
+                <ReactMarkdown>{article.content}</ReactMarkdown>
               </div>
             )
           )}
