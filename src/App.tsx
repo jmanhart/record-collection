@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as Sentry from "@sentry/react";
-import { RecordGrid } from "./components/RecordGrid";
-import { RecordDetail } from "./components/RecordDetail";
+import { RecordGrid } from "./components/RecordGrid/RecordGrid";
+import { RecordDetail } from "./components/RecordDetail/RecordDetail";
 import { useRecords } from "./hooks/useRecords";
 import "./styles/global.css";
 

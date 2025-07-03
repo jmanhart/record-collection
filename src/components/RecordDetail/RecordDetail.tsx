@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams, Link } from "react-router-dom";
-import { useRecords } from "../hooks/useRecords";
-import { useArticle } from "../hooks/useArticle";
+import { useRecords } from "../../hooks/useRecords";
+import { useArticle } from "../../hooks/useArticle";
 import ReactMarkdown from "react-markdown";
 import styles from "./RecordDetail.module.css";
 

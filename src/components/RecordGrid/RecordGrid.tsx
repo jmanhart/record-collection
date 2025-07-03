@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
-import { useRecords } from "../hooks/useRecords";
-import { RecordCard } from "./RecordCard";
-import { Search } from "./ui/Search";
-import type { Record, SortField, SortOrder } from "../types/Record";
+import { RecordCard } from "../RecordCard/RecordCard";
+import { Search } from "../Search/Search";
+import type { Record, SortField, SortOrder } from "../../types/Record";
+import { SortControls } from "./SortControls";
+import { FilterControls } from "./FilterControls";
+import { RecordGridList } from "./RecordGridList";
 import styles from "./RecordGrid.module.css";
 
 interface RecordGridProps {
@@ -11,7 +13,6 @@ interface RecordGridProps {
 }
 
 export function RecordGrid({ records, isLoading }: RecordGridProps) {
-  const { error } = useRecords();
   const [selectedRecord, setSelectedRecord] = useState<Record | null>(null);
   const [sortField, setSortField] = useState<SortField>("artist");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
@@ -60,15 +61,9 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
     return <div className={styles.loading}>Loading records...</div>;
   }
 
-  if (error) {
-    return (
-      <div className={styles.error}>Error loading records: {error.message}</div>
-    );
-  }
-
   // Get unique formats and genres
   const formats = Array.from(new Set(records.map((r) => r.format_name)))
-    .filter(Boolean)
+    .filter((f): f is string => typeof f === "string" && !!f)
     .sort();
   const genres = Array.from(
     new Set(records.flatMap((r) => r.genres || []))
@@ -109,38 +104,25 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
     <div className={styles.container}>
       <div className={styles.controls}>
         <div className={styles.sortControls}>
-          <select
-            value={sortField}
-            onChange={(e) => setSortField(e.target.value as SortField)}
-            className={styles.select}
-          >
-            <option value="dateAdded">Date Added</option>
-            <option value="artist">Artist</option>
-            <option value="title">Title</option>
-            <option value="year">Year</option>
-          </select>
-          <button
-            onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-            className={styles.sortButton}
-            aria-label="Toggle sort direction"
-          >
-            {sortOrder === "asc" ? "↑" : "↓"}
-          </button>
+          <SortControls
+            sortField={sortField}
+            sortOrder={sortOrder}
+            onSortFieldChange={(field) => setSortField(field as SortField)}
+            onSortOrderToggle={() =>
+              setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+            }
+          />
         </div>
 
         <div className={styles.filterControls}>
-          <select
-            value={selectedGenre}
-            onChange={(e) => handleGenreChange(e.target.value)}
-            className={styles.select}
-          >
-            <option value="all">All Genres</option>
-            {genres.map((genre) => (
-              <option key={genre} value={genre}>
-                {genre}
-              </option>
-            ))}
-          </select>
+          <FilterControls
+            formats={formats}
+            genres={genres}
+            selectedFormat={selectedFormat}
+            selectedGenre={selectedGenre}
+            onFormatChange={handleFormatChange}
+            onGenreChange={handleGenreChange}
+          />
         </div>
 
         <Search
@@ -151,13 +133,7 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
       </div>
 
       <div className={styles.grid}>
-        {sortedRecords.map((record) => (
-          <RecordCard
-            key={record.id}
-            record={record}
-            onSelect={setSelectedRecord}
-          />
-        ))}
+        <RecordGridList records={sortedRecords} />
       </div>
 
       {selectedRecord && (
