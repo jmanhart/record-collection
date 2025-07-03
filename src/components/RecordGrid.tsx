@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRecords } from "../hooks/useRecords";
 import { RecordCard } from "./RecordCard";
 import { Search } from "./ui/Search";
@@ -18,6 +18,43 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFormat, setSelectedFormat] = useState<string>("all");
   const [selectedGenre, setSelectedGenre] = useState<string>("all");
+
+  // Sync searchQuery with URL on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get("search") || "";
+    const format = params.get("format") || "all";
+    const genre = params.get("genre") || "all";
+    setSearchQuery(query);
+    setSelectedFormat(format);
+    setSelectedGenre(genre);
+  }, []);
+
+  const updateURL = (search: string, format: string, genre: string) => {
+    const params = new URLSearchParams(window.location.search);
+    if (search) params.set("search", search);
+    else params.delete("search");
+    if (format && format !== "all") params.set("format", format);
+    else params.delete("format");
+    if (genre && genre !== "all") params.set("genre", genre);
+    else params.delete("genre");
+    window.history.replaceState(null, "", "?" + params.toString());
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    updateURL(value, selectedFormat, selectedGenre);
+  };
+
+  const handleFormatChange = (value: string) => {
+    setSelectedFormat(value);
+    updateURL(searchQuery, value, selectedGenre);
+  };
+
+  const handleGenreChange = (value: string) => {
+    setSelectedGenre(value);
+    updateURL(searchQuery, selectedFormat, value);
+  };
 
   if (isLoading) {
     return <div className={styles.loading}>Loading records...</div>;
@@ -72,7 +109,6 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
     <div className={styles.container}>
       <div className={styles.controls}>
         <div className={styles.sortControls}>
-          <label>Sort by:</label>
           <select
             value={sortField}
             onChange={(e) => setSortField(e.target.value as SortField)}
@@ -94,21 +130,8 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
 
         <div className={styles.filterControls}>
           <select
-            value={selectedFormat}
-            onChange={(e) => setSelectedFormat(e.target.value)}
-            className={styles.select}
-          >
-            <option value="all">All Formats</option>
-            {formats.map((format) => (
-              <option key={format} value={format}>
-                {format}
-              </option>
-            ))}
-          </select>
-
-          <select
             value={selectedGenre}
-            onChange={(e) => setSelectedGenre(e.target.value)}
+            onChange={(e) => handleGenreChange(e.target.value)}
             className={styles.select}
           >
             <option value="all">All Genres</option>
@@ -122,7 +145,7 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
 
         <Search
           value={searchQuery}
-          onChange={setSearchQuery}
+          onChange={handleSearchChange}
           placeholder="Search by title or artist..."
         />
       </div>
