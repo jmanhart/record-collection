@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as Sentry from "@sentry/react";
 import { RecordGrid } from "./components/RecordGrid/RecordGrid";
 import { RecordDetail } from "./components/RecordDetail/RecordDetail";
+import { Testing } from "./components/Testing/Testing";
 import { useRecords } from "./hooks/useRecords";
 import "./styles/global.css";
 
@@ -40,6 +41,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<RecordList />} />
           <Route path="/records/:id" element={<RecordDetail />} />
+          <Route path="/testing" element={<Testing />} />
         </Routes>
       </Router>
     </QueryClientProvider>
