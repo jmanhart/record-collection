@@ -5,6 +5,7 @@ import { RecordGrid } from "./components/RecordGrid/RecordGrid";
 import { RecordDetail } from "./components/RecordDetail/RecordDetail";
 import { Testing } from "./components/Testing/Testing";
 import { ThemeToggle } from "./components/ThemeToggle/ThemeToggle";
+import { AlphabetIndicator } from "./components/AlphabetIndicator/AlphabetIndicator";
 import { useRecords } from "./hooks/useRecords";
 import "./App.css";
 
@@ -19,6 +20,7 @@ function RecordList() {
 
   return (
     <div className="app">
+      <AlphabetIndicator records={records || []} />
       <div className="container">
         <header className="page-header">
           <h2>My Record Collection</h2>

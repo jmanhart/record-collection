@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { type Record } from "../types/Record";
+import { type Record } from "../../types/Record";
 import styles from "./RecordCard.module.css";
 
 interface RecordCardProps {
@@ -12,7 +12,11 @@ export const RecordCard = ({ record }: RecordCardProps) => {
   const [showDebug, setShowDebug] = useState(false);
 
   return (
-    <Link to={`/records/${record.id}`} className={styles.cardLink}>
+    <Link 
+      to={`/records/${record.id}`} 
+      className={styles.cardLink}
+      data-artist-letter={record.artist.charAt(0).toUpperCase()}
+    >
       <div
         className={styles.card}
         onDoubleClick={(e) => {
