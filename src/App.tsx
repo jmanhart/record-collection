@@ -4,8 +4,9 @@ import * as Sentry from "@sentry/react";
 import { RecordGrid } from "./components/RecordGrid/RecordGrid";
 import { RecordDetail } from "./components/RecordDetail/RecordDetail";
 import { Testing } from "./components/Testing/Testing";
+import { SiteHeader } from "./components/Header/SiteHeader";
 import { useRecords } from "./hooks/useRecords";
-import "./styles/global.css";
+import "./App.css";
 
 const queryClient = new QueryClient();
 
@@ -18,11 +19,11 @@ function RecordList() {
 
   return (
     <div className="app">
-      <header className="header">
+      <header className="page-header">
         <h1>Record Collection</h1>
-        <p className="record-count">
+        <h3 className="record-count">
           {records?.length || 0} records in collection
-        </p>
+        </h3>
       </header>
       <main className="main">
         <RecordGrid records={records || []} isLoading={isLoading} />
@@ -38,6 +39,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
+        {/* <SiteHeader mainSiteUrl="https://johnmanhart.com" /> */}
         <Routes>
           <Route path="/" element={<RecordList />} />
           <Route path="/records/:id" element={<RecordDetail />} />

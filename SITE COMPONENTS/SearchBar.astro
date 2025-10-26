@@ -1,0 +1,201 @@
+---
+export let onSearch;
+---
+
+<div class="search-bar autocomplete-container">
+  <input
+    type="text"
+    id="searchInput"
+    placeholder="Search by artist or album title"
+    autocomplete="off"
+  />
+  <div id="autocomplete-list" class="autocomplete-list"></div>
+</div>
+
+<script>
+  console.log("SearchBar component loaded");
+
+  let autocompleteSuggestions = [];
+  let selectedIndex = -1;
+  const maxSuggestions = 10;
+
+  const searchInput = document.getElementById("searchInput");
+  const autocompleteList = document.getElementById("autocomplete-list");
+
+  if (!searchInput || !autocompleteList) {
+    console.error("Search input or autocomplete list not found");
+  } else {
+    // Debounce function to limit search frequency
+    function debounce(func, delay) {
+      let timeout;
+      return (...args) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func(...args), delay);
+      };
+    }
+
+    function handleSearch() {
+      console.log("Searching...");
+      const searchInputValue = searchInput.value.toLowerCase();
+      const collectionDataElement = document.getElementById("collection-data");
+
+      if (!collectionDataElement) {
+        console.error("Element with ID 'collection-data' not found");
+        return;
+      }
+
+      const records = JSON.parse(collectionDataElement.textContent);
+
+      const filteredCollection = records.filter((record) => {
+        return (
+          record.artist.toLowerCase().includes(searchInputValue) ||
+          record.title.toLowerCase().includes(searchInputValue)
+        );
+      });
+
+      autocompleteSuggestions = Array.from(
+        new Set(
+          records
+            .map((record) => record.artist)
+            .filter((artist) => artist.toLowerCase().includes(searchInputValue))
+        )
+      ).slice(0, maxSuggestions);
+
+      selectedIndex = -1;
+      updateAutocomplete();
+      window.dispatchEvent(new CustomEvent("updateList", { detail: filteredCollection }));
+    }
+
+    function updateAutocomplete() {
+      autocompleteList.innerHTML = "";
+
+      autocompleteSuggestions.forEach((suggestion, index) => {
+        const item = document.createElement("div");
+        item.classList.add("autocomplete-item");
+        if (index === selectedIndex) item.classList.add("selected");
+        item.textContent = suggestion;
+
+        item.onclick = () => selectSuggestion(suggestion);
+        item.onmouseover = () => highlightItem(index);
+        autocompleteList.appendChild(item);
+      });
+
+      autocompleteList.style.display = autocompleteSuggestions.length ? "block" : "none";
+      console.log("Autocomplete updated:", autocompleteSuggestions);
+    }
+
+    function selectSuggestion(suggestion) {
+      searchInput.value = suggestion;
+      searchInput.focus();
+      closeAutocomplete();
+      handleSearch();
+      console.log(`Selected: ${suggestion}`);
+    }
+
+    function highlightItem(index) {
+      selectedIndex = index;
+      updateAutocomplete();
+    }
+
+    function closeAutocomplete() {
+      autocompleteList.style.display = "none";
+      console.log("Autocomplete closed");
+    }
+
+    function handleKeyDown(event) {
+      const listLength = autocompleteSuggestions.length;
+
+      if (listLength > 0) {
+        if (event.key === "ArrowDown") {
+          selectedIndex = (selectedIndex + 1) % listLength;
+          updateAutocomplete();
+          event.preventDefault();
+        } else if (event.key === "ArrowUp") {
+          selectedIndex = (selectedIndex - 1 + listLength) % listLength;
+          updateAutocomplete();
+          event.preventDefault();
+        } else if (event.key === "Enter") {
+          if (selectedIndex >= 0) {
+            selectSuggestion(autocompleteSuggestions[selectedIndex]);
+          }
+          closeAutocomplete();
+          event.preventDefault();
+        }
+      }
+    }
+
+    function handleDocumentClick(event) {
+      if (!event.target.closest(".autocomplete-container")) {
+        closeAutocomplete();
+      }
+    }
+
+    // Event listeners (with debouncing for input)
+    searchInput.addEventListener("input", debounce(handleSearch, 200));
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("click", handleDocumentClick);
+
+    // Cleanup event listeners when the component is removed
+    window.addEventListener("unload", () => {
+      searchInput.removeEventListener("input", handleSearch);
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("click", handleDocumentClick);
+    });
+  }
+</script>
+
+<style>
+  :global(.search-bar) {
+    position: relative;
+    margin-bottom: 15px;
+  }
+
+  :global(input) {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+  }
+
+  :global(input:focus) {
+    border-color: #007bff;
+    outline: none;
+  }
+
+  :global(.autocomplete-list) {
+    position: absolute;
+    background: white;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 10;
+  }
+
+  :global(.autocomplete-item) {
+    padding: 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+    transition: background-color 0.2s;
+    color: #333;
+  }
+
+  :global(.autocomplete-item:last-child) {
+    border-bottom: none;
+  }
+
+  :global(.autocomplete-item:hover),
+  :global(.autocomplete-item.selected) {
+    background-color: #007bff;
+    color: white;
+  }
+
+  @media (hover: none) {
+    :global(.autocomplete-item) {
+      padding: 16px;
+      font-size: 16px;
+    }
+  }
+</style>

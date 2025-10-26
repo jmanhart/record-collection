@@ -61,13 +61,26 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
     return <div className={styles.loading}>Loading records...</div>;
   }
 
-  // Get unique formats and genres
+  // Get unique formats and genres with counts
   const formats = Array.from(new Set(records.map((r) => r.format_name)))
     .filter((f): f is string => typeof f === "string" && !!f)
     .sort();
   const genres = Array.from(
     new Set(records.flatMap((r) => r.genres || []))
   ).sort();
+
+  // Calculate counts for formats and genres
+  const formatCounts: Record<string, number> = {};
+  const genreCounts: Record<string, number> = {};
+  
+  records.forEach((record) => {
+    if (record.format_name) {
+      formatCounts[record.format_name] = (formatCounts[record.format_name] || 0) + 1;
+    }
+    (record.genres || []).forEach((genre) => {
+      genreCounts[genre] = (genreCounts[genre] || 0) + 1;
+    });
+  });
 
   // Filter records based on search query and categories
   const filteredRecords = records.filter((record) => {
@@ -103,32 +116,30 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
   return (
     <div className={styles.container}>
       <div className={styles.controls}>
-        <div className={styles.sortControls}>
-          <SortControls
-            sortField={sortField}
-            sortOrder={sortOrder}
-            onSortFieldChange={(field) => setSortField(field as SortField)}
-            onSortOrderToggle={() =>
-              setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-            }
-          />
-        </div>
-
-        <div className={styles.filterControls}>
-          <FilterControls
-            formats={formats}
-            genres={genres}
-            selectedFormat={selectedFormat}
-            selectedGenre={selectedGenre}
-            onFormatChange={handleFormatChange}
-            onGenreChange={handleGenreChange}
-          />
-        </div>
-
+        <SortControls
+          sortField={sortField}
+          sortOrder={sortOrder}
+          onSortFieldChange={(field) => setSortField(field as SortField)}
+          onSortOrderToggle={() =>
+            setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+          }
+        />
+        
         <Search
           value={searchQuery}
           onChange={handleSearchChange}
           placeholder="Search by title or artist..."
+        />
+
+        <FilterControls
+          formats={formats}
+          genres={genres}
+          selectedFormat={selectedFormat}
+          selectedGenre={selectedGenre}
+          onFormatChange={handleFormatChange}
+          onGenreChange={handleGenreChange}
+          formatCounts={formatCounts}
+          genreCounts={genreCounts}
         />
       </div>
 

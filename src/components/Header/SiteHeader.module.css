@@ -1,0 +1,188 @@
+/* Header styling - full width edge to edge */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  min-height: 65px;
+  z-index: 1000;
+  background-color: var(--surface000);
+  border-bottom: 1px solid var(--divider);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1em;
+  box-sizing: border-box;
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .nav {
+    padding: 0.75em;
+  }
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  width: 100%;
+  justify-content: flex-end;
+}
+
+/* Menu styles */
+.menu {
+  display: flex;
+  gap: 1em;
+  align-items: center;
+}
+
+.menuLink {
+  color: var(--link);
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.2s ease;
+}
+
+.menuLink:hover {
+  color: var(--link-hover);
+}
+
+/* Theme toggle button */
+.themeToggle {
+  position: relative;
+  height: 1.5em;
+  width: 1.5em;
+  cursor: pointer;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.themeToggle svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.2s ease;
+}
+
+/* Show/hide icons based on theme */
+.themeToggle svg:first-child {
+  /* Moon icon */
+  opacity: 0;
+  visibility: hidden;
+}
+
+.themeToggle svg:last-child {
+  /* Sun icon */
+  opacity: 1;
+  visibility: visible;
+}
+
+.dark-theme .themeToggle svg:first-child {
+  /* Moon icon in dark mode */
+  opacity: 1;
+  visibility: visible;
+}
+
+.dark-theme .themeToggle svg:last-child {
+  /* Sun icon in dark mode */
+  opacity: 0;
+  visibility: hidden;
+}
+
+:global(body.dark-theme) .themeToggle svg:first-child {
+  /* Moon icon in dark mode */
+  opacity: 1;
+  visibility: visible;
+}
+
+:global(body.dark-theme) .themeToggle svg:last-child {
+  /* Sun icon in dark mode */
+  opacity: 0;
+  visibility: hidden;
+}
+
+.themeToggle:hover {
+  background-color: transparent !important;
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
+}
+
+/* Mobile menu toggle */
+.overflowMenuToggle {
+  display: none;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .menu {
+    position: absolute;
+    top: 3em;
+    right: 4em;
+    background-color: var(--surface100);
+    border: 1px solid var(--divider);
+    border-radius: 0.5em;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 0.75em;
+    min-width: 180px;
+    display: none;
+    flex-direction: column;
+    gap: 0.5em;
+    z-index: 9999;
+  }
+
+  .menu.open {
+    display: flex;
+  }
+
+  .menuLink {
+    padding: 0.75em 1em;
+    border-radius: 0.25em;
+    text-decoration: none;
+    color: var(--text-primary);
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    font-size: 1.1em;
+  }
+
+  .menuLink:hover {
+    background-color: var(--surface200);
+    transform: translateX(2px);
+  }
+
+  .overflowMenuToggle {
+    display: flex;
+    background: none;
+    border: none;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+    padding: 0;
+    height: 32px;
+    width: 32px;
+  }
+
+  .overflowMenuToggle:hover {
+    background-color: transparent !important;
+    transform: scale(1.1);
+  }
+
+  .overflowMenuToggle svg {
+    width: 32px;
+    height: 32px;
+  }
+}
+

@@ -1,68 +1,285 @@
+/* ===========================================
+ *  GLOBAL THEME SETUP (Light Mode by Default)
+ * =========================================== */
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* Light Mode Colors */
+  --surface000: #ffffff; /* Background */
+  --surface100: #ededed; /* Background */
+  --surface200: #eeeeee; /* Secondary background */
+  --surface300: #e9e8e8; /* Tertiary background */
+  --surface400: #c4c4c4; /* Quaternary background */
+
+  --text-primary: #222222; /* Main text */
+  --text-secondary: #4c4c4c; /* Secondary text */
+  --text-tertiary: #7c7c7c; /* Tertiary text */
+
+  --inverse: #000000;
+
+  --white: #ffffff;
+
+  --divider: #d1d1d1; /* Borders & dividers */
+  --link: #444444; /* Default link color */
+  --link-hover: #000000; /* Link hover color */
+
+  --card-bg: #f8f8f8;
+  --card-bg-hover: #eaeaea;
+  --card-text: #222;
+  --card-shadow: 0 0 1px rgba(0, 0, 0, 0.04);
+  --card-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.08);
+
+  --red100: #c60202;
+  --red200: #ff8484;
+  --red300: #ffb3b3;
+
+  /* Legacy variable mappings for compatibility */
+  --bg-color: var(--surface200);
+  --bg-hover-color: var(--surface300);
+  --text-color: var(--text-primary);
+  --text-muted-color: var(--text-tertiary);
+  --border-color: var(--divider);
+  --border-hover-color: var(--text-secondary);
+  --error-color: var(--red100);
+  --accent-color: var(--red200);
+}
+
+/* ===========================================
+ *  DARK MODE SETUP
+ *  Applied when `.dark-theme` is on <body>
+ * =========================================== */
+
+.dark-theme {
+  --surface000: #000000;
+  --surface100: #171717;
+  --surface200: #221b28;
+  --surface300: #29232f;
+  --surface400: #4e3f58;
+
+  --text-primary: #ededed;
+  --text-secondary: #b3b3b3;
+  --text-tertiary: #747474;
+
+  --inverse: #ffffff;
+  --divider: #444444;
+  --link: #d1d1d1;
+  --link-hover: #ffffff;
+
+  --card-bg: #23272f;
+  --card-bg-hover: #2c313a;
+  --card-text: #f3f3f3;
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --card-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.6);
+
+  --red100: #c60202;
+  --red200: #ff8484;
+  --red300: #ffb3b3;
+}
+
+/* ===========================================
+ *  GLOBAL BASE STYLES
+ * =========================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  background-color: var(--surface000);
+  color: var(--text-primary);
+  font-family: "Work Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  margin: 0;
+  width: 100%;
+  min-height: 100vh;
+  text-align: left;
+  overflow-wrap: break-word;
   line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+/* ===========================================
+ *  TYPOGRAPHY
+ * =========================================== */
 
-body {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  padding: 0;
 }
 
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  color: var(--text-primary);
+  font-size: 3rem;
+  font-weight: 400;
 }
+h2 {
+  color: var(--text-secondary);
+  font-size: 2rem;
+  font-weight: 400;
+  line-height: 3rem;
+}
+h3 {
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 2rem;
+}
+h4 {
+  color: var(--text-tertiary);
+  font-size: 1.2rem;
+  font-weight: 400;
+  line-height: 2rem;
+}
+h5 {
+  color: var(--text-tertiary);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 2rem;
+}
+h6 {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 2rem;
+}
+
+p {
+  color: var(--text-tertiary);
+  font-size: 1.2rem;
+  font-weight: 400;
+  line-height: 1.75rem;
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2.25rem;
+  }
+  h2 {
+    font-size: 1.5rem;
+    line-height: 2.25rem;
+  }
+  h3 {
+    font-size: 1.25rem;
+  }
+  h4 {
+    font-size: 1.125rem;
+    line-height: 1.95rem;
+  }
+  h5 {
+    font-size: 0.9rem;
+  }
+  h6 {
+    font-size: 1rem;
+  }
+  p {
+    font-size: 1rem;
+  }
+}
+
+/* ===========================================
+ *  LINKS & LISTS
+ * =========================================== */
+
+a {
+  color: var(--link);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--link-hover);
+}
+
+ul,
+ol {
+  padding: 0 0;
+  color: var(--text-tertiary);
+  list-style-position: inside;
+}
+
+ul li,
+ol li {
+  font-size: 1.2rem;
+  color: var(--text-tertiary);
+  padding-left: 1.25em;
+  text-indent: -1.25em;
+}
+
+ul li:hover {
+  border-color: var(--divider);
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--divider);
+  height: 0;
+  margin: 2em 0;
+}
+
+blockquote {
+  border-left: 4px solid var(--divider);
+  padding: 0.125em 1em;
+  margin: 0.5em 0;
+}
+
+blockquote p {
+  margin: 0.125em 0;
+  font-style: italic;
+  font-weight: 600;
+}
+
+/* ===========================================
+ *  IMAGES & MEDIA
+ * =========================================== */
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ===========================================
+ *  BUTTONS
+ * =========================================== */
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+  color: inherit;
+  background: none;
+  font-size: 100%;
+  border: 0;
+  height: 2rem;
+  width: 2rem;
+  border-radius: 32px;
+  box-sizing: border-box;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  font-family: inherit;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+button:hover {
+  background-color: var(--surface300);
+}
+
+button:focus,
+button:active {
+  background-color: transparent;
+  outline: none;
+}
+
+/* ===========================================
+ *  SELECTION STYLING
+ * =========================================== */
+
+::selection {
+  background-color: var(--divider);
+  color: var(--text-primary);
 }

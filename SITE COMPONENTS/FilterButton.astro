@@ -1,0 +1,158 @@
+---
+export interface Props {
+  options: string[];
+  defaultOption?: string;
+  onFilterChange?: (selectedOption: string) => void;
+  postCounts?: Record<string, number>;
+}
+
+const { options, defaultOption = "All", onFilterChange, postCounts = {} } = Astro.props;
+const allOptions = [defaultOption, ...options];
+---
+
+<div class="filter-container">
+  <div class="filter-pills">
+    {allOptions.map((option: string) => {
+      const count = option === defaultOption 
+        ? Object.values(postCounts).reduce((sum, count) => sum + count, 0)
+        : postCounts[option] || 0;
+      
+      return (
+        <button 
+          class={`filter-pill ${option === defaultOption ? 'active' : ''}`}
+          data-value={option}
+          type="button"
+        >
+          <span class="filter-pill-text">{option}</span>
+          <span class="filter-pill-count">({count})</span>
+        </button>
+      );
+    })}
+  </div>
+</div>
+
+<script>
+  // Use event delegation for more reliable event handling
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    
+    // Check if the clicked element is a filter pill or inside one
+    const filterPill = target.closest('.filter-pill') as HTMLButtonElement;
+    
+    if (!filterPill) return;
+    
+    const selectedValue = filterPill.getAttribute('data-value');
+    
+    if (!selectedValue) return;
+    
+    // Remove active class from all pills
+    const allPills = document.querySelectorAll('.filter-pill');
+    allPills.forEach(p => p.classList.remove('active'));
+    
+    // Add active class to clicked pill
+    filterPill.classList.add('active');
+    
+    // Debug: log to console to verify the class is being added
+    console.log('Active pill:', filterPill, 'Has active class:', filterPill.classList.contains('active'));
+    
+    // Dispatch custom event for parent components to listen to
+    const filterEvent = new CustomEvent('filterChange', {
+      detail: { selectedOption: selectedValue }
+    });
+    
+    document.dispatchEvent(filterEvent);
+  });
+</script>
+
+<style lang="scss">
+  @import "../styles/_mixins.scss";
+
+  .filter-container {
+    margin-bottom: 1.5rem;
+  }
+  
+  .filter-pills {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .filter-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--divider);
+    border-radius: 4px;
+    padding: 0.375rem 0.75rem;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    // transition: all 0.2s ease;
+    white-space: nowrap;
+    text-decoration: none;
+    box-sizing: border-box;
+    font-family: inherit;
+    line-height: 1;
+    min-width: fit-content;
+  }
+  
+  .filter-pill:hover {
+    // background: var(--surface100);
+    color: var(--text-primary);
+    border-color: var(--text-tertiary);
+    // box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .filter-container button.filter-pill.active {
+    background: var(--surface200) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--divider) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  /* Override any global form field styles that might affect our buttons */
+  .filter-container button.filter-pill {
+    background: transparent !important;
+    cursor: pointer !important;
+  }
+  
+  .filter-container button.filter-pill:hover {
+    background: var(--surface100) !important;
+  }
+  
+  .filter-pill:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--link);
+  }
+  
+  .filter-pill:active {
+    transform: translateY(1px);
+  }
+  
+  .filter-pill-text {
+    margin-right: 0.25rem;
+  }
+  
+  .filter-pill-count {
+    color: var(--text-tertiary);
+    font-size: 11px;
+    font-weight: 400;
+  }
+  
+  .filter-pill.active .filter-pill-count {
+    color: var(--text-secondary);
+  }
+  
+  /* Dark mode adjustments */
+  .dark-theme .filter-pill {
+    &:hover {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    &.active {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+  }
+</style>

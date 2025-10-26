@@ -1,61 +1,108 @@
 .container {
+  max-width: 1280px;
+  margin: 0 auto;
   padding: 2rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .controls {
   display: flex;
-  gap: 1rem;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
   margin-bottom: 2rem;
-  align-items: center;
-  flex-wrap: wrap;
 }
 
-.sortControls,
-.filterControls {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
+/* Make search input fill available space */
+.controls > :nth-child(3) {
+  flex: 1;
+  min-width: 200px;
 }
 
-.sortControls label {
-  color: var(--text-color);
-  font-size: 14px;
+/* Genre select fixed width */
+.genreSelect {
+  min-width: 180px;
+  max-width: 200px;
+}
+
+/* Filter Pills */
+.sortPill {
   white-space: nowrap;
+  height: 40px;
 }
 
-.select {
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-  border: 1px solid var(--border-color);
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  font-size: 0.875rem;
-  min-width: 120px;
-}
-
-.select:hover {
-  border-color: var(--border-hover-color);
-}
-
-.select:focus {
-  outline: none;
-  border-color: var(--border-focus-color);
-  box-shadow: 0 0 0 1px var(--border-focus-color);
-}
-
-.sortButton {
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.375rem;
-  border: 1px solid var(--border-color);
-  background-color: var(--bg-color);
-  color: var(--text-color);
+.filterPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--divider);
+  border-radius: 4px;
+  padding: 0.375rem 0.75rem;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
   cursor: pointer;
-  font-size: 0.875rem;
+  white-space: nowrap;
+  text-decoration: none;
+  box-sizing: border-box;
+  font-family: inherit;
+  line-height: 1;
+  min-width: fit-content;
+  transition: all 0.2s ease;
 }
 
-.sortButton:hover {
-  border-color: var(--border-hover-color);
-  background-color: var(--bg-hover-color);
+.filterPill:hover {
+  color: var(--text-primary);
+  border-color: var(--text-tertiary);
+  background: var(--surface100);
+}
+
+.filterPill.active {
+  background: var(--surface200) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--divider) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.filterPill:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--link);
+}
+
+.filterPill:active {
+  transform: translateY(1px);
+}
+
+.filterPillText {
+  margin-right: 0.25rem;
+}
+
+.filterPillCount {
+  color: var(--text-tertiary);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.filterPill.active .filterPillCount {
+  color: var(--text-secondary);
+}
+
+.sortArrow {
+  margin-left: 0.25rem;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Dark mode adjustments */
+:global(.dark-theme) .filterPill:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+:global(.dark-theme) .filterPill.active {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
 }
 
 .grid {
@@ -67,13 +114,13 @@
 .loading {
   text-align: center;
   padding: 2rem;
-  color: var(--text-muted-color);
+  color: var(--text-tertiary);
 }
 
 .error {
   text-align: center;
   padding: 2rem;
-  color: var(--error-color);
+  color: var(--red100);
 }
 
 .modal {
@@ -90,27 +137,44 @@
 }
 
 .modalContent {
-  background: var(--primary-color);
+  background: var(--surface100);
   padding: 24px;
   border-radius: 8px;
   max-width: 500px;
   width: 90%;
-  border: 1px solid var(--border-color);
-  color: var(--text-color);
+  border: 1px solid var(--divider);
+  color: var(--text-primary);
 }
 
-@media (max-width: 768px) {
+/* Responsive layout */
+@media (max-width: 968px) {
+  .container {
+    padding: 1rem;
+  }
+
   .controls {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .sortControls,
-  .filterControls {
     flex-wrap: wrap;
+    gap: 0.5rem;
   }
 
+  .controls > :nth-child(3) {
+    flex: 1 1 100%;
+    min-width: 100%;
+    order: 3;
+  }
+
+  .genreSelect {
+    min-width: 140px;
+  }
+
+  .sortPill {
+    font-size: 12px;
+    padding: 0.3rem 0.6rem;
+    height: 36px;
+  }
+
+  .searchInput,
   .select {
-    flex: 1;
+    height: 36px;
   }
 }

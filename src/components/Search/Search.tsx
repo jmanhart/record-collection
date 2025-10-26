@@ -14,7 +14,7 @@ export function Search({
 }: SearchProps) {
   return (
     <div className={styles.searchContainer}>
-      <SearchIcon className={styles.searchIcon} size={18} />
+     
       <input
         type="text"
         value={value}

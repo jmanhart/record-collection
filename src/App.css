@@ -1,42 +1,58 @@
 #root {
+  padding: 0;
+  min-height: 100vh;
+  background-color: var(--surface000);
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-top: 65px; /* Space for fixed header */
+}
+
+/* Page header - aligned with container */
+.page-header {
+  width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  padding: 2rem 2rem 1.5rem;
+  box-sizing: border-box;
+  background-color: var(--surface000);
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.page-header h1 {
+  /* Using h1 styles from index.css */
+  font-size: 3rem;
+  font-weight: 400;
+  margin: 0 0 0.5rem;
+  color: var(--text-primary);
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.record-count {
+  /* Using h3 styles from index.css */
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 2rem;
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.main {
+  flex: 1;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    padding: 1.5rem 1rem 1rem;
   }
-  to {
-    transform: rotate(360deg);
+  
+  .page-header h1 {
+    font-size: 2.25rem;
   }
-}
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  .record-count {
+    font-size: 1.25rem;
   }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }

@@ -1,0 +1,51 @@
+---
+import "../styles/global.scss";
+
+const { pathname } = Astro.url;
+const hideOnPaths = ['/']; // Paths where the button should be hidden
+const shouldHideButton = hideOnPaths.includes(pathname);
+
+function truncateMiddle(str: string, maxLength = 24) {
+  if (str.length <= maxLength) return str;
+  const keep = Math.floor((maxLength - 1) / 2);
+  return str.slice(0, keep) + '…' + str.slice(-keep);
+}
+
+const prettyPath = pathname.replace(/^\/+/g, "").replace(/\/+$/g, "").split("/").join(" / ");
+const truncatedPath = truncateMiddle(prettyPath, 400); // Adjust 24 as needed
+---
+
+{!shouldHideButton && (
+    <div class="breadcrumb" onclick="window.history.back()">       
+        <span class="pretty-path">{truncatedPath}</span>
+    </div>
+)}
+
+
+
+<style>
+    .breadcrumb {
+        position: fixed;
+        top: 0;
+        left: 4em;
+        padding: 1.25em 0em;
+    }
+    .styled-pathname {
+        font-size: 1em;
+        font-family: monospace;
+        letter-spacing: 0.05em;
+    }
+    .pretty-path {
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 600px; /* Default for larger screens */
+    }
+
+    @media (max-width: 600px) {
+        .pretty-path {
+            max-width: 80px; /* Truncate more on small screens */
+        }
+    }
+</style>

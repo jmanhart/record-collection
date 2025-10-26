@@ -1,4 +1,5 @@
 import React from "react";
+import { Select } from "../common/Select";
 import styles from "./RecordGrid.module.css";
 
 interface FilterControlsProps {
@@ -8,6 +9,8 @@ interface FilterControlsProps {
   selectedGenre: string;
   onFormatChange: (format: string) => void;
   onGenreChange: (genre: string) => void;
+  formatCounts?: Record<string, number>;
+  genreCounts?: Record<string, number>;
 }
 
 export function FilterControls({
@@ -17,33 +20,27 @@ export function FilterControls({
   selectedGenre,
   onFormatChange,
   onGenreChange,
+  formatCounts = {},
+  genreCounts = {},
 }: FilterControlsProps) {
+  // Create genre options for select dropdown
+  const totalRecords = Object.values(genreCounts).reduce((sum, count) => sum + count, 0);
+  const genreOptions = [
+    { value: "all", label: "All Genres", count: totalRecords },
+    ...genres.map((genre) => ({
+      value: genre,
+      label: genre,
+      count: genreCounts[genre] || 0,
+    })),
+  ];
+
   return (
-    <div>
-      <select
-        value={selectedFormat}
-        onChange={(e) => onFormatChange(e.target.value)}
-        className={styles.select}
-      >
-        <option value="all">All Formats</option>
-        {formats.map((format) => (
-          <option key={format} value={format}>
-            {format}
-          </option>
-        ))}
-      </select>
-      <select
-        value={selectedGenre}
-        onChange={(e) => onGenreChange(e.target.value)}
-        className={styles.select}
-      >
-        <option value="all">All Genres</option>
-        {genres.map((genre) => (
-          <option key={genre} value={genre}>
-            {genre}
-          </option>
-        ))}
-      </select>
-    </div>
+    <Select
+      value={selectedGenre}
+      onChange={onGenreChange}
+      options={genreOptions}
+      placeholder="Select genre..."
+      className={styles.genreSelect}
+    />
   );
 }

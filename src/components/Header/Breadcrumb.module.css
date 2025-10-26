@@ -1,0 +1,35 @@
+.breadcrumb {
+  position: absolute;
+  top: 50%;
+  left: 3.5em;
+  transform: translateY(-50%);
+  cursor: pointer;
+  transition: color 0.2s ease;
+  z-index: 1001;
+}
+
+.breadcrumb:hover {
+  color: var(--link-hover);
+}
+
+.prettyPath {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 600px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+@media (max-width: 600px) {
+  .prettyPath {
+    max-width: 120px;
+    font-size: 0.85rem;
+  }
+  
+  .breadcrumb {
+    left: 3em;
+  }
+}
+

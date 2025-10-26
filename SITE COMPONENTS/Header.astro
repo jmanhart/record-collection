@@ -1,0 +1,241 @@
+---
+import HeaderLink from "./HeaderLink.astro";
+import BackButton from '../components/BackButton.astro';
+import BreadCrumb from '../components/BreadCrumb.astro';
+import HamburgerIcon from '../components/icons/HamburgerIcon.astro';
+import "../styles/global.scss";
+---
+
+<header>
+  <nav>
+    <!-- Back and Breadcrumb navigation -->
+    <BackButton />
+    <BreadCrumb />
+    <div class="header-actions">
+      <!-- Mobile menu toggle button -->
+      <button id="menu-toggle" aria-label="Toggle menu" class="overflow-menu-toggle">
+        <HamburgerIcon />
+      </button>
+      <!-- Navigation links dropdown menu -->
+      <div id="menu" class="menu">
+        <HeaderLink href="/projects">Projects</HeaderLink>
+        <HeaderLink href="/writing">Writing</HeaderLink>
+        <HeaderLink href="/social">Links</HeaderLink>
+        <HeaderLink href="/about">About</HeaderLink>
+      </div>
+      <!-- Theme toggle button -->
+      <button id="theme-toggle" aria-label="Toggle theme" class="theme-toggle">
+        <img
+          src="/icon-moon.svg"
+          class="icon-moon"
+          alt="moon icon"
+        />
+        <img
+          src="/icon-sun.svg"
+          class="icon-sun"
+          alt="sun icon"
+        />
+      </button>
+    </div>
+  </nav>
+
+  <!-- JavaScript: Theme and menu toggle functionality -->
+<script type="text/javascript">
+  // Apply stored theme on page load
+  if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark-theme");
+  }
+  // Update icon visibility on page load
+  updateThemeIcons();
+
+  // Theme toggle functionality
+  document.getElementById("theme-toggle").addEventListener("click", () => {
+    document.body.classList.toggle("dark-theme");
+
+    // Store the user's preference
+    if (document.body.classList.contains("dark-theme")) {
+      localStorage.setItem("theme", "dark");
+    } else {
+      localStorage.removeItem("theme"); // Default to light mode (no class needed)
+    }
+
+    // Update the icons based on the new theme
+    updateThemeIcons();
+  });
+
+  // Function to update icon visibility based on theme
+  function updateThemeIcons() {
+    const isDarkMode = document.body.classList.contains("dark-theme");
+    document.querySelector(".icon-moon").style.visibility = isDarkMode ? "visible" : "hidden";
+    document.querySelector(".icon-sun").style.visibility = isDarkMode ? "hidden" : "visible";
+  }
+
+  // Menu toggle functionality
+  document.getElementById("menu-toggle").addEventListener("click", () => {
+    document.getElementById("menu").classList.toggle("open");
+  });
+
+  // Close menu when clicking close button or menu items
+  document.querySelector(".menu-close").addEventListener("click", () => {
+    document.getElementById("menu").classList.remove("open");
+  });
+
+  // Close menu when clicking menu items
+  document.querySelectorAll("#menu a").forEach(link => {
+    link.addEventListener("click", () => {
+      document.getElementById("menu").classList.remove("open");
+    });
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener("click", (event) => {
+    const menu = document.getElementById("menu");
+    const menuToggle = document.getElementById("menu-toggle");
+    if (!menu.contains(event.target) && !menuToggle.contains(event.target)) {
+      menu.classList.remove("open");
+    }
+  });
+</script>
+
+
+</header>
+
+<style lang="scss">
+  
+  .hero__image {
+    position: fixed;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    left:18px;
+  }
+  /* Theme toggle button */
+  .theme-toggle {
+    position: relative;
+    height: 1.5em;
+    width: 1.5em;
+    cursor: pointer;
+    background: none; /* Reset any inherited background */
+    border: none; /* Reset any inherited border */
+
+    .icon-moon,
+    .icon-sun {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      visibility: hidden;
+    }
+
+    /* Override global button:hover styles */
+    &:hover {
+      background-color: transparent !important; /* Override global hover */
+      /* Add your custom hover effects here */
+      transform: scale(1.05);
+      transition: transform 0.2s ease;
+    }
+  }
+
+  /* Show correct icon based on theme */
+  body[data-theme="light"] .theme-toggle .icon-sun {
+    visibility: visible;
+  }
+
+  body[data-theme="dark"] .theme-toggle .icon-moon {
+    visibility: visible;
+  }
+
+  /* Header styling */
+  header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: 1em;
+    box-sizing: border-box;
+    min-height: 65px;
+
+    display: flex;
+    justify-content: flex-end;
+    z-index: 1000;
+  }
+
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    width: 100%;
+  }
+
+  .menu {
+    display: flex;
+    gap: 1em;
+    align-items: center;
+
+    /* Mobile styles */
+    @media (max-width: 768px) {
+      position: absolute;
+      top: 3em;
+      right: 4em;
+      background-color: var(--surface100);
+      border: 1px solid var(--divider);
+      border-radius: 0.5em;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 0.75em;
+      min-width: 180px;
+      display: none;
+      flex-direction: column;
+      gap: 0.5em;
+      z-index: 9999;
+
+      &.open {
+        display: flex;
+      }
+
+      a {
+        padding: 0.75em 1em;
+        border-radius: 0.25em;
+        text-decoration: none;
+        color: var(--text-primary);
+        white-space: nowrap;
+        transition: all 0.2s ease;
+        font-size: 1.1em;
+
+        &:hover {
+          background-color: var(--surface200);
+          transform: translateX(2px);
+        }
+      }
+    }
+  }
+
+  .overflow-menu-toggle {
+    display: none;
+    @media (max-width: 768px) {
+      display: flex;
+      background: none;
+      border: none;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease;
+      
+      /* Override global button:hover styles */
+      &:hover {
+        background-color: transparent !important; /* Override global hover */
+        transform: scale(1.1);
+      }
+      
+      svg {
+        width: 32px;
+        height: 32px;
+      }
+    }
+  }
+</style>

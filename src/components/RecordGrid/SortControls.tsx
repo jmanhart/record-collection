@@ -14,25 +14,35 @@ export function SortControls({
   onSortFieldChange,
   onSortOrderToggle,
 }: SortControlsProps) {
+  const handleArtistClick = () => {
+    if (sortField === "artist") {
+      // Already on artist, just toggle direction
+      onSortOrderToggle();
+    } else {
+      // Switch to artist sorting
+      onSortFieldChange("artist");
+    }
+  };
+
   return (
-    <div>
-      <select
-        value={sortField}
-        onChange={(e) => onSortFieldChange(e.target.value)}
-        className={styles.select}
-      >
-        <option value="dateAdded">Date Added</option>
-        <option value="artist">Artist</option>
-        <option value="title">Title</option>
-        <option value="year">Year</option>
-      </select>
+    <>
       <button
-        onClick={onSortOrderToggle}
-        aria-label="Toggle sort direction"
-        className={styles.sortButton}
+        className={`${styles.filterPill} ${styles.sortPill} ${sortField === "artist" ? styles.active : ""}`}
+        onClick={handleArtistClick}
+        type="button"
       >
-        {sortOrder === "asc" ? "↑" : "↓"}
+        <span>Artist</span>
+        <span className={styles.sortArrow}>
+          {sortOrder === "asc" ? " ↑" : " ↓"}
+        </span>
       </button>
-    </div>
+      <button
+        className={`${styles.filterPill} ${styles.sortPill} ${sortField === "dateAdded" ? styles.active : ""}`}
+        onClick={() => onSortFieldChange("dateAdded")}
+        type="button"
+      >
+        Date Added
+      </button>
+    </>
   );
 }

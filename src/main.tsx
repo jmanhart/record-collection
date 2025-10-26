@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+import "./index.css";
 import "./styles/global.css";
 import { initSentry } from "./config/sentry";
 import App from "./App";

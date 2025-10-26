@@ -1,21 +1,7 @@
-:root {
-  --primary-color: #1a1a1a;
-  --secondary-color: #333333;
-  --accent-color: #646cff;
-  --text-color: #ffffff;
-  --background-color: #242424;
-  --card-background: #2a2a2a;
-  --border-color: #404040;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  background-color: var(--background-color);
-  color: var(--text-color);
-}
+/* ===========================================
+ *  GLOBAL LAYOUT STYLES
+ *  Using theme variables defined in index.css
+ * =========================================== */
 
 .container {
   max-width: 1200px;
@@ -31,28 +17,31 @@ body {
 }
 
 .card {
-  background-color: var(--card-background);
+  background-color: var(--card-bg);
   border-radius: 8px;
   overflow: hidden;
   transition: transform 0.2s ease;
+  border: 1px solid var(--divider);
 }
 
 .card:hover {
   transform: translateY(-4px);
+  background-color: var(--card-bg-hover);
 }
 
 .button {
-  background-color: var(--accent-color);
-  color: var(--text-color);
+  background-color: var(--red200);
+  color: var(--text-primary);
   border: none;
   padding: 0.5rem 1rem;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  font-weight: 500;
 }
 
 .button:hover {
-  background-color: color-mix(in srgb, var(--accent-color) 80%, white);
+  background-color: var(--red100);
 }
 
 .button:disabled {
@@ -61,28 +50,32 @@ body {
 }
 
 .input {
-  background-color: var(--secondary-color);
-  border: 1px solid var(--border-color);
-  color: var(--text-color);
-  padding: 0.5rem;
-  border-radius: 4px;
+  background-color: var(--surface100);
+  border: 2px solid var(--divider);
+  color: var(--text-primary);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
   width: 100%;
+  font-size: 1rem;
+  line-height: 1.5;
+  transition: border-color 0.2s ease;
 }
 
 .input:focus {
-  outline: 2px solid var(--accent-color);
-  outline-offset: -1px;
+  outline: none;
+  border-color: var(--red200);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
 }
 
 .app {
   min-height: 100vh;
-  background-color: var(--background-color);
+  background-color: var(--surface000);
 }
 
 .header {
-  background-color: var(--primary-color);
+  background-color: var(--surface000);
   padding: 24px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--divider);
   text-align: center;
 }
 
@@ -90,12 +83,12 @@ body {
   font-size: 32px;
   font-weight: 600;
   margin: 0;
-  color: var(--text-color);
+  color: var(--text-primary);
 }
 
 .record-count {
   margin: 8px 0 0;
-  color: var(--accent-color);
+  color: var(--red200);
   font-size: 14px;
   opacity: 0.8;
 }

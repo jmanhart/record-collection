@@ -1,0 +1,203 @@
+---
+import "../styles/global.scss";
+
+const { 
+  value = "npx manhart-resume",
+  placeholder = "Command to copy",
+  readonly = true,
+  class: className = ""
+} = Astro.props;
+---
+
+<div class="copy-input-container">
+  <div class="terminal-prompt">></div>
+  <input 
+    type="text"
+    id="copy-input"
+    value={value}
+    placeholder={placeholder}
+    readonly={readonly}
+    class={`form-field copy-input ${className}`}
+  />
+  <button 
+    type="button"
+    class="copy-button"
+    id="copy-button"
+    title="Copy to clipboard"
+  >
+    <svg class="copy-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+    </svg>
+  </button>
+</div>
+<div class="copy-feedback" id="copy-feedback">Copied to clipboard!</div>
+
+<script>
+  function copyToClipboard() {
+    const input = document.getElementById('copy-input') as HTMLInputElement;
+    const feedback = document.getElementById('copy-feedback') as HTMLElement;
+    
+    if (!input || !feedback) return;
+    
+    // Select the text in the input
+    input.select();
+    input.setSelectionRange(0, 99999); // For mobile devices
+    
+    try {
+      // Copy the text to clipboard
+      document.execCommand('copy');
+      
+      // Show feedback
+      feedback.classList.add('show');
+      
+      // Hide after 2 seconds
+      setTimeout(() => {
+        feedback.classList.remove('show');
+      }, 2000);
+      
+    } catch (err) {
+      // Fallback for modern browsers
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(input.value).then(() => {
+          feedback.classList.add('show');
+          
+          setTimeout(() => {
+            feedback.classList.remove('show');
+          }, 2000);
+        });
+      }
+    }
+  }
+
+  // Add event listener when the DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    const copyButton = document.getElementById('copy-button');
+    if (copyButton) {
+      copyButton.addEventListener('click', copyToClipboard);
+    }
+  });
+</script>
+
+<style>
+  .copy-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 300px;
+    /* background-color: var(--surface100); */
+    border: 2px solid var(--divider);
+    border-radius: 8px;
+    padding: 0.75rem 0.5rem 0.75rem 1rem;
+    box-sizing: border-box;
+  }
+
+  .terminal-prompt {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+    user-select: none;
+  }
+
+  .copy-input {
+    flex: 1;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9rem;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    color: var(--text-primary);
+    cursor: text;
+    box-sizing: border-box;
+    outline: none;
+  }
+
+  .copy-input:focus {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .copy-input-container:focus-within {
+    border-color: var(--divider) !important;
+    box-shadow: none !important;
+  }
+
+  .copy-input-container:hover {
+    border-color: var(--surface300);
+  }
+
+  .copy-button {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    background-color: transparent;
+    color: var(--text-secondary);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .copy-button:hover {
+    background-color: var(--surface200);
+    color: var(--text-primary);
+  }
+
+  .copy-button:active {
+    transform: translateY(-50%) scale(0.95);
+  }
+
+  .copy-button:focus {
+    outline: none;
+  }
+
+  .copy-feedback {
+    font-size: 0.875rem;
+    color: var(--text-tertiary);
+    margin: 0.5rem 0 0 0;
+    padding: 0;
+    line-height: 1.4;
+    font-weight: 400;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    max-width: 400px;
+  }
+
+  .copy-feedback.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .copy-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  /* Dark theme adjustments */
+  .dark-theme .copy-input-container {
+    background-color: var(--surface200);
+  }
+
+  .dark-theme .copy-button:hover {
+    background-color: var(--surface400);
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    .copy-input-container {
+      max-width: 100%;
+    }
+  }
+</style>

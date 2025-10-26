@@ -5,23 +5,25 @@
 }
 
 .card {
-  background: var(--bg-color);
-  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  border: 1px solid var(--divider);
   border-radius: 8px;
   overflow: hidden;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  box-shadow: var(--card-shadow);
 }
 
 .cardLink:hover .card {
   transform: translateY(-2px);
-  border-color: var(--border-hover-color);
+  background: var(--card-bg-hover);
+  box-shadow: var(--card-shadow-hover);
 }
 
 .imageContainer {
   position: relative;
   width: 100%;
   padding-bottom: 100%;
-  background: var(--bg-color);
+  background: var(--surface200);
 }
 
 .image {
@@ -42,17 +44,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-hover-color);
+  background: var(--surface300);
   font-size: 2rem;
   font-weight: bold;
-  color: var(--text-muted-color);
+  color: var(--text-tertiary);
 }
 
 .errorIndicator {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  color: var(--error-color);
+  color: var(--red100);
 }
 
 .info {
@@ -63,33 +65,33 @@
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--text-color);
+  color: var(--text-primary);
 }
 
 .artist {
   margin: 0.25rem 0;
   font-size: 0.875rem;
-  color: var(--text-muted-color);
+  color: var(--text-secondary);
 }
 
 .year,
 .format {
   margin: 0.25rem 0;
   font-size: 0.75rem;
-  color: var(--text-muted-color);
+  color: var(--text-tertiary);
 }
 
 .listens {
   margin: 0.5rem 0 0;
   font-size: 0.8rem;
-  color: var(--accent-color);
+  color: var(--red200);
 }
 
 .debug {
   margin-top: 0.5rem;
   padding-top: 0.5rem;
-  border-top: 1px dashed var(--border-color);
+  border-top: 1px dashed var(--divider);
   font-size: 0.75rem;
-  color: var(--text-muted-color);
+  color: var(--text-tertiary);
   word-break: break-all;
 }

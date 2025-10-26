@@ -1,0 +1,33 @@
+---
+import "../styles/global.scss";
+
+const { pathname } = Astro.url;
+const hideOnPaths = ['/']; // Paths where the button should be hidden
+const shouldHideButton = hideOnPaths.includes(pathname);
+import BackArrow from "../components/icons/BackArrow.astro";
+import { images } from "../data/allGreetings.js";
+
+const randomImage = '/' + images[Math.floor(Math.random() * images.length)];
+---
+
+{!shouldHideButton && (
+  <a class="hero__image" href="/">
+    <img src={randomImage} alt="Self portrait" />
+  </a>
+)}
+
+<style>
+    .back-button {
+      position: fixed;
+      top: 0;
+      left: 0;
+      padding: 1em;
+    }
+  .hero__image {
+    position: fixed;
+    width: 32px;
+    height: 32px;
+    border-radius: 2px;
+    left:18px;
+  }
+</style>
