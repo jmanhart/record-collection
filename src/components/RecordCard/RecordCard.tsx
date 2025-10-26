@@ -42,12 +42,8 @@ export const RecordCard = ({ record }: RecordCardProps) => {
           )}
         </div>
         <div className={styles.info}>
-          <h3 className={styles.title}>{record.title}</h3>
+          <h4 className={styles.title}>{record.title}</h4>
           <p className={styles.artist}>{record.artist}</p>
-          {record.year && <p className={styles.year}>{record.year}</p>}
-          {record.format_name && (
-            <p className={styles.format}>{record.format_name}</p>
-          )}
           {showDebug && (
             <div className={styles.debug}>
               <small>Image path: {record.supabase_image_url || "none"}</small>

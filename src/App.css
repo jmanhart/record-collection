@@ -8,7 +8,6 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding-top: 65px; /* Space for fixed header */
 }
 
 /* Page header - aligned with container */
@@ -16,7 +15,7 @@
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem 2rem 1.5rem;
+  padding: 2rem;
   box-sizing: border-box;
   background-color: var(--surface000);
 }
@@ -45,7 +44,7 @@
 
 @media (max-width: 768px) {
   .page-header {
-    padding: 1.5rem 1rem 1rem;
+    padding: 1.5rem 1rem;
   }
   
   .page-header h1 {

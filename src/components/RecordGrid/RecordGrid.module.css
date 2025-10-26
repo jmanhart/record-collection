@@ -1,7 +1,7 @@
 .container {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0 2rem 2rem;
   width: 100%;
   box-sizing: border-box;
 }
@@ -50,7 +50,7 @@
   font-family: inherit;
   line-height: 1;
   min-width: fit-content;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
 .filterPill:hover {
@@ -107,7 +107,8 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-auto-rows: 1fr;
   gap: 2rem;
 }
 
@@ -149,7 +150,7 @@
 /* Responsive layout */
 @media (max-width: 968px) {
   .container {
-    padding: 1rem;
+    padding: 0 1rem 1rem;
   }
 
   .controls {

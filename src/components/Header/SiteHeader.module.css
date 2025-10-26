@@ -48,76 +48,10 @@
   color: var(--link);
   text-decoration: none;
   font-size: 1rem;
-  transition: color 0.2s ease;
 }
 
 .menuLink:hover {
   color: var(--link-hover);
-}
-
-/* Theme toggle button */
-.themeToggle {
-  position: relative;
-  height: 1.5em;
-  width: 1.5em;
-  cursor: pointer;
-  background: none;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-
-.themeToggle svg {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  transition: opacity 0.2s ease;
-}
-
-/* Show/hide icons based on theme */
-.themeToggle svg:first-child {
-  /* Moon icon */
-  opacity: 0;
-  visibility: hidden;
-}
-
-.themeToggle svg:last-child {
-  /* Sun icon */
-  opacity: 1;
-  visibility: visible;
-}
-
-.dark-theme .themeToggle svg:first-child {
-  /* Moon icon in dark mode */
-  opacity: 1;
-  visibility: visible;
-}
-
-.dark-theme .themeToggle svg:last-child {
-  /* Sun icon in dark mode */
-  opacity: 0;
-  visibility: hidden;
-}
-
-:global(body.dark-theme) .themeToggle svg:first-child {
-  /* Moon icon in dark mode */
-  opacity: 1;
-  visibility: visible;
-}
-
-:global(body.dark-theme) .themeToggle svg:last-child {
-  /* Sun icon in dark mode */
-  opacity: 0;
-  visibility: hidden;
-}
-
-.themeToggle:hover {
-  background-color: transparent !important;
-  transform: scale(1.05);
-  transition: transform 0.2s ease;
 }
 
 /* Mobile menu toggle */

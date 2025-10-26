@@ -4,7 +4,6 @@
   left: 3.5em;
   transform: translateY(-50%);
   cursor: pointer;
-  transition: color 0.2s ease;
   z-index: 1001;
 }
 

@@ -4,7 +4,7 @@ import * as Sentry from "@sentry/react";
 import { RecordGrid } from "./components/RecordGrid/RecordGrid";
 import { RecordDetail } from "./components/RecordDetail/RecordDetail";
 import { Testing } from "./components/Testing/Testing";
-import { SiteHeader } from "./components/Header/SiteHeader";
+import { ThemeToggle } from "./components/ThemeToggle/ThemeToggle";
 import { useRecords } from "./hooks/useRecords";
 import "./App.css";
 
@@ -39,7 +39,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
-        {/* <SiteHeader mainSiteUrl="https://johnmanhart.com" /> */}
+        <ThemeToggle />
         <Routes>
           <Route path="/" element={<RecordList />} />
           <Route path="/records/:id" element={<RecordDetail />} />

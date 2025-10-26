@@ -8,6 +8,16 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <title>Record Collection</title>
+    <script>
+      // Prevent flash of light theme - apply dark mode immediately
+      (function() {
+        const savedTheme = localStorage.getItem('theme');
+        // Default to dark if no preference saved
+        if (savedTheme === null || savedTheme === 'dark') {
+          document.body.classList.add('dark-theme');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
