@@ -19,15 +19,17 @@ function RecordList() {
 
   return (
     <div className="app">
-      <header className="page-header">
-        <h1>Record Collection</h1>
-        <h3 className="record-count">
-          {records?.length || 0} records in collection
-        </h3>
-      </header>
-      <main className="main">
-        <RecordGrid records={records || []} isLoading={isLoading} />
-      </main>
+      <div className="container">
+        <header className="page-header">
+          <h2>My Record Collection</h2>
+          <h3 className="record-count">
+            {records?.length || 0} records in collection
+          </h3>
+        </header>
+        <main className="main">
+          <RecordGrid records={records || []} isLoading={isLoading} />
+        </main>
+      </div>
     </div>
   );
 }

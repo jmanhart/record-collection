@@ -1,11 +1,3 @@
-.container {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 2rem 2rem;
-  width: 100%;
-  box-sizing: border-box;
-}
-
 .controls {
   display: flex;
   flex-direction: row;
@@ -149,10 +141,6 @@
 
 /* Responsive layout */
 @media (max-width: 968px) {
-  .container {
-    padding: 0 1rem 1rem;
-  }
-
   .controls {
     flex-wrap: wrap;
     gap: 0.5rem;

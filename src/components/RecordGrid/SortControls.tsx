@@ -25,24 +25,15 @@ export function SortControls({
   };
 
   return (
-    <>
-      <button
-        className={`${styles.filterPill} ${styles.sortPill} ${sortField === "artist" ? styles.active : ""}`}
-        onClick={handleArtistClick}
-        type="button"
-      >
-        <span>Artist</span>
-        <span className={styles.sortArrow}>
-          {sortOrder === "asc" ? " ↑" : " ↓"}
-        </span>
-      </button>
-      <button
-        className={`${styles.filterPill} ${styles.sortPill} ${sortField === "dateAdded" ? styles.active : ""}`}
-        onClick={() => onSortFieldChange("dateAdded")}
-        type="button"
-      >
-        Date Added
-      </button>
-    </>
+    <button
+      className={`${styles.filterPill} ${styles.sortPill} ${styles.active}`}
+      onClick={handleArtistClick}
+      type="button"
+    >
+      <span>Artist</span>
+      <span className={styles.sortArrow}>
+        {sortOrder === "asc" ? " ↑" : " ↓"}
+      </span>
+    </button>
   );
 }

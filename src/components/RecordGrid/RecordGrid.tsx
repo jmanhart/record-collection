@@ -114,7 +114,7 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
   });
 
   return (
-    <div className={styles.container}>
+    <>
       <div className={styles.controls}>
         <SortControls
           sortField={sortField}
@@ -155,6 +155,6 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
