@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ComponentType } from "react";
+import { articleImports } from "../content/articles";
 
 interface Article {
   id: number;
@@ -9,33 +10,32 @@ interface Article {
 export function useArticle(recordId: number) {
   const queryClient = useQueryClient();
 
-  // Dynamically import MDX article from the content directory
+  // Import MDX article using the manifest
   const { data: article, isLoading } = useQuery<Article | null>({
     queryKey: ["article", recordId],
     queryFn: async () => {
-      // Try .mdx first, then fall back to .md
-      const extensions = [".mdx", ".md"];
+      const recordIdStr = String(recordId);
+      const importFn = articleImports[recordIdStr as keyof typeof articleImports];
       
-      for (const ext of extensions) {
-        try {
-          const module = await import(
-            /* @vite-ignore */
-            `../content/articles/${recordId}${ext}`
-          );
+      if (!importFn) {
+        // Article doesn't exist
+        return null;
+      }
 
-          if (module && module.default) {
-            return {
-              id: recordId,
-              Content: module.default,
-            };
-          }
-        } catch (error) {
-          // Continue to next extension
-          continue;
+      try {
+        const module = await importFn();
+        
+        if (module && module.default) {
+          return {
+            id: recordId,
+            Content: module.default,
+          };
         }
+      } catch (error) {
+        console.error(`Error loading article for record ${recordId}:`, error);
+        return null;
       }
       
-      // No article found
       return null;
     },
   });

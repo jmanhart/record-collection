@@ -8,6 +8,62 @@ import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+// Plugin to generate article manifest for production builds
+const generateArticleManifest = (): Plugin => {
+  const generateManifest = async () => {
+    const articlesDir = resolve(__dirname, "src/content/articles");
+    const manifestPath = resolve(__dirname, "src/content/articles/index.ts");
+    
+    try {
+      const files = await fs.readdir(articlesDir);
+      const articleFiles = files.filter(
+        (file) => (file.endsWith(".mdx") || file.endsWith(".md")) && !file.startsWith("README")
+      );
+      
+      const imports = articleFiles.map((file) => {
+        const recordId = file.replace(/\.(mdx|md)$/, "");
+        return `  "${recordId}": () => import("./${file}"),`;
+      });
+      
+      const manifestContent = `// This file is auto-generated - do not edit manually
+// It maps record IDs to their MDX article imports
+
+export const articleImports = {
+${imports.join("\n")}
+} as const;
+
+export type ArticleId = keyof typeof articleImports;
+`;
+      
+      await fs.writeFile(manifestPath, manifestContent, "utf-8");
+      console.log("✅ Generated article manifest");
+    } catch (error) {
+      console.error("Error generating article manifest:", error);
+    }
+  };
+
+  return {
+    name: "generate-article-manifest",
+    buildStart: generateManifest,
+    configureServer: (server) => {
+      // Generate manifest on server start
+      generateManifest();
+      
+      // Watch for article file changes and regenerate manifest
+      server.watcher.on("add", async (path) => {
+        if (path.includes("articles") && (path.endsWith(".md") || path.endsWith(".mdx")) && !path.includes("README")) {
+          await generateManifest();
+        }
+      });
+      server.watcher.on("unlink", async (path) => {
+        if (path.includes("articles") && (path.endsWith(".md") || path.endsWith(".mdx")) && !path.includes("README")) {
+          await generateManifest();
+        }
+      });
+    },
+  };
+};
+
 // Custom plugin to watch article files and copy them on change
 const articlesWatcher = (): Plugin => ({
   name: "articles-watcher",
@@ -99,6 +155,7 @@ const articlesWatcher = (): Plugin => ({
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
+    generateArticleManifest(),
     react(),
     mdx({
       // Treat .md and .mdx files as MDX
