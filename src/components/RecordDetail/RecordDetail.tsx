@@ -1,8 +1,6 @@
-import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { useRecords } from "../../hooks/useRecords";
 import { useArticle } from "../../hooks/useArticle";
-import ReactMarkdown from "react-markdown";
 import styles from "./RecordDetail.module.css";
 
 export function RecordDetail() {
@@ -38,22 +36,20 @@ export function RecordDetail() {
         <div className={styles.info}>
           <h1>{record.title}</h1>
           <h2>{record.artist}</h2>
-          <p>Format: {record.format_name}</p>
-          {record.year && <p>Year: {record.year}</p>}
-          {record.genres && <p>Genres: {record.genres.join(", ")}</p>}
+          {/* <p>Format: {record.format_name}</p> */}
+          {/* {record.year && <p>Year: {record.year}</p>}
+          {record.genres && <p>Genres: {record.genres.join(", ")}</p>} */}
         </div>
       </div>
 
       {(isLoadingArticle || article) && (
         <div className={styles.article}>
-          <div className={styles.articleHeader}></div>
-
           {isLoadingArticle ? (
             <div className={styles.loading}>Loading...</div>
           ) : (
             article && (
               <div className={styles.markdown}>
-                <ReactMarkdown>{article.content}</ReactMarkdown>
+                <article.Content />
               </div>
             )
           )}

@@ -14,10 +14,10 @@ try {
   await fs.mkdir(targetDir, { recursive: true });
 }
 
-// Copy all .md files from source to target
+// Copy all .md and .mdx files from source to target
 const files = await fs.readdir(sourceDir);
 for (const file of files) {
-  if (file.endsWith(".md") && !file.startsWith("README")) {
+  if ((file.endsWith(".md") || file.endsWith(".mdx")) && !file.startsWith("README")) {
     const sourcePath = join(sourceDir, file);
     const targetPath = join(targetDir, file);
     await fs.copyFile(sourcePath, targetPath);

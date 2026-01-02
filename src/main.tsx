@@ -19,6 +19,15 @@ const queryClient = new QueryClient({
   },
 });
 
+// Set up HMR listener for article updates
+if (import.meta.hot) {
+  import.meta.hot.on("article-updated", (data: { recordId: string }) => {
+    // Invalidate the specific article query to trigger a refetch
+    queryClient.invalidateQueries({ queryKey: ["article", Number(data.recordId)] });
+    console.log(`🔄 Article ${data.recordId} updated - cache invalidated`);
+  });
+}
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
