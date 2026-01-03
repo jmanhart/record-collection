@@ -147,9 +147,18 @@
 }
 
 .markdown {
-
   border-radius: 8px;
   /* border: 1px solid var(--divider); */
+}
+
+.markdown em,
+.markdown i {
+  font-style: italic;
+}
+
+.markdown strong,
+.markdown b {
+  font-weight: bold;
 }
 
 @media (max-width: 768px) {

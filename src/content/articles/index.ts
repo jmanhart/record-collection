@@ -5,6 +5,7 @@ export const articleImports = {
   "12753004": () => import("./12753004.mdx"),
   "21029242": () => import("./21029242.mdx"),
   "387851": () => import("./387851.mdx"),
+  "9216088": () => import("./9216088.mdx"),
 } as const;
 
 export type ArticleId = keyof typeof articleImports;
