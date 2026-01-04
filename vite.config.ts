@@ -171,5 +171,14 @@ export default defineConfig({
 
   build: {
     sourcemap: true, // Required for Sentry source maps
+    rollupOptions: {
+      output: {
+        manualChunks: undefined, // Let Vite handle chunking automatically
+      },
+    },
+    // Ensure MDX files are included in the build
+    commonjsOptions: {
+      include: [/node_modules/],
+    },
   },
 });

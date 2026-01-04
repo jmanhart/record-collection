@@ -33,6 +33,8 @@ export function useArticle(recordId: number) {
         }
       } catch (error) {
         console.error(`Error loading article for record ${recordId}:`, error);
+        console.error("Import function:", importFn);
+        console.error("Available articles:", Object.keys(articleImports));
         return null;
       }
       
