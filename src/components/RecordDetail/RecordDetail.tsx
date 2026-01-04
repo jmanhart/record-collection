@@ -23,10 +23,6 @@ export function RecordDetail() {
 
   return (
     <div className={styles.container}>
-      <Link to="/" className={styles.backLink}>
-        ← Back to collection
-      </Link>
-
       <div className={styles.header}>
         <img
           src={record.supabase_image_url || record.coverImage}
