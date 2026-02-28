@@ -5,6 +5,10 @@ on:
     - cron: '0 17 * * *' # Daily at 9am PST
   workflow_dispatch: # Allow manual trigger
 
+env:
+  SENTRY_DSN: https://8083211186186ef765078486adc736af@o4508215900766208.ingest.us.sentry.io/4509834064166912
+  SENTRY_CRONS_SLUG: sync-discogs-collection
+
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -18,10 +22,34 @@ jobs:
 
       - run: npm ci
 
-      - run: npm run sync:discogs
+      - name: Sentry Crons check-in (in_progress)
+        run: |
+          CHECKIN_ID=$(curl -sS "${SENTRY_DSN}" \
+            -H 'Content-Type: application/json' \
+            -d "{\"monitor_slug\":\"${SENTRY_CRONS_SLUG}\",\"status\":\"in_progress\",\"monitor_config\":{\"schedule\":{\"type\":\"crontab\",\"value\":\"0 17 * * *\"},\"timezone\":\"America/Los_Angeles\",\"checkin_margin\":15,\"max_runtime\":30}}" \
+            | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])")
+          echo "CHECKIN_ID=$CHECKIN_ID" >> "$GITHUB_ENV"
+
+      - name: Sync Discogs collection
+        id: sync
+        run: npm run sync:discogs
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           DISCOGS_USER: ${{ secrets.DISCOGS_USER }}
           PUBLIC_DISCOGS_API_TOKEN: ${{ secrets.PUBLIC_DISCOGS_API_TOKEN }}
+
+      - name: Sentry Crons check-in (ok)
+        if: success()
+        run: |
+          curl -sS "${SENTRY_DSN}" \
+            -H 'Content-Type: application/json' \
+            -d "{\"monitor_slug\":\"${SENTRY_CRONS_SLUG}\",\"status\":\"ok\",\"check_in_id\":\"${CHECKIN_ID}\"}"
+
+      - name: Sentry Crons check-in (error)
+        if: failure()
+        run: |
+          curl -sS "${SENTRY_DSN}" \
+            -H 'Content-Type: application/json' \
+            -d "{\"monitor_slug\":\"${SENTRY_CRONS_SLUG}\",\"status\":\"error\",\"check_in_id\":\"${CHECKIN_ID}\"}"
