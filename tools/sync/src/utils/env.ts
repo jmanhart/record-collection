@@ -6,17 +6,15 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const envPath = path.resolve(__dirname, "../../../../.env");
 
-console.log("🔍 Looking for .env file at:", envPath);
-
-// Load environment variables from root .env file
+// Try to load .env file, but don't fail if it's missing (e.g. in CI)
 const result = dotenv.config({ path: envPath });
 
 if (result.error) {
-  console.error("❌ Error loading .env file:", result.error);
-  process.exit(1);
+  console.log("ℹ️  No .env file found, using environment variables directly");
+} else {
+  console.log("✅ .env file loaded successfully");
 }
 
-console.log("✅ .env file loaded successfully");
 console.log("📝 Environment variables loaded:", {
   VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL ? "set" : "not set",
   VITE_SUPABASE_ANON_KEY: process.env.VITE_SUPABASE_ANON_KEY
@@ -42,7 +40,7 @@ const requiredEnvVars = [
 
 for (const envVar of requiredEnvVars) {
   if (!process.env[envVar]) {
-    throw new Error(`${envVar} is required in .env file at ${envPath}`);
+    throw new Error(`${envVar} is required but not set`);
   }
 }
 

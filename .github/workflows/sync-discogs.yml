@@ -1,0 +1,27 @@
+name: Sync Discogs Collection
+
+on:
+  schedule:
+    - cron: '0 17 * * *' # Daily at 9am PST
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run sync:discogs
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          DISCOGS_USER: ${{ secrets.DISCOGS_USER }}
+          PUBLIC_DISCOGS_API_TOKEN: ${{ secrets.PUBLIC_DISCOGS_API_TOKEN }}
