@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { RecordCard } from "../RecordCard/RecordCard";
 import { Search } from "../Search/Search";
 import type { Record, SortField, SortOrder } from "../../types/Record";
 import { SortControls } from "./SortControls";
@@ -13,7 +12,6 @@ interface RecordGridProps {
 }
 
 export function RecordGrid({ records, isLoading }: RecordGridProps) {
-  const [selectedRecord, setSelectedRecord] = useState<Record | null>(null);
   const [sortField, setSortField] = useState<SortField>("artist");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [searchQuery, setSearchQuery] = useState("");
@@ -147,14 +145,6 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
         <RecordGridList records={sortedRecords} />
       </div>
 
-      {selectedRecord && (
-        <div className={styles.modal}>
-          <div className={styles.modalContent}>
-            <h2>{selectedRecord.title}</h2>
-            <button onClick={() => setSelectedRecord(null)}>Close</button>
-          </div>
-        </div>
-      )}
     </>
   );
 }

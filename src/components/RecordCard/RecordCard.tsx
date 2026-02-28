@@ -30,11 +30,7 @@ export const RecordCard = ({ record }: RecordCardProps) => {
               src={record.supabase_image_url}
               alt={`${record.title} by ${record.artist}`}
               className={styles.image}
-              onError={(e) => {
-                console.error("Image load error:", {
-                  src: record.supabase_image_url,
-                  error: e,
-                });
+              onError={() => {
                 setImageError(true);
               }}
             />

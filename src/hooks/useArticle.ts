@@ -31,10 +31,7 @@ export function useArticle(recordId: number) {
             Content: module.default,
           };
         }
-      } catch (error) {
-        console.error(`Error loading article for record ${recordId}:`, error);
-        console.error("Import function:", importFn);
-        console.error("Available articles:", Object.keys(articleImports));
+      } catch {
         return null;
       }
       

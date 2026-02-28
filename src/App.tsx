@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as Sentry from "@sentry/react";
 import { RecordGrid } from "./components/RecordGrid/RecordGrid";
 import { RecordDetail } from "./components/RecordDetail/RecordDetail";
@@ -8,8 +7,6 @@ import { ThemeToggle } from "./components/ThemeToggle/ThemeToggle";
 import { AlphabetIndicator } from "./components/AlphabetIndicator/AlphabetIndicator";
 import { useRecords } from "./hooks/useRecords";
 import "./App.css";
-
-const queryClient = new QueryClient();
 
 function RecordList() {
   const { records, isLoading, error } = useRecords();
@@ -36,12 +33,9 @@ function RecordList() {
   );
 }
 
-// Keep the error boundary for production error handling
-const SentryErrorBoundary = Sentry.ErrorBoundary;
-
 export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
+    <Sentry.ErrorBoundary fallback={<div>Something went wrong. Please refresh the page.</div>}>
       <Router>
         <ThemeToggle />
         <Routes>
@@ -50,6 +44,6 @@ export default function App() {
           <Route path="/testing" element={<Testing />} />
         </Routes>
       </Router>
-    </QueryClientProvider>
+    </Sentry.ErrorBoundary>
   );
 }

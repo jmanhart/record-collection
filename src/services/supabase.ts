@@ -22,12 +22,6 @@ export const getImageUrl = (path: string) => {
     : `${COVERS_PATH}/${path}`;
   const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(fullPath);
 
-  console.log("Generated image URL:", {
-    originalPath: path,
-    fullPath,
-    publicUrl: data.publicUrl,
-  });
-
   return data.publicUrl;
 };
 
@@ -53,14 +47,6 @@ export const getRecords = async () => {
   if (error) {
     console.error("Error fetching records:", error);
     throw error;
-  }
-
-  // Log the structure of the first record
-  if (data && data.length > 0) {
-    console.log("Table structure (from first record):", {
-      availableFields: Object.keys(data[0]),
-      sampleRecord: data[0],
-    });
   }
 
   // Transform the records to include full image URLs
