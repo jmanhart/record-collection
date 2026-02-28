@@ -24,9 +24,12 @@ jobs:
       - name: Sentry Crons check-in (in_progress)
         run: |
           CHECK_IN_ID="$(uuidgen)"
-          curl -sS -X POST "${SENTRY_CRONS_URL}" \
+          echo "Sending check-in to: ${SENTRY_CRONS_URL}"
+          echo "Check-in ID: ${CHECK_IN_ID}"
+          RESPONSE=$(curl -v -X POST "${SENTRY_CRONS_URL}" \
             -H 'Content-Type: application/json' \
-            -d "{\"status\":\"in_progress\",\"check_in_id\":\"${CHECK_IN_ID}\",\"monitor_config\":{\"schedule\":{\"type\":\"crontab\",\"value\":\"0 17 * * *\"},\"timezone\":\"America/Los_Angeles\",\"checkin_margin\":15,\"max_runtime\":30}}"
+            -d "{\"status\":\"in_progress\",\"check_in_id\":\"${CHECK_IN_ID}\",\"monitor_config\":{\"schedule\":{\"type\":\"crontab\",\"value\":\"0 17 * * *\"},\"timezone\":\"America/Los_Angeles\",\"checkin_margin\":15,\"max_runtime\":30}}" 2>&1)
+          echo "Response: ${RESPONSE}"
           echo "CHECK_IN_ID=$CHECK_IN_ID" >> "$GITHUB_ENV"
 
       - name: Sync Discogs collection
@@ -40,8 +43,12 @@ jobs:
 
       - name: Sentry Crons check-in (ok)
         if: success()
-        run: curl -sS "${SENTRY_CRONS_URL}?check_in_id=${CHECK_IN_ID}&status=ok"
+        run: |
+          RESPONSE=$(curl -v "${SENTRY_CRONS_URL}?check_in_id=${CHECK_IN_ID}&status=ok" 2>&1)
+          echo "Response: ${RESPONSE}"
 
       - name: Sentry Crons check-in (error)
         if: failure()
-        run: curl -sS "${SENTRY_CRONS_URL}?check_in_id=${CHECK_IN_ID}&status=error"
+        run: |
+          RESPONSE=$(curl -v "${SENTRY_CRONS_URL}?check_in_id=${CHECK_IN_ID}&status=error" 2>&1)
+          echo "Response: ${RESPONSE}"
