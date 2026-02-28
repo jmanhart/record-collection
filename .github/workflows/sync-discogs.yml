@@ -6,8 +6,7 @@ on:
   workflow_dispatch: # Allow manual trigger
 
 env:
-  SENTRY_DSN: https://8083211186186ef765078486adc736af@o4508215900766208.ingest.us.sentry.io/4509834064166912
-  SENTRY_CRONS_SLUG: sync-discogs-collection
+  SENTRY_CRONS_URL: https://o4508215900766208.ingest.us.sentry.io/api/4509834064166912/cron/sync-discogs-collection/8083211186186ef765078486adc736af/
 
 jobs:
   sync:
@@ -24,14 +23,11 @@ jobs:
 
       - name: Sentry Crons check-in (in_progress)
         run: |
-          CHECKIN_ID=$(curl -sS "${SENTRY_DSN}" \
-            -H 'Content-Type: application/json' \
-            -d "{\"monitor_slug\":\"${SENTRY_CRONS_SLUG}\",\"status\":\"in_progress\",\"monitor_config\":{\"schedule\":{\"type\":\"crontab\",\"value\":\"0 17 * * *\"},\"timezone\":\"America/Los_Angeles\",\"checkin_margin\":15,\"max_runtime\":30}}" \
-            | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])")
-          echo "CHECKIN_ID=$CHECKIN_ID" >> "$GITHUB_ENV"
+          CHECK_IN_ID="$(uuidgen)"
+          curl -sS "${SENTRY_CRONS_URL}?check_in_id=${CHECK_IN_ID}&status=in_progress"
+          echo "CHECK_IN_ID=$CHECK_IN_ID" >> "$GITHUB_ENV"
 
       - name: Sync Discogs collection
-        id: sync
         run: npm run sync:discogs
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
@@ -42,14 +38,8 @@ jobs:
 
       - name: Sentry Crons check-in (ok)
         if: success()
-        run: |
-          curl -sS "${SENTRY_DSN}" \
-            -H 'Content-Type: application/json' \
-            -d "{\"monitor_slug\":\"${SENTRY_CRONS_SLUG}\",\"status\":\"ok\",\"check_in_id\":\"${CHECKIN_ID}\"}"
+        run: curl -sS "${SENTRY_CRONS_URL}?check_in_id=${CHECK_IN_ID}&status=ok"
 
       - name: Sentry Crons check-in (error)
         if: failure()
-        run: |
-          curl -sS "${SENTRY_DSN}" \
-            -H 'Content-Type: application/json' \
-            -d "{\"monitor_slug\":\"${SENTRY_CRONS_SLUG}\",\"status\":\"error\",\"check_in_id\":\"${CHECKIN_ID}\"}"
+        run: curl -sS "${SENTRY_CRONS_URL}?check_in_id=${CHECK_IN_ID}&status=error"
