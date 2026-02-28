@@ -24,7 +24,9 @@ jobs:
       - name: Sentry Crons check-in (in_progress)
         run: |
           CHECK_IN_ID="$(uuidgen)"
-          curl -sS "${SENTRY_CRONS_URL}?check_in_id=${CHECK_IN_ID}&status=in_progress"
+          curl -sS -X POST "${SENTRY_CRONS_URL}" \
+            -H 'Content-Type: application/json' \
+            -d "{\"status\":\"in_progress\",\"check_in_id\":\"${CHECK_IN_ID}\",\"monitor_config\":{\"schedule\":{\"type\":\"crontab\",\"value\":\"0 17 * * *\"},\"timezone\":\"America/Los_Angeles\",\"checkin_margin\":15,\"max_runtime\":30}}"
           echo "CHECK_IN_ID=$CHECK_IN_ID" >> "$GITHUB_ENV"
 
       - name: Sync Discogs collection
