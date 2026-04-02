@@ -13,5 +13,10 @@ export interface Record {
   year?: number;
 }
 
+export type WishlistRecord = Pick<
+  Record,
+  "id" | "title" | "artist" | "coverImage" | "supabase_image_url" | "format_name" | "genres" | "styles" | "year"
+>;
+
 export type SortField = "dateAdded" | "artist" | "title" | "year";
 export type SortOrder = "asc" | "desc";

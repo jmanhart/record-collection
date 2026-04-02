@@ -62,6 +62,25 @@ export const getRecords = async () => {
   return transformedRecords;
 };
 
+export const getWishlist = async () => {
+  const { data, error } = await supabase.from("wishlist").select("*");
+
+  if (error) {
+    console.error("Error fetching wishlist:", error);
+    throw error;
+  }
+
+  const transformedRecords = data.map((record: Record) => {
+    const imagePath = `${record.id}.jpeg`;
+    return {
+      ...record,
+      coverImage: getImageUrl(imagePath),
+    };
+  }) as Record[];
+
+  return transformedRecords;
+};
+
 export const addRecord = async (record: Omit<Record, "id" | "dateAdded">) => {
   const { data, error } = await supabase
     .from("records")
