@@ -11,11 +11,12 @@ export interface Record {
   genres?: string[];
   styles?: string[];
   year?: number;
+  duration_seconds?: number;
 }
 
 export type WishlistRecord = Pick<
   Record,
-  "id" | "title" | "artist" | "coverImage" | "supabase_image_url" | "format_name" | "genres" | "styles" | "year"
+  "id" | "title" | "artist" | "coverImage" | "supabase_image_url" | "format_name" | "genres" | "styles" | "year" | "duration_seconds"
 >;
 
 export type SortField = "dateAdded" | "artist" | "title" | "year";

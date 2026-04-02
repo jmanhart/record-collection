@@ -1,0 +1,2 @@
+ALTER TABLE records ADD COLUMN IF NOT EXISTS duration_seconds INTEGER;
+ALTER TABLE wishlist ADD COLUMN IF NOT EXISTS duration_seconds INTEGER;

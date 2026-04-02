@@ -35,9 +35,24 @@ function RecordList() {
 
   const isCollection = activeTab === "collection";
   const currentRecords = isCollection ? records : wishlistRecords;
+
+  const formatRuntime = (totalSeconds: number): string => {
+    if (totalSeconds <= 0) return "";
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.round((totalSeconds % 3600) / 60);
+    if (hours > 0) return `${hours} hours${minutes > 0 ? ` ${minutes} min` : ""} of music`;
+    return `${minutes} min of music`;
+  };
+
+  const totalDuration = (isCollection ? records : wishlistRecords)?.reduce(
+    (sum, r) => sum + (r.duration_seconds || 0),
+    0
+  ) || 0;
+  const runtimeSuffix = formatRuntime(totalDuration);
+
   const subtitle = isCollection
-    ? `${records?.length || 0} records in collection`
-    : `${wishlistRecords?.length || 0} records on wishlist`;
+    ? `${records?.length || 0} records in collection${runtimeSuffix ? ` · ${runtimeSuffix}` : ""}`
+    : `${wishlistRecords?.length || 0} records on wishlist${runtimeSuffix ? ` · ${runtimeSuffix}` : ""}`;
 
   return (
     <div className="app">
