@@ -7,12 +7,13 @@ interface Article {
   Content: ComponentType;
 }
 
-export function useArticle(recordId: number) {
+export function useArticle(recordId: number | undefined) {
   const queryClient = useQueryClient();
 
   // Import MDX article using the manifest
   const { data: article, isLoading } = useQuery<Article | null>({
     queryKey: ["article", recordId],
+    enabled: recordId != null,
     queryFn: async () => {
       const recordIdStr = String(recordId);
       const importFn = articleImports[recordIdStr as keyof typeof articleImports];

@@ -44,15 +44,14 @@ function RecordList() {
     return `${minutes} min of music`;
   };
 
-  const totalDuration = (isCollection ? records : wishlistRecords)?.reduce(
-    (sum, r) => sum + (r.duration_seconds || 0),
-    0
-  ) || 0;
+  const totalDuration = isCollection
+    ? (records?.reduce((sum, r) => sum + (r.duration_seconds || 0), 0) || 0)
+    : 0;
   const runtimeSuffix = formatRuntime(totalDuration);
 
   const subtitle = isCollection
     ? `${records?.length || 0} records in collection${runtimeSuffix ? ` · ${runtimeSuffix}` : ""}`
-    : `${wishlistRecords?.length || 0} records on wishlist${runtimeSuffix ? ` · ${runtimeSuffix}` : ""}`;
+    : `${wishlistRecords?.length || 0} records on wishlist`;
 
   return (
     <div className="app">
@@ -82,7 +81,7 @@ export default function App() {
         <ThemeToggle />
         <Routes>
           <Route path="/" element={<RecordList />} />
-          <Route path="/records/:id" element={<RecordDetail />} />
+          <Route path="/:artist/:album" element={<RecordDetail />} />
           <Route path="/testing" element={<Testing />} />
         </Routes>
       </Router>

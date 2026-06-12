@@ -178,6 +178,53 @@
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
+.writePrompt {
+  border: 2px dashed var(--divider);
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+  margin-top: 2rem;
+  color: var(--text-tertiary);
+}
+
+.writePromptIcon {
+  margin-bottom: 0.5rem;
+}
+
+.writePromptText {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+.writePromptCommand {
+  display: block;
+  background: var(--surface200);
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.writePromptPath {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.editHint {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--divider);
+}
+
+.editHint code {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
 @media (max-width: 768px) {
   .header {
     grid-template-columns: 1fr;

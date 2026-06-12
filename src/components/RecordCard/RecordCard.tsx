@@ -1,19 +1,22 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { BookOpen } from "lucide-react";
 import { type Record } from "../../types/Record";
+import { slugify } from "../../utils/slugify";
 import styles from "./RecordCard.module.css";
 
 interface RecordCardProps {
   record: Record;
+  hasArticle?: boolean;
 }
 
-export const RecordCard = ({ record }: RecordCardProps) => {
+export const RecordCard = ({ record, hasArticle }: RecordCardProps) => {
   const [imageError, setImageError] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
 
   return (
     <Link 
-      to={`/records/${record.id}`} 
+      to={`/${slugify(record.artist)}/${slugify(record.title)}`}
       className={styles.cardLink}
       data-artist-letter={record.artist.charAt(0).toUpperCase()}
     >
@@ -25,6 +28,11 @@ export const RecordCard = ({ record }: RecordCardProps) => {
         }}
       >
         <div className={styles.imageContainer}>
+          {hasArticle && (
+            <span className={styles.articleBadge}>
+              <BookOpen size={14} />
+            </span>
+          )}
           {record.supabase_image_url && !imageError ? (
             <img
               src={record.supabase_image_url}

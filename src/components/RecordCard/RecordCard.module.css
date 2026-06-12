@@ -53,6 +53,21 @@
   color: var(--text-tertiary);
 }
 
+.articleBadge {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+}
+
 .errorIndicator {
   position: absolute;
   top: 0.5rem;
@@ -134,6 +149,10 @@
     margin: 0.5rem 0 0.5rem 0.75rem;
     border-radius: 4px;
     overflow: hidden;
+  }
+
+  .articleBadge {
+    display: none;
   }
 
   .image {

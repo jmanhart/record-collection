@@ -15,7 +15,8 @@
     "sync:discogs": "npm run fetch -w tools/sync",
     "sync:readme": "npm run generate-readme",
     "sync:all": "npm run sync:discogs && npm run sync:readme",
-    "tools:dev": "npm run dev -w tools/sync"
+    "tools:dev": "npm run dev -w tools/sync",
+    "article:new": "node scripts/newArticle.js"
   },
   "dependencies": {
     "@mdx-js/react": "^3.0.1",

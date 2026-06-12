@@ -55,6 +55,7 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
     updateURL(searchQuery, selectedFormat, value);
   };
 
+
   if (isLoading) {
     return <div className={styles.loading}>Loading records...</div>;
   }
