@@ -5,6 +5,7 @@ import { fetchDiscogsRecords } from "./utils/fetchDiscogs.js";
 import { updateSupabaseRecords } from "./utils/updateSupabase.js";
 import { syncWishlist } from "./utils/fetchWantlist.js";
 import { syncDurations } from "./utils/fetchDurations.js";
+import { syncDiscographyTargets } from "./utils/syncDiscographyTargets.js";
 import { logInfo, logError } from "./utils/log.js";
 
 async function run() {
@@ -21,6 +22,10 @@ async function run() {
     logInfo("🕐 Starting duration sync...");
     await syncDurations();
     logInfo("✅ Duration sync completed!");
+
+    logInfo("🎯 Starting discography targets sync...");
+    await syncDiscographyTargets();
+    logInfo("✅ Discography targets sync completed!");
 
     logInfo("✅ All syncs completed successfully!");
   } catch (error) {

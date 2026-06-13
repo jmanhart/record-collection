@@ -14,6 +14,7 @@
     "generate-readme": "node scripts/generateReadme.cjs",
     "sync:discogs": "npm run fetch -w tools/sync",
     "sync:readme": "npm run generate-readme",
+    "sync:discography": "npm run sync:discography -w tools/sync",
     "sync:all": "npm run sync:discogs && npm run sync:readme",
     "tools:dev": "npm run dev -w tools/sync",
     "article:new": "node scripts/newArticle.js"

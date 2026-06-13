@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "fetch": "tsx src/run.ts",
+    "sync:discography": "tsx src/syncDiscography.ts",
     "start": "node src/server.js"
   },
   "dependencies": {

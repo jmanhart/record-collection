@@ -3,6 +3,8 @@ import * as Sentry from "@sentry/react";
 import { RecordGrid } from "./components/RecordGrid/RecordGrid";
 import { RecordDetail } from "./components/RecordDetail/RecordDetail";
 import { Testing } from "./components/Testing/Testing";
+import { ArtistProgressList } from "./components/ArtistProgress/ArtistProgressList";
+import { ArtistProgressDetail } from "./components/ArtistProgress/ArtistProgressDetail";
 import { ThemeToggle } from "./components/ThemeToggle/ThemeToggle";
 import { AlphabetIndicator } from "./components/AlphabetIndicator/AlphabetIndicator";
 import { Tabs, type TabValue } from "./components/Tabs/Tabs";
@@ -81,6 +83,8 @@ export default function App() {
         <ThemeToggle />
         <Routes>
           <Route path="/" element={<RecordList />} />
+          <Route path="/collecting" element={<ArtistProgressList />} />
+          <Route path="/collecting/:artistSlug" element={<ArtistProgressDetail />} />
           <Route path="/:artist/:album" element={<RecordDetail />} />
           <Route path="/testing" element={<Testing />} />
         </Routes>

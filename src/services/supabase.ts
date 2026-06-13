@@ -121,3 +121,27 @@ export const deleteImage = async (path: string) => {
 
   if (error) throw error;
 };
+
+export interface DiscographyTarget {
+  release_id: number;
+  artist: string;
+  title: string;
+  year: number | null;
+  supabase_image_url: string | null;
+}
+
+export const getDiscographyTargets = async (): Promise<DiscographyTarget[]> => {
+  const { data, error } = await supabase
+    .from("discography_targets")
+    .select("*");
+
+  if (error) {
+    console.error("Error fetching discography targets:", error);
+    throw error;
+  }
+
+  return (data || []).map((row: DiscographyTarget) => ({
+    ...row,
+    supabase_image_url: row.supabase_image_url || getImageUrl(`${row.release_id}.jpeg`),
+  }));
+};
