@@ -1,7 +1,6 @@
-import { Link } from "react-router-dom";
 import styles from "./Tabs.module.css";
 
-export type TabValue = "collection" | "wishlist";
+export type TabValue = "collection" | "wishlist" | "collecting";
 
 interface TabsProps {
   activeTab: TabValue;
@@ -23,9 +22,12 @@ export function Tabs({ activeTab, onTabChange }: TabsProps) {
       >
         Wishlist
       </button>
-      <Link to="/collecting" className={styles.tab}>
+      <button
+        className={`${styles.tab} ${activeTab === "collecting" ? styles.active : ""}`}
+        onClick={() => onTabChange("collecting")}
+      >
         Collecting
-      </Link>
+      </button>
     </div>
   );
 }

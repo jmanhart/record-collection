@@ -16,27 +16,37 @@ import "./App.css";
 function RecordList() {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = (searchParams.get("tab") as TabValue) || "collection";
+  const artistSlug = searchParams.get("artist");
 
   const { records, isLoading: isLoadingRecords, error: recordsError } = useRecords();
   const { records: wishlistRecords, isLoading: isLoadingWishlist, error: wishlistError } = useWishlist();
 
   const handleTabChange = (tab: TabValue) => {
-    const params = new URLSearchParams(searchParams);
-    if (tab === "collection") {
-      params.delete("tab");
-    } else {
+    const params = new URLSearchParams();
+    if (tab !== "collection") {
       params.set("tab", tab);
     }
     setSearchParams(params);
   };
 
-  const error = activeTab === "collection" ? recordsError : wishlistError;
+  const handleArtistSelect = (slug: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("artist", slug);
+    setSearchParams(params);
+  };
+
+  const handleArtistBack = () => {
+    const params = new URLSearchParams(searchParams);
+    params.delete("artist");
+    setSearchParams(params);
+  };
+
+  const error = activeTab === "collection" ? recordsError : activeTab === "wishlist" ? wishlistError : null;
   if (error) {
     return <div>Error loading records</div>;
   }
 
   const isCollection = activeTab === "collection";
-  const currentRecords = isCollection ? records : wishlistRecords;
 
   const formatRuntime = (totalSeconds: number): string => {
     if (totalSeconds <= 0) return "";
@@ -53,7 +63,9 @@ function RecordList() {
 
   const subtitle = isCollection
     ? `${records?.length || 0} records in collection${runtimeSuffix ? ` · ${runtimeSuffix}` : ""}`
-    : `${wishlistRecords?.length || 0} records on wishlist`;
+    : activeTab === "wishlist"
+    ? `${wishlistRecords?.length || 0} records on wishlist`
+    : "Tracking progress on artist discographies";
 
   return (
     <div className="app">
@@ -65,10 +77,14 @@ function RecordList() {
         </header>
         <Tabs activeTab={activeTab} onTabChange={handleTabChange} />
         <main className="main">
-          {isCollection ? (
-            <RecordGrid records={currentRecords || []} isLoading={isLoadingRecords} />
+          {activeTab === "collection" ? (
+            <RecordGrid records={records || []} isLoading={isLoadingRecords} />
+          ) : activeTab === "wishlist" ? (
+            <WishlistList records={wishlistRecords || []} isLoading={isLoadingWishlist} />
+          ) : artistSlug ? (
+            <ArtistProgressDetail artistSlug={artistSlug} onBack={handleArtistBack} />
           ) : (
-            <WishlistList records={currentRecords || []} isLoading={isLoadingWishlist} />
+            <ArtistProgressList onArtistSelect={handleArtistSelect} />
           )}
         </main>
       </div>
@@ -83,8 +99,6 @@ export default function App() {
         <ThemeToggle />
         <Routes>
           <Route path="/" element={<RecordList />} />
-          <Route path="/collecting" element={<ArtistProgressList />} />
-          <Route path="/collecting/:artistSlug" element={<ArtistProgressDetail />} />
           <Route path="/:artist/:album" element={<RecordDetail />} />
           <Route path="/testing" element={<Testing />} />
         </Routes>

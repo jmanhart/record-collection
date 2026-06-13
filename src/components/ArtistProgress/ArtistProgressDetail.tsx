@@ -1,38 +1,34 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useArtistDiscography } from "../../hooks/useDiscography";
 import { slugify } from "../../utils/slugify";
 import styles from "./ArtistProgressDetail.module.css";
 
-export function ArtistProgressDetail() {
-  const { artistSlug } = useParams<{ artistSlug: string }>();
+interface ArtistProgressDetailProps {
+  artistSlug: string;
+  onBack: () => void;
+}
+
+export function ArtistProgressDetail({ artistSlug, onBack }: ArtistProgressDetailProps) {
   const { artist, albums, progress, isLoading } = useArtistDiscography(
-    artistSlug || ""
+    artistSlug
   );
 
   if (isLoading) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.loading}>Loading...</div>
-      </div>
-    );
+    return <div className={styles.loading}>Loading...</div>;
   }
 
   if (!artist) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.loading}>Artist not found</div>
-      </div>
-    );
+    return <div className={styles.loading}>Artist not found</div>;
   }
 
   return (
-    <div className={styles.container}>
-      <Link to="/collecting" className={styles.backLink}>
+    <>
+      <button onClick={onBack} className={styles.backLink}>
         <ArrowLeft size={16} />
         Back to Collecting
-      </Link>
+      </button>
       <header className={styles.header}>
         <h2>{artist}</h2>
         <p className={styles.subtitle}>
@@ -44,7 +40,7 @@ export function ArtistProgressDetail() {
           <AlbumCard key={album.releaseId} album={album} />
         ))}
       </div>
-    </div>
+    </>
   );
 }
 
