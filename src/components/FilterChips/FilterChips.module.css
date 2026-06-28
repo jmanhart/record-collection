@@ -1,0 +1,80 @@
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.label {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-right: 0.25rem;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.filterPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--divider);
+  border-radius: 4px;
+  padding: 0.375rem 0.75rem;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  box-sizing: border-box;
+  font-family: inherit;
+  line-height: 1;
+  min-width: fit-content;
+  transition: transform 0.2s ease;
+}
+
+.filterPill:hover {
+  color: var(--text-primary);
+  border-color: var(--text-tertiary);
+  background: var(--surface100);
+}
+
+.filterPill.active {
+  background: var(--surface200) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--divider) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.filterPill:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--link);
+}
+
+.filterPill:active {
+  transform: translateY(1px);
+}
+
+.filterPillText {
+  margin-right: 0.25rem;
+}
+
+.filterPillCount {
+  color: var(--text-tertiary);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.filterPill.active .filterPillCount {
+  color: var(--text-secondary);
+}
+
+/* Dark mode adjustments */
+:global(.dark-theme) .filterPill:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+:global(.dark-theme) .filterPill.active {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
