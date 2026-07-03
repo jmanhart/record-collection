@@ -108,13 +108,59 @@ ndef.onreading = async (event) => {
    a. Looks up `nfc_tags` by `nfc_uid` → gets `release_id`
    b. Fetches the record details (album art, title, artist)
    c. Inserts row into `listens` table: `{ release_id, source: 'nfc' }`
-   d. Shows confirmation: album art + "Listen logged!" + listen count
-5. Optional: auto-close or redirect after a few seconds
+   d. Shows the **Listen Confirmation Screen** (see below)
+
+### Listen Confirmation Screen
+
+The tab that opens on each tap serves as a visual log/receipt. It should display:
+
+- **Album art** (from Supabase storage)
+- **Artist — Album Title**
+- **Date and time** of the listen (formatted nicely, e.g., "Thursday, July 3, 2026 at 8:42 PM")
+- **Status indicator**: "Listen logged!" (success) or "Already logged recently" (cooldown)
+- **Total listen count** for this record (e.g., "Listened 14 times")
+
+This screen is important — it's the confirmation that the tap worked and doubles as a timestamped log entry you can glance at. The date/time display matters because listen data will feed into a **timeline view** in the future (see Phase 4).
+
+The tab stays open so you can reference it. No auto-close.
 
 **Edge cases to handle:**
 - Unknown NFC UID (tag not paired yet) → "This tag isn't linked to a record. Pair it from your collection."
-- Duplicate rapid taps → debounce (ignore listens within 60 seconds of the last one for same record)
+- Duplicate rapid taps → see Spam Prevention below
 - Offline → queue the listen in localStorage, sync when back online (stretch goal)
+
+---
+
+## Spam Prevention & Debounce
+
+Two layers of protection, both enforced **server-side** (Supabase) so they can't be bypassed:
+
+### 1. Global cooldown — 2 minute timeout
+Only one listen can be logged every 2 minutes, regardless of which record. Rationale: you can only physically listen to one record at a time.
+
+Implemented as a Supabase RLS policy or database function that checks:
+```sql
+-- Reject insert if any listen exists within the last 2 minutes
+NOT EXISTS (
+  SELECT 1 FROM listens
+  WHERE listened_at > now() - interval '2 minutes'
+)
+```
+
+### 2. Per-record debounce — same record within 2 minutes
+Prevents accidental double-taps on the same tag from logging twice. Covered by the global cooldown above, but called out explicitly so the intent is clear.
+
+### Frontend handling
+When a listen is rejected by the cooldown, the `/listen/:nfcUid` page should:
+- Still show the album art and record info
+- Display "Already logged recently" instead of "Listen logged!"
+- Show when the last listen was recorded
+
+### Why server-side?
+Each NFC tap opens a fresh browser tab — there's no client-side state to persist between taps. The database is the only reliable place to enforce this.
+
+### Future: Arduino NFC reader
+The listen logging is designed as a simple API-style call (look up tag → insert listen). An Arduino with an NFC reader can hit the same `/listen/:nfcUid` URL or a dedicated Supabase Edge Function endpoint via HTTP POST. The 2-minute cooldown and debounce apply identically regardless of the source device.
 
 ---
 
@@ -129,7 +175,7 @@ ndef.onreading = async (event) => {
 | Listen logging       | Direct Supabase insert from frontend                        |
 | Auth                 | Lightweight (personal site — open or simple token)          |
 | Frontend             | New React routes + pairing UI on record detail page         |
-| Debounce             | Ignore duplicate NFC listens within 60s for same release_id |
+| Spam prevention      | 2-min global cooldown, server-side (Supabase RLS/function)  |
 
 ---
 
@@ -173,17 +219,57 @@ ndef.onreading = async (event) => {
 10. Add debounce logic (prevent rapid duplicate logs)
 11. Add to Vercel rewrite rules if needed (SPA catch-all should handle it)
 
-### Phase 4: Stats Frontend (future)
-12. Listen history page (recent listens)
-13. Most played records
-14. Listening streaks / calendar heatmap
-15. Per-record listen count on detail pages
+### Phase 4: Timeline & Analytics (future — planning in progress)
+See "Timeline & Analytics" section below for current thinking.
 
 ---
 
 ## Tag Placement
 
-Recommended: stick NTAG215 tags on the **inner sleeve** or **back of the jacket** where they won't interfere with the vinyl or artwork. The Pixel's NFC reader is in the upper-center back of the phone.
+Tags placed **inside the sleeve** with a label/name on each tag for identification. The Pixel's NFC reader is in the upper-center back of the phone.
+
+---
+
+## Timeline & Analytics (planning in progress)
+
+### What we know so far
+
+**Timeline feed:** A long chronological list of all listens, each entry showing:
+- Album art, artist, album title
+- Date and time of the listen
+- Runtime of the record (using existing `duration_seconds` data from Discogs sync)
+
+**Rollup views:** Day, week, month, and year summaries with full analytics. Stored in Supabase. Specific metrics and UI still being discussed.
+
+**Runtime data status:**
+- `duration_seconds` column already exists on `records` and `wishlist` tables
+- `fetchDurations.ts` in sync tools pulls track durations from Discogs API and sums per album
+- Frontend already uses this (collection page shows total listening time)
+- **Gap:** Some records won't have duration data on Discogs — `duration_seconds` will be `null` for those
+- Rollup totals will note "approximate" when some records lack duration data
+- Manual duration entry for missing records is a future nice-to-have
+
+### Open questions to resolve
+1. Timeline feed — single scrollable page or paginated?
+2. Should back-to-back listens of the same record (e.g., flipping sides and re-tapping) show as one entry or two?
+3. Rollup analytics — which specific metrics? Candidates:
+   - Total listens (count)
+   - Total listening time (hours/minutes)
+   - Most played records / artists
+   - Listening streaks (consecutive days)
+   - Average listens per day/week
+   - Genre breakdown (if genre data exists)
+   - Time-of-day patterns
+4. Rollup dashboard UI — cards with summary stats, or drill-down (click week → see each day)?
+5. Pre-computed rollup tables in Supabase vs. on-the-fly queries? (On-the-fly is fine for 140 records, pre-computed matters at scale)
+
+---
+
+## Tab Clutter Mitigation
+
+Each NFC tap opens a new Chrome tab. To minimize clutter:
+- The listen page will attempt `window.close()` after logging (works when the tab was opened by the OS, not always guaranteed)
+- If `window.close()` fails, show a minimal confirmation that doesn't need interaction
 
 ---
 
