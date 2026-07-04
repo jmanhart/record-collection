@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Search } from "../Search/Search";
-import { FilterChips } from "../FilterChips/FilterChips";
 import type { Record, SortField, SortOrder } from "../../types/Record";
 import { SortControls } from "./SortControls";
 import { RecordGridList } from "./RecordGridList";
@@ -113,18 +112,26 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
           onChange={handleSearchChange}
           placeholder="Search by title or artist..."
         />
-      </div>
 
-      <div className={styles.filterRow}>
-        <FilterChips
-          label="Genre"
-          options={genres}
-          counts={genreCounts}
-          selected={selectedGenre}
-          onSelect={handleGenreChange}
-          excludeList={filterConfig.excludeGenres}
-          minCount={filterConfig.minCount}
-        />
+        <select
+          className={styles.genreSelect}
+          value={selectedGenre}
+          onChange={(e) => handleGenreChange(e.target.value)}
+        >
+          <option value="all">All Genres</option>
+          {genres
+            .filter(
+              (g) =>
+                !filterConfig.excludeGenres.includes(g) &&
+                (genreCounts[g] || 0) >= filterConfig.minCount
+            )
+            .sort((a, b) => (genreCounts[b] || 0) - (genreCounts[a] || 0))
+            .map((genre) => (
+              <option key={genre} value={genre}>
+                {genre} ({genreCounts[genre]})
+              </option>
+            ))}
+        </select>
       </div>
 
       <div className={styles.grid}>
