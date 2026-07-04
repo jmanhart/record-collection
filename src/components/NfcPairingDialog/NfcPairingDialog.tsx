@@ -1,8 +1,9 @@
 import { useState, useCallback } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Nfc, Copy, Check, Scan } from "lucide-react";
+import { Copy, Check, Scan } from "lucide-react";
 import { useNfcTags } from "../../hooks/useNfcTags";
 import { normalizeNfcUid, isValidNfcUid, isWebNfcSupported, buildListenUrl } from "../../utils/nfc";
+import { Button } from "../Button/Button";
 import type { NfcTag } from "../../services/supabase";
 import styles from "./NfcPairingDialog.module.css";
 
@@ -11,12 +12,12 @@ interface NfcPairingDialogProps {
   existingTag?: NfcTag;
 }
 
-type Tab = "scan" | "manual";
+type Tab = "manual" | "scan";
 
 export function NfcPairingDialog({ releaseId, existingTag }: NfcPairingDialogProps) {
   const { pairTag, unpairTag, isPairing, isUnpairing } = useNfcTags();
   const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<Tab>(isWebNfcSupported() ? "scan" : "manual");
+  const [activeTab, setActiveTab] = useState<Tab>("manual");
   const [manualUid, setManualUid] = useState("");
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
@@ -25,6 +26,7 @@ export function NfcPairingDialog({ releaseId, existingTag }: NfcPairingDialogPro
 
   const isPaired = !!existingTag;
   const listenUrl = existingTag ? buildListenUrl(existingTag.nfc_uid) : "";
+  const webNfcAvailable = isWebNfcSupported();
 
   const handleCopy = useCallback(async (text: string) => {
     await navigator.clipboard.writeText(text);
@@ -123,16 +125,16 @@ export function NfcPairingDialog({ releaseId, existingTag }: NfcPairingDialogPro
       setManualUid("");
       setCopied(false);
       setScanning(false);
+      setActiveTab("manual");
     }
   };
 
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>
       <Dialog.Trigger asChild>
-        <button className={`${styles.trigger} ${isPaired ? styles.triggerPaired : styles.triggerUnpaired}`}>
-          <Nfc size={16} />
-          {isPaired ? "NFC Linked" : "Link NFC Tag"}
-        </button>
+        <Button variant={isPaired ? "success" : "ghost"}>
+          {isPaired ? "NFC Linked" : "Link NFC"}
+        </Button>
       </Dialog.Trigger>
 
       <Dialog.Portal>
@@ -166,47 +168,30 @@ export function NfcPairingDialog({ releaseId, existingTag }: NfcPairingDialogPro
               {error && <p className={styles.error}>{error}</p>}
 
               <div className={styles.actions}>
-                <button
-                  className={`${styles.button} ${styles.buttonDanger}`}
+                <Button
+                  variant="danger"
                   onClick={handleUnpair}
                   disabled={isUnpairing}
                 >
                   {isUnpairing ? "Unlinking..." : "Unlink Tag"}
-                </button>
+                </Button>
               </div>
             </div>
           ) : (
             <>
-              <div className={styles.tabs}>
-                {isWebNfcSupported() && (
+              {webNfcAvailable && (
+                <div className={styles.tabs}>
+                  <button
+                    className={`${styles.tab} ${activeTab === "manual" ? styles.tabActive : ""}`}
+                    onClick={() => setActiveTab("manual")}
+                  >
+                    Enter Manually
+                  </button>
                   <button
                     className={`${styles.tab} ${activeTab === "scan" ? styles.tabActive : ""}`}
                     onClick={() => setActiveTab("scan")}
                   >
                     Scan with Phone
-                  </button>
-                )}
-                <button
-                  className={`${styles.tab} ${activeTab === "manual" ? styles.tabActive : ""}`}
-                  onClick={() => setActiveTab("manual")}
-                >
-                  Enter Manually
-                </button>
-              </div>
-
-              {activeTab === "scan" && (
-                <div className={styles.section}>
-                  <p className={styles.instructions}>
-                    Hold an NFC tag against the back of your phone. The tag UID will be read and
-                    the listen URL will be written to the tag.
-                  </p>
-                  <button
-                    className={`${styles.button} ${styles.buttonPrimary} ${styles.scanButton} ${scanning ? styles.scanning : ""}`}
-                    onClick={handleScan}
-                    disabled={scanning || isPairing}
-                  >
-                    <Scan size={16} />
-                    {scanning ? "Scanning..." : "Start Scan"}
                   </button>
                 </div>
               )}
@@ -225,17 +210,35 @@ export function NfcPairingDialog({ releaseId, existingTag }: NfcPairingDialogPro
                         setManualUid(e.target.value);
                         setError("");
                       }}
-                      placeholder="04a23b1a2c5e80"
-                      maxLength={20}
+                      placeholder="04:01:DA:AE:47:02:89"
+                      maxLength={23}
                     />
-                    <button
-                      className={`${styles.button} ${styles.buttonPrimary}`}
+                    <Button
+                      variant="primary"
                       onClick={handleManualPair}
                       disabled={!manualUid.trim() || isPairing}
                     >
                       {isPairing ? "Linking..." : "Link"}
-                    </button>
+                    </Button>
                   </div>
+                </div>
+              )}
+
+              {activeTab === "scan" && (
+                <div className={styles.section}>
+                  <p className={styles.instructions}>
+                    Hold an NFC tag against the back of your phone. The tag UID will be read and
+                    the listen URL will be written to the tag.
+                  </p>
+                  <Button
+                    variant="primary"
+                    className={`${styles.scanButton} ${scanning ? styles.scanning : ""}`}
+                    onClick={handleScan}
+                    disabled={scanning || isPairing}
+                  >
+                    <Scan size={16} />
+                    {scanning ? "Scanning..." : "Start Scan"}
+                  </Button>
                 </div>
               )}
 
