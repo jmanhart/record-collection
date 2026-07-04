@@ -66,33 +66,36 @@ async function generateReadme() {
     ""
   );
 
-  // Table header
-  sections.push("| Album 1 | Album 2 | Album 3 |", "|:---:|:---:|:---:|");
-
-  // Generate rows
+  // Album grid using HTML table for even column widths
   const COLUMNS = 3;
+  sections.push('<table>', '<tbody>');
+
   for (let i = 0; i < records.length; i += COLUMNS) {
     const row = records.slice(i, i + COLUMNS);
-    const cells = row.map((record) => {
-      const imageUrl = `https://${
-        supabaseUrl.split("//")[1]
-      }/storage/v1/object/public/record-images/covers/${record.id}.jpeg`;
-      return `<img src="${imageUrl}" width="130" alt="${record.title.replace(
-        /"/g,
-        '\\"'
-      )}"/><br>${record.title.replace(/\|/g, "\\|")} - ${record.artist.replace(
-        /\|/g,
-        "\\|"
-      )}`;
-    });
-
-    // Pad with empty cells if needed
-    while (cells.length < COLUMNS) {
-      cells.push("&nbsp;");
+    sections.push('  <tr>');
+    for (let j = 0; j < COLUMNS; j++) {
+      const record = row[j];
+      if (record) {
+        const imageUrl = `https://${
+          supabaseUrl.split("//")[1]
+        }/storage/v1/object/public/record-images/covers/${record.id}.jpeg`;
+        const alt = record.title.replace(/"/g, '&quot;');
+        const title = record.title.replace(/</g, '&lt;');
+        const artist = record.artist.replace(/</g, '&lt;');
+        sections.push(
+          `    <td width="33%" align="center" valign="top">`,
+          `      <img src="${imageUrl}" width="200" alt="${alt}"/><br/>`,
+          `      <sub>${title} - ${artist}</sub>`,
+          `    </td>`
+        );
+      } else {
+        sections.push('    <td width="33%"></td>');
+      }
     }
-
-    sections.push(`|${cells.join("|")}|`);
+    sections.push('  </tr>');
   }
+
+  sections.push('</tbody>', '</table>');
 
   // Join all sections with newlines and add a final newline
   const fullContent = sections.join("\n") + "\n";
