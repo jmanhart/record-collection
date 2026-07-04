@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useListens } from "../../hooks/useListens";
 import { useRecords } from "../../hooks/useRecords";
 import { slugify } from "../../utils/slugify";
+import { TIMEZONE } from "../../utils/timezone";
 import type { Listen } from "../../services/supabase";
 import type { Record } from "../../types/Record";
 import styles from "./Timeline.module.css";
@@ -10,26 +11,46 @@ interface ListenWithRecord extends Listen {
   record?: Record;
 }
 
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: TIMEZONE,
+  year: "numeric",
+  month: "numeric",
+  day: "numeric",
+});
+
+function getCalendarDate(date: Date): string {
+  const parts = dateFormatter.formatToParts(date);
+  const year = parts.find((p) => p.type === "year")!.value;
+  const month = parts.find((p) => p.type === "month")!.value.padStart(2, "0");
+  const day = parts.find((p) => p.type === "day")!.value.padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
   const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-  const listenDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const todayKey = getCalendarDate(now);
+  const listenKey = getCalendarDate(date);
 
-  if (listenDate.getTime() === today.getTime()) return "Today";
-  if (listenDate.getTime() === yesterday.getTime()) return "Yesterday";
+  if (listenKey === todayKey) return "Today";
 
+  const yesterday = new Date(now.getTime() - 86400000);
+  const yesterdayKey = getCalendarDate(yesterday);
+  if (listenKey === yesterdayKey) return "Yesterday";
+
+  const year = listenKey.slice(0, 4);
+  const nowYear = todayKey.slice(0, 4);
   return date.toLocaleDateString("en-US", {
+    timeZone: TIMEZONE,
     month: "long",
     day: "numeric",
-    year: date.getFullYear() !== now.getFullYear() ? "numeric" : undefined,
+    year: year !== nowYear ? "numeric" : undefined,
   });
 }
 
 function formatTime(dateStr: string): string {
   return new Date(dateStr).toLocaleTimeString("en-US", {
+    timeZone: TIMEZONE,
     hour: "numeric",
     minute: "2-digit",
   });
