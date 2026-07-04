@@ -3,7 +3,7 @@
 -- Populated during the one-time pairing flow (Web NFC API on record detail page).
 CREATE TABLE nfc_tags (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  nfc_uid     TEXT UNIQUE NOT NULL,   -- hardware serial from NTAG215, e.g. "04:a2:3b:1a:2c:5e:80"
+  nfc_uid     TEXT UNIQUE NOT NULL,   -- hardware serial from NTAG215, colons stripped, e.g. "04a23b1a2c5e80"
   release_id  INTEGER NOT NULL,       -- Discogs release ID (matches records.id)
   created_at  TIMESTAMPTZ DEFAULT now()
 );
@@ -17,9 +17,24 @@ CREATE POLICY "Allow public read access"
   TO anon
   USING (true);
 
--- Restrict inserts to authenticated/service role (pairing flow only)
-CREATE POLICY "Allow authenticated insert"
+-- Allow anonymous insert and update (no auth on this site, pairing flow needs this)
+CREATE POLICY "Allow public insert"
   ON nfc_tags
   FOR INSERT
-  TO authenticated
+  TO anon
   WITH CHECK (true);
+
+-- Allow anonymous update (re-pairing a tag to a different record)
+CREATE POLICY "Allow public update"
+  ON nfc_tags
+  FOR UPDATE
+  TO anon
+  USING (true)
+  WITH CHECK (true);
+
+-- Allow anonymous delete (unlinking a tag)
+CREATE POLICY "Allow public delete"
+  ON nfc_tags
+  FOR DELETE
+  TO anon
+  USING (true);

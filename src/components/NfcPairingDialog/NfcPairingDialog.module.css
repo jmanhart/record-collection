@@ -1,0 +1,280 @@
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  flex-direction: row;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.trigger svg {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.triggerUnpaired {
+  background: transparent;
+  border: 2px dashed var(--divider);
+  color: var(--text-secondary);
+}
+
+.triggerUnpaired:hover {
+  border-color: var(--text-tertiary);
+  background: var(--surface200);
+}
+
+.triggerPaired {
+  background: var(--surface200);
+  border: 2px solid var(--red200);
+  color: var(--text-primary);
+}
+
+.triggerPaired:hover {
+  background: var(--surface300);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  animation: fadeIn 0.15s ease;
+}
+
+.content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--surface100);
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  padding: 1.5rem;
+  width: 90vw;
+  max-width: 420px;
+  min-width: 300px;
+  z-index: 101;
+  box-sizing: border-box;
+  animation: slideIn 0.15s ease;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+}
+
+.tabs {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--divider);
+}
+
+.tab {
+  padding: 0.5rem 1rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.tab:hover {
+  color: var(--text-primary);
+}
+
+.tabActive {
+  color: var(--text-primary);
+  border-bottom-color: var(--red200);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.instructions {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--divider);
+  border-radius: 6px;
+  background: var(--surface200);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-family: monospace;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--red200);
+}
+
+.inputError {
+  border-color: var(--red100);
+}
+
+.error {
+  font-size: 0.8rem;
+  color: var(--red100);
+  margin: 0;
+}
+
+.button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease;
+}
+
+.buttonPrimary {
+  background: var(--red200);
+  color: #fff;
+}
+
+.buttonPrimary:hover:not(:disabled) {
+  background: var(--red100);
+}
+
+.buttonPrimary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.buttonDanger {
+  background: transparent;
+  border: 1px solid var(--red100);
+  color: var(--red100);
+}
+
+.buttonDanger:hover {
+  background: var(--red100);
+  color: #fff;
+}
+
+.buttonGhost {
+  background: var(--surface200);
+  color: var(--text-primary);
+  border: 1px solid var(--divider);
+}
+
+.buttonGhost:hover {
+  background: var(--surface300);
+}
+
+.urlDisplay {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface200);
+  border: 1px solid var(--divider);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+}
+
+.urlText {
+  flex: 1;
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  word-break: break-all;
+}
+
+.copyButton {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.copyButton:hover {
+  color: var(--text-primary);
+  background: var(--surface300);
+}
+
+.pairedInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tagUid {
+  font-family: monospace;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.label {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.scanButton {
+  width: 100%;
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.scanning {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translate(-50%, -48%); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}

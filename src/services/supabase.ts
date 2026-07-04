@@ -130,6 +130,68 @@ export interface DiscographyTarget {
   supabase_image_url: string | null;
 }
 
+export interface NfcTag {
+  id: string;
+  nfc_uid: string;
+  release_id: number;
+  created_at: string;
+}
+
+export const getNfcTags = async (): Promise<NfcTag[]> => {
+  const { data, error } = await supabase.from("nfc_tags").select("*");
+
+  if (error) {
+    console.error("Error fetching NFC tags:", error);
+    throw error;
+  }
+
+  return data || [];
+};
+
+export const createNfcTag = async (
+  nfcUid: string,
+  releaseId: number
+): Promise<NfcTag> => {
+  const { data, error } = await supabase
+    .from("nfc_tags")
+    .insert({ nfc_uid: nfcUid, release_id: releaseId })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data as NfcTag;
+};
+
+export const deleteNfcTag = async (id: string): Promise<void> => {
+  const { error } = await supabase.from("nfc_tags").delete().eq("id", id);
+  if (error) throw error;
+};
+
+export const logListen = async (releaseId: number): Promise<void> => {
+  const { error } = await supabase
+    .from("listens")
+    .insert({ release_id: releaseId, source: "nfc" });
+
+  if (error) {
+    console.error("Error logging listen:", error);
+    throw error;
+  }
+};
+
+export const getListenCount = async (releaseId: number): Promise<number> => {
+  const { count, error } = await supabase
+    .from("listens")
+    .select("*", { count: "exact", head: true })
+    .eq("release_id", releaseId);
+
+  if (error) {
+    console.error("Error fetching listen count:", error);
+    throw error;
+  }
+
+  return count || 0;
+};
+
 export const getDiscographyTargets = async (): Promise<DiscographyTarget[]> => {
   const { data, error } = await supabase
     .from("discography_targets")

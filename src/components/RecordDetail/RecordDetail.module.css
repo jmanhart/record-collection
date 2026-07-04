@@ -59,6 +59,19 @@
   text-wrap: pretty
 }
 
+.nfcSection {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0 1.5rem;
+}
+
+.listenCount {
+  font-size: 1.5rem;
+  color: var(--text-tertiary);
+  text-align: center;
+  margin: 0;
+}
+
 .article p {
   font-size: 1.2rem;
   line-height: 1.8em;

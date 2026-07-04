@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, useSearchParams } from "react-r
 import * as Sentry from "@sentry/react";
 import { RecordGrid } from "./components/RecordGrid/RecordGrid";
 import { RecordDetail } from "./components/RecordDetail/RecordDetail";
+import { ListenRedirect } from "./components/ListenRedirect/ListenRedirect";
 import { Testing } from "./components/Testing/Testing";
 import { ArtistProgressList } from "./components/ArtistProgress/ArtistProgressList";
 import { ArtistProgressDetail } from "./components/ArtistProgress/ArtistProgressDetail";
@@ -99,6 +100,7 @@ export default function App() {
         <ThemeToggle />
         <Routes>
           <Route path="/" element={<RecordList />} />
+          <Route path="/listen/:uid" element={<ListenRedirect />} />
           <Route path="/:artist/:album" element={<RecordDetail />} />
           <Route path="/testing" element={<Testing />} />
         </Routes>

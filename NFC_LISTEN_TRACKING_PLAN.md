@@ -57,43 +57,91 @@ This split gives the best UX: the browser handles the smart setup work once, the
 
 ## Detailed Flows
 
-### Pairing Flow (in-browser, Web NFC API)
+### NFC Status on Records
 
-**When:** One-time setup for each of the 30 records getting tags
-**Where:** Record detail page on `records.manhart.io` in Chrome on Pixel
-**How:**
+Every record in the collection shows an NFC paired/unpaired indicator:
+- **Collection grid/list view:** Small icon or badge on each record showing NFC status (paired vs not)
+- **Record detail page:** Clear indicator — "NFC Tag Linked" or "No NFC Tag"
+- **Data source:** Query `nfc_tags` table to check if a `release_id` has a matching row
+- **Use case:** As you slowly backlog through 140+ records, you can see at a glance which ones still need tagging
 
-1. User navigates to a record's detail page (e.g., `/:artist/:album`)
-2. Taps a "Link NFC Tag" button (only visible on Android/Chrome where Web NFC is supported)
+### Pairing Flow — Two Methods
+
+There are two ways to pair a tag to a record. Both save the same data to Supabase and produce the same result. Use whichever works best in the moment.
+
+---
+
+#### Method A: In-Browser Web NFC (automated)
+
+**When the Web NFC API works well, this is the fastest path.**
+
+1. Navigate to a record's detail page on your Pixel in Chrome
+2. Tap "Link NFC Tag" button
 3. Browser shows NFC prompt — "Hold your NFC tag to the back of your phone"
-4. Web NFC API reads the tag's **hardware serial number** (UID) — this is read-only, unique per tag, unforgeable
-5. Web NFC API writes an NDEF URL record to the tag: `https://records.manhart.io/listen/{nfc_uid}`
-6. Frontend inserts a row into `nfc_tags` table: `{ nfc_uid, release_id }`
-7. UI confirms: "Tag linked to [Album Name]!"
+4. Web NFC API reads the tag's hardware UID
+5. Web NFC API writes the listen URL to the tag: `https://records.manhart.io/listen/{nfc_uid_no_colons}`
+6. Frontend saves the mapping to `nfc_tags` table
+7. UI confirms: "Tag linked!" and shows the NFC status as paired
 
 **Web NFC API requirements:**
 - HTTPS (Vercel provides this)
-- Chrome on Android only (no iOS — Apple locks NFC)
+- Chrome on Android only
 - Must be triggered by a user gesture (button tap)
 - Page must be in foreground during scan
 
 **Code approach:**
 ```typescript
-// Pairing — read UID + write URL
 const ndef = new NDEFReader();
 await ndef.scan();
 ndef.onreading = async (event) => {
   const uid = event.serialNumber; // e.g., "04:a2:3b:1a:2c:5e:80"
+  const uidClean = uid.replaceAll(":", ""); // "04a23b1a2c5e80" — safe for URLs
 
   // Write the listen URL to the tag
   await ndef.write({
-    records: [{ recordType: "url", data: `https://records.manhart.io/listen/${uid}` }]
+    records: [{ recordType: "url", data: `https://records.manhart.io/listen/${uidClean}` }]
   });
 
-  // Save mapping to Supabase
-  await supabase.from('nfc_tags').insert({ nfc_uid: uid, release_id: currentRecordId });
+  // Save mapping to Supabase (store the clean version)
+  await supabase.from('nfc_tags').insert({ nfc_uid: uidClean, release_id: currentRecordId });
 };
 ```
+
+---
+
+#### Method B: Manual Entry + NFC Tools App (fallback)
+
+**For when the Web NFC API is unreliable or you're working from desktop.**
+
+**Step 1 — Save the mapping (on website, any device):**
+1. Navigate to a record's detail page
+2. Tap "Link NFC Tag" → choose "Enter manually"
+3. Paste the tag's UID (copied from NFC Tools app on your phone)
+4. System saves the mapping to `nfc_tags` table
+5. System shows the full listen URL with a **copy button**: `https://records.manhart.io/listen/04a23b1a2c5e80`
+6. Copy the URL — paste it to Discord, notes, wherever you can grab it on your phone
+
+**Step 2 — Write the URL to the tag (on phone, NFC Tools app):**
+1. Open NFC Tools on your Pixel
+2. Write → Add a record → URL
+3. Paste the listen URL you copied from the website
+4. Hold tag to phone → URL written
+
+**This separates the two concerns:**
+- Saving the mapping (website, always works)
+- Writing the URL to the tag (NFC Tools fallback if Web NFC is rough)
+
+The URL is human-readable and easy to copy/paste through Discord or any messaging app.
+
+---
+
+#### Pairing UI on Record Detail Page
+
+The "Link NFC Tag" button opens a small modal/panel with:
+- **"Scan with phone"** — triggers Web NFC API (Method A)
+- **"Enter manually"** — shows a text input for pasting UID from NFC Tools (Method B)
+- After pairing (either method): shows the listen URL with a copy button
+- If already paired: shows "NFC Tag Linked" with the UID and URL (copyable), plus option to unlink/re-pair
 
 ### Listen Logging Flow (native Android NFC → web page)
 
@@ -103,7 +151,7 @@ ndef.onreading = async (event) => {
 
 1. User taps Pixel on the NFC tag stuck to the record/sleeve
 2. Android OS reads the NDEF URL from the tag (no app needed)
-3. Android auto-opens Chrome to `https://records.manhart.io/listen/{nfc_uid}`
+3. Android auto-opens Chrome to `https://records.manhart.io/listen/{nfc_uid_no_colons}`
 4. React route `/listen/:nfcUid` mounts and:
    a. Looks up `nfc_tags` by `nfc_uid` → gets `release_id`
    b. Fetches the record details (album art, title, artist)
@@ -206,12 +254,15 @@ The listen logging is designed as a simple API-style call (look up tag → inser
 1. Create `nfc_tags` table in Supabase with RLS policies
 2. Create `listens` table in Supabase with RLS policies
 
-### Phase 2: Pairing Flow (in-browser)
-3. Add Web NFC TypeScript types (or `@types/web-nfc`)
-4. Create NFC pairing hook: `useNfcPairing(releaseId)`
-5. Add "Link NFC Tag" button to record detail page
-6. Implement read UID + write URL + save to Supabase flow
-7. Handle browser compatibility (hide button on unsupported browsers)
+### Phase 2: Pairing Flow
+3. Add NFC status indicator to collection grid (paired/unpaired badge per record)
+4. Add NFC status indicator to record detail page
+5. Add "Link NFC Tag" button + modal to record detail page with two methods:
+   a. Method A: Web NFC scan (auto read UID + write URL) — requires TypeScript types, browser detection
+   b. Method B: Manual UID entry (paste from NFC Tools) + copyable listen URL output
+6. Create `useNfcPairing(releaseId)` hook for Web NFC logic
+7. Create Supabase query hook to check NFC status per record (has tag or not)
+8. After pairing (either method): display copyable listen URL for fallback writing via NFC Tools
 
 ### Phase 3: Listen Logging Route
 8. Create `/listen/:nfcUid` route and component

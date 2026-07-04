@@ -68,6 +68,21 @@
   color: #fff;
 }
 
+.nfcBadge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+}
+
 .errorIndicator {
   position: absolute;
   top: 0.5rem;
@@ -151,7 +166,8 @@
     overflow: hidden;
   }
 
-  .articleBadge {
+  .articleBadge,
+  .nfcBadge {
     display: none;
   }
 

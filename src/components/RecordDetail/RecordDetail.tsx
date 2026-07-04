@@ -1,9 +1,13 @@
 import { useParams, Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { PenLine } from "lucide-react";
 import { useRecords } from "../../hooks/useRecords";
 import { useArticle } from "../../hooks/useArticle";
+import { useNfcTags } from "../../hooks/useNfcTags";
+import { getListenCount } from "../../services/supabase";
 import { hasArticle } from "../../content/articles/articleIds";
 import { slugify } from "../../utils/slugify";
+import { NfcPairingDialog } from "../NfcPairingDialog/NfcPairingDialog";
 import styles from "./RecordDetail.module.css";
 
 export function RecordDetail() {
@@ -14,6 +18,14 @@ export function RecordDetail() {
   );
 
   const { article, isLoading: isLoadingArticle } = useArticle(record?.id);
+  const { getNfcTag } = useNfcTags();
+  const nfcTag = record ? getNfcTag(record.id) : undefined;
+
+  const { data: listenCount } = useQuery({
+    queryKey: ["listen-count", record?.id],
+    queryFn: () => getListenCount(record!.id),
+    enabled: !!nfcTag && !!record,
+  });
 
   if (!record) {
     return (
@@ -37,10 +49,16 @@ export function RecordDetail() {
         <div className={styles.info}>
           <h1>{record.title}</h1>
           <h2>{record.artist}</h2>
-          {/* <p>Format: {record.format_name}</p> */}
-          {/* {record.year && <p>Year: {record.year}</p>}
-          {record.genres && <p>Genres: {record.genres.join(", ")}</p>} */}
+          {nfcTag && (
+            <p className={styles.listenCount}>
+              {listenCount ?? 0} {listenCount === 1 ? "listen" : "listens"}
+            </p>
+          )}
         </div>
+      </div>
+
+      <div className={styles.nfcSection}>
+        <NfcPairingDialog releaseId={record.id} existingTag={nfcTag} />
       </div>
 
       {(isLoadingArticle || article) && (

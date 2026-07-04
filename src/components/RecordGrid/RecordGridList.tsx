@@ -1,6 +1,7 @@
 import React from "react";
 import { RecordCard } from "../RecordCard/RecordCard";
 import { hasArticle } from "../../content/articles/articleIds";
+import { useNfcTags } from "../../hooks/useNfcTags";
 import type { Record } from "../../types/Record";
 
 interface RecordGridListProps {
@@ -8,6 +9,8 @@ interface RecordGridListProps {
 }
 
 export function RecordGridList({ records }: RecordGridListProps) {
+  const { hasNfcTag } = useNfcTags();
+
   return (
     <>
       {records.map((record) => (
@@ -15,6 +18,7 @@ export function RecordGridList({ records }: RecordGridListProps) {
           key={record.id}
           record={record}
           hasArticle={hasArticle(record.id)}
+          hasNfc={hasNfcTag(record.id)}
         />
       ))}
     </>
