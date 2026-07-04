@@ -167,10 +167,10 @@ export const deleteNfcTag = async (id: string): Promise<void> => {
   if (error) throw error;
 };
 
-export const logListen = async (releaseId: number): Promise<void> => {
+export const logListen = async (releaseId: number, source = "nfc"): Promise<void> => {
   const { error } = await supabase
     .from("listens")
-    .insert({ release_id: releaseId, source: "nfc" });
+    .insert({ release_id: releaseId, source });
 
   if (error) {
     console.error("Error logging listen:", error);
