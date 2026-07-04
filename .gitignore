@@ -32,3 +32,6 @@ dist-ssr
 # .gitignore
 .env.local
 .env.*.local
+
+# Backups
+backups/

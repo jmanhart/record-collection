@@ -39,12 +39,26 @@ async function generateReadme() {
     "## Quick Start",
     "",
     "```bash",
-    "# Install dependencies",
-    "npm install",
-    "",
-    "# Start development server",
-    "npm run dev",
+    "npm install        # Install dependencies",
+    "npm run dev        # Start dev server",
     "```",
+    "",
+    "## Scripts",
+    "",
+    "| Command | Description |",
+    "|---------|-------------|",
+    "| `npm run dev` | Start local dev server |",
+    "| `npm run build` | Production build |",
+    "| `npm run lint` | ESLint (strict, zero warnings) |",
+    "| `npm run sync:discogs` | Sync records from Discogs to Supabase |",
+    "| `npm run sync:discography` | Sync discography targets with Discogs metadata |",
+    "| `npm run sync:readme` | Regenerate this README with album covers |",
+    "| `npm run sync:all` | Run discogs + readme syncs |",
+    "| `npm run backup` | Backup all tables locally to `backups/` |",
+    "| `npm run backup:push` | Backup locally + push to GitHub backup repo |",
+    "| `npm run restore` | Dry-run restore (prints plan, no changes) |",
+    "| `npm run restore:execute` | Restore from most recent backup |",
+    "| `npm run article:new` | Scaffold a new MDX article |",
     "",
     "## Collection",
     "",
@@ -63,7 +77,7 @@ async function generateReadme() {
       const imageUrl = `https://${
         supabaseUrl.split("//")[1]
       }/storage/v1/object/public/record-images/covers/${record.id}.jpeg`;
-      return `<img src="${imageUrl}" width="200" alt="${record.title.replace(
+      return `<img src="${imageUrl}" width="130" alt="${record.title.replace(
         /"/g,
         '\\"'
       )}"/><br>${record.title.replace(/\|/g, "\\|")} - ${record.artist.replace(

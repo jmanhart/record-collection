@@ -17,7 +17,11 @@
     "sync:discography": "npm run sync:discography -w tools/sync",
     "sync:all": "npm run sync:discogs && npm run sync:readme",
     "tools:dev": "npm run dev -w tools/sync",
-    "article:new": "node scripts/newArticle.js"
+    "article:new": "node scripts/newArticle.js",
+    "backup": "node scripts/backup.cjs",
+    "backup:push": "node scripts/backup.cjs --push",
+    "restore": "node scripts/restore.cjs",
+    "restore:execute": "node scripts/restore.cjs --execute"
   },
   "dependencies": {
     "@mdx-js/react": "^3.0.1",
