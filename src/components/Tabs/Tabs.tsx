@@ -1,6 +1,6 @@
 import styles from "./Tabs.module.css";
 
-export type TabValue = "collection" | "wishlist" | "collecting";
+export type TabValue = "timeline" | "collection" | "wishlist" | "collecting";
 
 interface TabsProps {
   activeTab: TabValue;
@@ -10,6 +10,12 @@ interface TabsProps {
 export function Tabs({ activeTab, onTabChange }: TabsProps) {
   return (
     <div className={styles.tabs}>
+      <button
+        className={`${styles.tab} ${activeTab === "timeline" ? styles.active : ""}`}
+        onClick={() => onTabChange("timeline")}
+      >
+        Timeline
+      </button>
       <button
         className={`${styles.tab} ${activeTab === "collection" ? styles.active : ""}`}
         onClick={() => onTabChange("collection")}

@@ -192,6 +192,27 @@ export const getListenCount = async (releaseId: number): Promise<number> => {
   return count || 0;
 };
 
+export interface Listen {
+  id: string;
+  release_id: number;
+  listened_at: string;
+  source: string;
+}
+
+export const getListens = async (): Promise<Listen[]> => {
+  const { data, error } = await supabase
+    .from("listens")
+    .select("*")
+    .order("listened_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching listens:", error);
+    throw error;
+  }
+
+  return data || [];
+};
+
 export const getDiscographyTargets = async (): Promise<DiscographyTarget[]> => {
   const { data, error } = await supabase
     .from("discography_targets")

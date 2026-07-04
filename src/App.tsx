@@ -6,6 +6,7 @@ import { ListenRedirect } from "./components/ListenRedirect/ListenRedirect";
 import { Testing } from "./components/Testing/Testing";
 import { ArtistProgressList } from "./components/ArtistProgress/ArtistProgressList";
 import { ArtistProgressDetail } from "./components/ArtistProgress/ArtistProgressDetail";
+import { Timeline } from "./components/Timeline/Timeline";
 import { ThemeToggle } from "./components/ThemeToggle/ThemeToggle";
 import { AlphabetIndicator } from "./components/AlphabetIndicator/AlphabetIndicator";
 import { Tabs, type TabValue } from "./components/Tabs/Tabs";
@@ -66,6 +67,8 @@ function RecordList() {
     ? `${records?.length || 0} records in collection${runtimeSuffix ? ` · ${runtimeSuffix}` : ""}`
     : activeTab === "wishlist"
     ? `${wishlistRecords?.length || 0} records on wishlist`
+    : activeTab === "timeline"
+    ? "Recent listening activity"
     : "Tracking progress on artist discographies";
 
   return (
@@ -78,7 +81,9 @@ function RecordList() {
         </header>
         <Tabs activeTab={activeTab} onTabChange={handleTabChange} />
         <main className="main">
-          {activeTab === "collection" ? (
+          {activeTab === "timeline" ? (
+            <Timeline />
+          ) : activeTab === "collection" ? (
             <RecordGrid records={records || []} isLoading={isLoadingRecords} />
           ) : activeTab === "wishlist" ? (
             <WishlistList records={wishlistRecords || []} isLoading={isLoadingWishlist} />
