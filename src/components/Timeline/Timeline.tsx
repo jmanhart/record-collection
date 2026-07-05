@@ -56,6 +56,15 @@ function formatTime(dateStr: string): string {
   });
 }
 
+function formatDuration(totalSeconds: number): string {
+  if (totalSeconds <= 0) return "< 1min";
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.round((totalSeconds % 3600) / 60);
+  if (hours === 0) return `${minutes}min`;
+  if (minutes === 0) return `${hours}hr`;
+  return `${hours}hr ${minutes}min`;
+}
+
 function groupByDate(listens: ListenWithRecord[]): Map<string, ListenWithRecord[]> {
   const groups = new Map<string, ListenWithRecord[]>();
   for (const listen of listens) {
@@ -96,7 +105,12 @@ export function Timeline() {
     <div className={styles.timeline}>
       {Array.from(grouped.entries()).map(([date, items]) => (
         <div key={date} className={styles.group}>
-          <h4 className={styles.dateHeading}>{date}</h4>
+          <h4 className={styles.dateHeading}>
+            <span>{date}</span>
+            <span className={styles.daySummary}>
+              {new Set(items.map((i) => i.release_id)).size} albums · {formatDuration(items.reduce((sum, i) => sum + (i.record?.duration_seconds || 0), 0))}
+            </span>
+          </h4>
           <div className={styles.entries}>
             {items.map((item) => {
               const record = item.record;

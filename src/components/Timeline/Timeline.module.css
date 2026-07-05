@@ -14,6 +14,9 @@
 }
 
 .dateHeading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-tertiary);
@@ -22,6 +25,12 @@
   margin: 0 0 0.5rem;
   padding-bottom: 0.4rem;
   border-bottom: 1px solid var(--divider);
+}
+
+.daySummary {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
 }
 
 .entries {
