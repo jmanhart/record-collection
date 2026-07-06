@@ -1,5 +1,5 @@
 .container {
-  max-width: 650px;
+  max-width: 1100px;
   margin: 2rem auto;
   padding: 0 2rem;
   width: 100%;
@@ -38,36 +38,95 @@
   padding: 1rem 0;
 }
 
-.list {
-  list-style: none;
-  margin: 1rem 0 0;
-  padding: 0;
-  max-height: 400px;
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.left {
+  min-width: 0;
+}
+
+.tableWrapper {
+  margin-top: 1rem;
+  max-height: 500px;
   overflow-y: auto;
   border: 2px solid var(--divider);
   border-radius: 8px;
 }
 
-.recordButton {
-  display: flex;
-  flex-direction: column;
+.table {
   width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.table thead {
+  position: sticky;
+  top: 0;
+  background: var(--surface100);
+  z-index: 1;
+}
+
+.table th {
   text-align: left;
   padding: 0.625rem 1rem;
+  border-bottom: 1px solid var(--divider);
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.sortButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
   background: none;
   border: none;
-  border-bottom: 1px solid var(--divider);
-  color: var(--text-primary);
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--text-secondary);
   cursor: pointer;
-  font-family: inherit;
 }
 
-.recordButton:hover {
+.sortButton:hover {
+  color: var(--text-primary);
+}
+
+.sortArrow {
+  font-size: 0.8rem;
+}
+
+.listensCol,
+.nfcCol {
+  text-align: center;
+  width: 80px;
+}
+
+.row {
+  cursor: pointer;
+  border-bottom: 1px solid var(--divider);
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.row:hover {
+  background-color: var(--surface100);
+}
+
+.rowActive,
+.rowActive:hover {
   background-color: var(--surface200);
 }
 
-.recordButtonActive {
-  background-color: var(--surface200);
+.table td {
+  padding: 0.625rem 1rem;
+  vertical-align: middle;
 }
 
 .recordArtist {
@@ -79,14 +138,25 @@
   font-size: 1rem;
 }
 
-.selectedPanel {
-  margin-top: 1.5rem;
+.listensCell,
+.nfcCell {
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.nfcCheck {
+  color: var(--text-primary);
+  display: inline-flex;
+}
+
+.detailPane {
   padding: 1.5rem;
   border: 2px solid var(--divider);
   border-radius: 8px;
+  min-height: 180px;
 }
 
-.selectedPanel h2 {
+.detailPane h2 {
   margin: 0 0 1rem;
   font-size: 1.25rem;
 }
@@ -94,4 +164,10 @@
 .actions {
   display: flex;
   gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
 }
