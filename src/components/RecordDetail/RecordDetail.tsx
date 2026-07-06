@@ -3,9 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { PenLine } from "lucide-react";
 import { useRecords } from "../../hooks/useRecords";
 import { useArticle } from "../../hooks/useArticle";
+import { useNfcTags } from "../../hooks/useNfcTags";
+import { useAdminAuth } from "../../hooks/useAdminAuth";
 import { getListenCount } from "../../services/supabase";
 import { hasArticle } from "../../content/articles/articleIds";
 import { slugify } from "../../utils/slugify";
+import { NfcPairingDialog } from "../NfcPairingDialog/NfcPairingDialog";
+import { LogListenDialog } from "../LogListenDialog/LogListenDialog";
 import styles from "./RecordDetail.module.css";
 
 export function RecordDetail() {
@@ -16,6 +20,8 @@ export function RecordDetail() {
   );
 
   const { article, isLoading: isLoadingArticle } = useArticle(record?.id);
+  const { isAdmin } = useAdminAuth();
+  const { getNfcTag } = useNfcTags();
 
   const { data: listenCount } = useQuery({
     queryKey: ["listen-count", record?.id],
@@ -52,6 +58,13 @@ export function RecordDetail() {
           )}
         </div>
       </div>
+
+      {isAdmin && (
+        <div className={styles.nfcSection}>
+          <NfcPairingDialog releaseId={record.id} existingTag={getNfcTag(record.id)} />
+          <LogListenDialog releaseId={record.id} title={record.title} artist={record.artist} />
+        </div>
+      )}
 
       {(isLoadingArticle || article) && (
         <div className={styles.article}>

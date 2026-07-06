@@ -6,6 +6,7 @@ import { ListenRedirect } from "./components/ListenRedirect/ListenRedirect";
 import { Testing } from "./components/Testing/Testing";
 import { AdminGate } from "./components/AdminGate/AdminGate";
 import { AdminPanel } from "./components/AdminPanel/AdminPanel";
+import { AdminAuthProvider } from "./contexts/AdminAuthContext";
 import { ArtistProgressList } from "./components/ArtistProgress/ArtistProgressList";
 import { ArtistProgressDetail } from "./components/ArtistProgress/ArtistProgressDetail";
 import { Timeline } from "./components/Timeline/Timeline";
@@ -103,23 +104,25 @@ function RecordList() {
 export default function App() {
   return (
     <Sentry.ErrorBoundary fallback={<div>Something went wrong. Please refresh the page.</div>}>
-      <Router>
-        <ThemeToggle />
-        <Routes>
-          <Route path="/" element={<RecordList />} />
-          <Route path="/listen/:uid" element={<ListenRedirect />} />
-          <Route path="/:artist/:album" element={<RecordDetail />} />
-          <Route path="/testing" element={<Testing />} />
-          <Route
-            path="/admin"
-            element={
-              <AdminGate>
-                <AdminPanel />
-              </AdminGate>
-            }
-          />
-        </Routes>
-      </Router>
+      <AdminAuthProvider>
+        <Router>
+          <ThemeToggle />
+          <Routes>
+            <Route path="/" element={<RecordList />} />
+            <Route path="/listen/:uid" element={<ListenRedirect />} />
+            <Route path="/:artist/:album" element={<RecordDetail />} />
+            <Route path="/testing" element={<Testing />} />
+            <Route
+              path="/admin"
+              element={
+                <AdminGate>
+                  <AdminPanel />
+                </AdminGate>
+              }
+            />
+          </Routes>
+        </Router>
+      </AdminAuthProvider>
     </Sentry.ErrorBoundary>
   );
 }

@@ -1,22 +1,18 @@
 import { useState, type FormEvent, type ReactNode } from "react";
+import { useAdminAuth } from "../../hooks/useAdminAuth";
 import { Button } from "../Button/Button";
 import styles from "./AdminGate.module.css";
-
-const GATE_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
-const SESSION_KEY = "admin-authenticated";
 
 interface AdminGateProps {
   children: ReactNode;
 }
 
 export function AdminGate({ children }: AdminGateProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    () => sessionStorage.getItem(SESSION_KEY) === "true"
-  );
+  const { isAdmin, isConfigured, login } = useAdminAuth();
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  if (!GATE_PASSWORD) {
+  if (!isConfigured) {
     return (
       <div className={styles.container}>
         <div className={styles.box}>
@@ -29,15 +25,13 @@ export function AdminGate({ children }: AdminGateProps) {
     );
   }
 
-  if (isAuthenticated) {
+  if (isAdmin) {
     return <>{children}</>;
   }
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (password === GATE_PASSWORD) {
-      sessionStorage.setItem(SESSION_KEY, "true");
-      setIsAuthenticated(true);
+    if (login(password)) {
       setError("");
     } else {
       setError("Incorrect password");
@@ -61,7 +55,7 @@ export function AdminGate({ children }: AdminGateProps) {
           />
           {error && <p className={styles.error}>{error}</p>}
           <Button type="submit" variant="primary">
-            Enter
+            Login
           </Button>
         </form>
       </div>

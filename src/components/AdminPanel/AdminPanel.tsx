@@ -2,7 +2,9 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useRecords } from "../../hooks/useRecords";
 import { useNfcTags } from "../../hooks/useNfcTags";
+import { useAdminAuth } from "../../hooks/useAdminAuth";
 import { Search } from "../Search/Search";
+import { Button } from "../Button/Button";
 import { NfcPairingDialog } from "../NfcPairingDialog/NfcPairingDialog";
 import { LogListenDialog } from "../LogListenDialog/LogListenDialog";
 import type { Record } from "../../types/Record";
@@ -11,6 +13,7 @@ import styles from "./AdminPanel.module.css";
 export function AdminPanel() {
   const { records, isLoading } = useRecords();
   const { getNfcTag } = useNfcTags();
+  const { logout } = useAdminAuth();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Record | null>(null);
 
@@ -28,9 +31,14 @@ export function AdminPanel() {
     <div className={styles.container}>
       <header className={styles.header}>
         <h1>Admin</h1>
-        <Link to="/" className={styles.backLink}>
-          ← Back to collection
-        </Link>
+        <div className={styles.headerActions}>
+          <Link to="/" className={styles.backLink}>
+            ← Back to collection
+          </Link>
+          <Button variant="ghost" size="sm" onClick={logout}>
+            Logout
+          </Button>
+        </div>
       </header>
 
       <Search value={search} onChange={setSearch} placeholder="Search records..." />

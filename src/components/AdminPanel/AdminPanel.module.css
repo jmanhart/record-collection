@@ -9,12 +9,18 @@
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   margin-bottom: 1.5rem;
 }
 
 .header h1 {
   margin: 0;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .backLink {
