@@ -21,6 +21,17 @@ These are used by the main React application and the sync tool:
   - ⚠️ **Keep this secret!** This key has admin privileges
   - Where to find: Supabase Dashboard → Settings → API → Project API keys → `service_role` `secret`
 
+### Admin Panel
+
+- **`VITE_ADMIN_PASSWORD`** - Shared password gating the `/admin` route
+  - Used in: `src/components/AdminGate/AdminGate.tsx`
+  - Protects NFC tag pairing and manual listen logging from casual visitors
+  - ⚠️ This is a client-side check only, not real authentication — the
+    value ships in the JS bundle and is recoverable via dev tools. It stops
+    casual stumbling, not a determined attacker. It also does not restrict
+    direct writes to Supabase via the exposed anon key (see `nfc_tags`/`listens`
+    RLS policies, which are intentionally public for the no-auth NFC flow).
+
 ### Discogs API Configuration
 Used for syncing your record collection from Discogs:
 
@@ -63,6 +74,9 @@ VITE_SUPABASE_URL=https://your-project-id.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key-here
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
 
+# Admin Panel
+VITE_ADMIN_PASSWORD=your-shared-admin-password
+
 # Discogs API Configuration
 DISCOGS_USER=your-discogs-username
 PUBLIC_DISCOGS_API_TOKEN=your-discogs-token-here
@@ -104,6 +118,6 @@ VITE_APP_VERSION=1.0.0
 
 After setting up your `.env` file, you can verify it's working by:
 
-1. **Main app**: Run `npm run dev` - should start without errors
-2. **Sync tool**: Run `npm run sync:discogs` - should connect to Supabase and Discogs
+1. **Main app**: Run `pnpm run dev` - should start without errors
+2. **Sync tool**: Run `pnpm run sync:discogs` - should connect to Supabase and Discogs
 

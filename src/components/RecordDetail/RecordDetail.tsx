@@ -3,12 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { PenLine } from "lucide-react";
 import { useRecords } from "../../hooks/useRecords";
 import { useArticle } from "../../hooks/useArticle";
-import { useNfcTags } from "../../hooks/useNfcTags";
 import { getListenCount } from "../../services/supabase";
 import { hasArticle } from "../../content/articles/articleIds";
 import { slugify } from "../../utils/slugify";
-import { NfcPairingDialog } from "../NfcPairingDialog/NfcPairingDialog";
-import { LogListenDialog } from "../LogListenDialog/LogListenDialog";
 import styles from "./RecordDetail.module.css";
 
 export function RecordDetail() {
@@ -19,8 +16,6 @@ export function RecordDetail() {
   );
 
   const { article, isLoading: isLoadingArticle } = useArticle(record?.id);
-  const { getNfcTag } = useNfcTags();
-  const nfcTag = record ? getNfcTag(record.id) : undefined;
 
   const { data: listenCount } = useQuery({
     queryKey: ["listen-count", record?.id],
@@ -56,11 +51,6 @@ export function RecordDetail() {
             </p>
           )}
         </div>
-      </div>
-
-      <div className={styles.nfcSection}>
-        <NfcPairingDialog releaseId={record.id} existingTag={nfcTag} />
-        <LogListenDialog releaseId={record.id} title={record.title} artist={record.artist} />
       </div>
 
       {(isLoadingArticle || article) && (

@@ -1,0 +1,5 @@
+packages:
+  - "tools/*"
+allowBuilds:
+  '@sentry/cli': true
+  esbuild: true

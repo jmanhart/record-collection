@@ -14,12 +14,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
+          cache: pnpm
 
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
 
       - name: Sentry Crons check-in (in_progress)
         run: |
@@ -33,7 +37,7 @@ jobs:
           echo "CHECK_IN_ID=$CHECK_IN_ID" >> "$GITHUB_ENV"
 
       - name: Sync Discogs collection
-        run: npm run sync:discogs
+        run: pnpm run sync:discogs
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}

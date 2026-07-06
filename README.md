@@ -5,26 +5,26 @@ A simple React app to manage your vinyl record collection.
 ## Quick Start
 
 ```bash
-npm install        # Install dependencies
-npm run dev        # Start dev server
+pnpm install       # Install dependencies
+pnpm run dev       # Start dev server
 ```
 
 ## Scripts
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start local dev server |
-| `npm run build` | Production build |
-| `npm run lint` | ESLint (strict, zero warnings) |
-| `npm run sync:discogs` | Sync records from Discogs to Supabase |
-| `npm run sync:discography` | Sync discography targets with Discogs metadata |
-| `npm run sync:readme` | Regenerate this README with album covers |
-| `npm run sync:all` | Run discogs + readme syncs |
-| `npm run backup` | Backup all tables locally to `backups/` |
-| `npm run backup:push` | Backup locally + push to GitHub backup repo |
-| `npm run restore` | Dry-run restore (prints plan, no changes) |
-| `npm run restore:execute` | Restore from most recent backup |
-| `npm run article:new` | Scaffold a new MDX article |
+| `pnpm run dev` | Start local dev server |
+| `pnpm run build` | Production build |
+| `pnpm run lint` | ESLint (strict, zero warnings) |
+| `pnpm run sync:discogs` | Sync records from Discogs to Supabase |
+| `pnpm run sync:discography` | Sync discography targets with Discogs metadata |
+| `pnpm run sync:readme` | Regenerate this README with album covers |
+| `pnpm run sync:all` | Run discogs + readme syncs |
+| `pnpm run backup` | Backup all tables locally to `backups/` |
+| `pnpm run backup:push` | Backup locally + push to GitHub backup repo |
+| `pnpm run restore` | Dry-run restore (prints plan, no changes) |
+| `pnpm run restore:execute` | Restore from most recent backup |
+| `pnpm run article:new` | Scaffold a new MDX article |
 
 ## Collection
 

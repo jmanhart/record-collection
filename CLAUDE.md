@@ -34,13 +34,13 @@ scripts/                 # copyArticles.js, generateReadme.cjs
 ## Key Commands
 
 ```bash
-npm run dev              # Copy articles + start Vite dev server
-npm run build            # Production build (articles + Vite + Sentry sourcemaps)
-npm run lint             # ESLint (strict, zero warnings)
-npm run sync:discogs     # Fetch records from Discogs, sync to Supabase
-npm run sync:discography # Sync discography targets (enriches JSON with Discogs metadata)
-npm run sync:readme      # Generate README with album cover gallery
-npm run sync:all         # Run discogs + readme syncs
+pnpm run dev              # Copy articles + start Vite dev server
+pnpm run build            # Production build (articles + Vite + Sentry sourcemaps)
+pnpm run lint             # ESLint (strict, zero warnings)
+pnpm run sync:discogs     # Fetch records from Discogs, sync to Supabase
+pnpm run sync:discography # Sync discography targets (enriches JSON with Discogs metadata)
+pnpm run sync:readme      # Generate README with album cover gallery
+pnpm run sync:all         # Run discogs + readme syncs
 ```
 
 ## Architecture Notes
@@ -58,7 +58,7 @@ Tracks progress toward completing specific artists' discographies.
 
 ### Data flow
 1. **Source of truth**: `src/data/discography-targets.json` — array of `{ artist, slug, releaseIds[] }` (Discogs release IDs)
-2. **Sync**: `npm run sync:discography` fetches metadata (title, year, cover) from Discogs API for any missing IDs, uploads covers to Supabase Storage, upserts into `discography_targets` table
+2. **Sync**: `pnpm run sync:discography` fetches metadata (title, year, cover) from Discogs API for any missing IDs, uploads covers to Supabase Storage, upserts into `discography_targets` table
 3. **Frontend**: `useArtistDiscography(slug)` merges JSON config + Supabase metadata + owned records (from `useRecords()`) to produce album list with ownership status
 
 ### Supabase table: `discography_targets`
@@ -79,7 +79,7 @@ Requires a public-read RLS policy (same as `records` and `wishlist` tables).
 
 ### Adding a new artist
 1. Add an entry to `src/data/discography-targets.json` with the artist name, URL slug, and array of Discogs release IDs
-2. Run `npm run sync:discography` to fetch metadata and images
+2. Run `pnpm run sync:discography` to fetch metadata and images
 3. The artist will appear at `/collecting` automatically
 
 ## Environment Variables

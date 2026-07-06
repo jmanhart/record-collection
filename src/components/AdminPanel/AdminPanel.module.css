@@ -1,0 +1,91 @@
+.container {
+  max-width: 650px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 1.5rem;
+}
+
+.header h1 {
+  margin: 0;
+}
+
+.backLink {
+  color: var(--link);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.backLink:hover {
+  color: var(--link-hover);
+}
+
+.status {
+  color: var(--text-tertiary);
+  padding: 1rem 0;
+}
+
+.list {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  max-height: 400px;
+  overflow-y: auto;
+  border: 2px solid var(--divider);
+  border-radius: 8px;
+}
+
+.recordButton {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  text-align: left;
+  padding: 0.625rem 1rem;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--divider);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.recordButton:hover {
+  background-color: var(--surface200);
+}
+
+.recordButtonActive {
+  background-color: var(--surface200);
+}
+
+.recordArtist {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.recordTitle {
+  font-size: 1rem;
+}
+
+.selectedPanel {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  border: 2px solid var(--divider);
+  border-radius: 8px;
+}
+
+.selectedPanel h2 {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}

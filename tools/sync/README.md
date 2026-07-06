@@ -29,7 +29,7 @@ cd record-sync
 ### **2️⃣ Install Dependencies**
 
 ```sh
-npm install
+pnpm install
 ```
 
 ### **3️⃣ Set Up Your `.env` File**
@@ -57,7 +57,7 @@ Make sure your **Supabase Service Role Key** is correct, as it's needed for writ
 To manually trigger a sync:
 
 ```sh
-npm run fetch
+pnpm run fetch
 ```
 
 This will:
@@ -157,7 +157,7 @@ Explanation of Columns:
 - Run:
 
 ```sh
-npm run fetch
+pnpm run fetch
 ```
 
 - If it says `"✅ No new records to add."`, that means **everything is already up-to-date**.

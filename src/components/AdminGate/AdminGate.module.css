@@ -1,0 +1,63 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  padding: 20px;
+}
+
+.box {
+  background-color: var(--card-bg);
+  border: 2px solid var(--divider);
+  border-radius: 8px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 100%;
+}
+
+.box h2 {
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.input {
+  padding: 0.625rem 1rem;
+  border: 2px solid var(--divider);
+  border-radius: 8px;
+  background-color: var(--surface000);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--red200);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.error {
+  color: var(--red200);
+  font-size: 0.875rem;
+  margin: 0;
+  text-align: center;
+}
+
+:global(.dark-theme) .input {
+  background-color: var(--surface100);
+}
