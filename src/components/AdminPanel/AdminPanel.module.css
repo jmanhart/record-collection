@@ -101,7 +101,8 @@
 }
 
 .listensCol,
-.nfcCol {
+.nfcCol,
+.favoriteCol {
   text-align: center;
   width: 80px;
 }
@@ -139,13 +140,19 @@
 }
 
 .listensCell,
-.nfcCell {
+.nfcCell,
+.favoriteCell {
   text-align: center;
   color: var(--text-secondary);
 }
 
 .nfcCheck {
   color: var(--text-primary);
+  display: inline-flex;
+}
+
+.favoriteCheck {
+  color: #f5b400;
   display: inline-flex;
 }
 

@@ -66,9 +66,21 @@
   margin: 1rem 0 1.5rem;
 }
 
-.listenCount {
+.listenCount,
+.purchaseLocation {
   font-size: 1.5rem;
   color: var(--text-tertiary);
+  text-align: center;
+  margin: 0;
+}
+
+.favoriteLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  font-size: 1.5rem;
+  color: #f5b400;
   text-align: center;
   margin: 0;
 }

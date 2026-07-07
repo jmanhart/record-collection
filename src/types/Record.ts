@@ -12,6 +12,10 @@ export interface Record {
   styles?: string[];
   year?: number;
   duration_seconds?: number;
+  acquired_at?: string | null;
+  purchase_location?: string | null;
+  tags?: string[];
+  is_favorite?: boolean;
 }
 
 export type WishlistRecord = Pick<

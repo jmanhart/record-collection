@@ -6,6 +6,7 @@ import { env } from "./env.js";
 
 export interface DiscogsRecord {
   id: number; // Collection item ID
+  date_added: string; // When this release was added to the Discogs collection
   basic_information: {
     id: number; // Release ID
     title: string;
@@ -235,6 +236,7 @@ export async function fetchDiscogsRecords(): Promise<DiscogsRecord[]> {
             release.basic_information.artists?.[0]?.name || "Unknown Artist",
           image_url: release.basic_information.cover_image || "",
           supabase_image_url: null,
+          acquired_at: release.date_added || null,
         }));
 
       if (recordsToInsert.length === 0) {

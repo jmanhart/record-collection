@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { PenLine } from "lucide-react";
+import { PenLine, Star } from "lucide-react";
 import { useRecords } from "../../hooks/useRecords";
 import { useArticle } from "../../hooks/useArticle";
 import { useNfcTags } from "../../hooks/useNfcTags";
@@ -54,6 +54,17 @@ export function RecordDetail() {
           {(listenCount ?? 0) > 0 && (
             <p className={styles.listenCount}>
               {listenCount} {listenCount === 1 ? "listen" : "listens"}
+            </p>
+          )}
+          {record.purchase_location && (
+            <p className={styles.purchaseLocation}>
+              Bought at {record.purchase_location}
+            </p>
+          )}
+          {record.is_favorite && (
+            <p className={styles.favoriteLabel}>
+              <Star size={16} fill="currentColor" />
+              Favorite
             </p>
           )}
         </div>

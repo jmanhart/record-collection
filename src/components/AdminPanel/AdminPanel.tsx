@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Check } from "lucide-react";
+import { Check, Star } from "lucide-react";
 import { useRecords } from "../../hooks/useRecords";
 import { useNfcTags } from "../../hooks/useNfcTags";
 import { useListens } from "../../hooks/useListens";
@@ -9,10 +9,10 @@ import { Search } from "../Search/Search";
 import { Button } from "../Button/Button";
 import { NfcPairingDialog } from "../NfcPairingDialog/NfcPairingDialog";
 import { LogListenDialog } from "../LogListenDialog/LogListenDialog";
-import type { Record } from "../../types/Record";
+import { RecordMetadataEditor } from "./RecordMetadataEditor";
 import styles from "./AdminPanel.module.css";
 
-type AdminSortField = "artist" | "listens" | "nfc";
+type AdminSortField = "artist" | "listens" | "nfc" | "favorite";
 type AdminSortOrder = "asc" | "desc";
 
 export function AdminPanel() {
@@ -21,7 +21,7 @@ export function AdminPanel() {
   const { listens } = useListens();
   const { logout } = useAdminAuth();
   const [search, setSearch] = useState("");
-  const [selected, setSelected] = useState<Record | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
   const [sortField, setSortField] = useState<AdminSortField>("artist");
   const [sortOrder, setSortOrder] = useState<AdminSortOrder>("asc");
 
@@ -48,6 +48,7 @@ export function AdminPanel() {
       record,
       listens: listenCountsByReleaseId.get(record.id) ?? 0,
       nfc: hasNfcTag(record.id) ? 1 : 0,
+      favorite: record.is_favorite ? 1 : 0,
     }));
 
     withMeta.sort((a, b) => {
@@ -56,14 +57,18 @@ export function AdminPanel() {
         diff = a.record.artist.localeCompare(b.record.artist);
       } else if (sortField === "listens") {
         diff = a.listens - b.listens;
-      } else {
+      } else if (sortField === "nfc") {
         diff = a.nfc - b.nfc;
+      } else {
+        diff = a.favorite - b.favorite;
       }
       return sortOrder === "asc" ? diff : -diff;
     });
 
     return withMeta.map((entry) => entry.record);
   }, [filtered, listenCountsByReleaseId, hasNfcTag, sortField, sortOrder]);
+
+  const selected = records.find((r) => r.id === selectedId) ?? null;
 
   const handleSort = (field: AdminSortField) => {
     if (field === sortField) {
@@ -128,6 +133,14 @@ export function AdminPanel() {
                         NFC {sortArrow("nfc")}
                       </button>
                     </th>
+                    <th className={styles.favoriteCol}>
+                      <button
+                        className={styles.sortButton}
+                        onClick={() => handleSort("favorite")}
+                      >
+                        ★ {sortArrow("favorite")}
+                      </button>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -135,9 +148,9 @@ export function AdminPanel() {
                     <tr
                       key={record.id}
                       className={`${styles.row} ${
-                        selected?.id === record.id ? styles.rowActive : ""
+                        selectedId === record.id ? styles.rowActive : ""
                       }`}
-                      onClick={() => setSelected(record)}
+                      onClick={() => setSelectedId(record.id)}
                     >
                       <td>
                         <div className={styles.recordArtist}>{record.artist}</div>
@@ -149,6 +162,11 @@ export function AdminPanel() {
                       <td className={styles.nfcCell}>
                         {hasNfcTag(record.id) && (
                           <Check size={16} className={styles.nfcCheck} />
+                        )}
+                      </td>
+                      <td className={styles.favoriteCell}>
+                        {record.is_favorite && (
+                          <Star size={16} fill="currentColor" className={styles.favoriteCheck} />
                         )}
                       </td>
                     </tr>
@@ -172,6 +190,7 @@ export function AdminPanel() {
                 <NfcPairingDialog releaseId={selected.id} existingTag={getNfcTag(selected.id)} />
                 <LogListenDialog releaseId={selected.id} title={selected.title} artist={selected.artist} />
               </div>
+              <RecordMetadataEditor record={selected} />
             </>
           )}
         </div>

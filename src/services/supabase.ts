@@ -213,6 +213,72 @@ export const getListens = async (): Promise<Listen[]> => {
   return data || [];
 };
 
+export interface TagOption {
+  id: string;
+  name: string;
+  created_at: string;
+}
+
+export const getTagOptions = async (): Promise<TagOption[]> => {
+  const { data, error } = await supabase
+    .from("tag_options")
+    .select("*")
+    .order("name", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching tag options:", error);
+    throw error;
+  }
+
+  return data || [];
+};
+
+export const createTagOption = async (name: string): Promise<TagOption> => {
+  const { data, error } = await supabase
+    .from("tag_options")
+    .insert({ name })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data as TagOption;
+};
+
+export interface PurchaseLocationOption {
+  id: string;
+  name: string;
+  created_at: string;
+}
+
+export const getPurchaseLocationOptions = async (): Promise<
+  PurchaseLocationOption[]
+> => {
+  const { data, error } = await supabase
+    .from("purchase_location_options")
+    .select("*")
+    .order("name", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching purchase location options:", error);
+    throw error;
+  }
+
+  return data || [];
+};
+
+export const createPurchaseLocationOption = async (
+  name: string
+): Promise<PurchaseLocationOption> => {
+  const { data, error } = await supabase
+    .from("purchase_location_options")
+    .insert({ name })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data as PurchaseLocationOption;
+};
+
 export const getDiscographyTargets = async (): Promise<DiscographyTarget[]> => {
   const { data, error } = await supabase
     .from("discography_targets")
