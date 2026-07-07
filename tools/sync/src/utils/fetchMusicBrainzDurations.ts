@@ -125,23 +125,38 @@ function matchTracks(
 ): { filled: number; updated: DiscogsTrack[] } {
   const updated = tracklist.map((t) => ({ ...t }));
 
-  const mbByTitle = new Map<string, number | null>();
-  for (const mbTrack of mbTracks) {
-    const key = normalizeTitle(mbTrack.title);
-    if (!mbByTitle.has(key)) mbByTitle.set(key, mbTrack.length);
-  }
-
   const nonHeading = updated
     .map((t, idx) => ({ t, idx }))
     .filter(({ t }) => t.type_ !== "heading");
   const sameCount = nonHeading.length === mbTracks.length;
+
+  // A title that appears more than once in THIS record's own tracklist
+  // (e.g. a bonus disc repeating an album track as a demo/instrumental
+  // under the identical plain title) is ambiguous for title-based
+  // matching — a naive title -> length map would silently apply the same
+  // (wrong) length to every occurrence. Exclude those titles from the
+  // title lookup entirely; only strict positional matching (same track
+  // count on both sides) may fill them.
+  const discogsTitleCounts = new Map<string, number>();
+  for (const { t } of nonHeading) {
+    const key = normalizeTitle(t.title);
+    discogsTitleCounts.set(key, (discogsTitleCounts.get(key) || 0) + 1);
+  }
+
+  const mbByTitle = new Map<string, number | null>();
+  for (const mbTrack of mbTracks) {
+    const key = normalizeTitle(mbTrack.title);
+    if ((discogsTitleCounts.get(key) || 0) > 1) continue; // ambiguous, skip
+    if (!mbByTitle.has(key)) mbByTitle.set(key, mbTrack.length);
+  }
 
   let filled = 0;
   nonHeading.forEach(({ t, idx }, position) => {
     if (t.duration) return; // never overwrite an existing Discogs value
 
     const key = normalizeTitle(t.title);
-    let length = mbByTitle.get(key);
+    const isAmbiguous = (discogsTitleCounts.get(key) || 0) > 1;
+    let length = isAmbiguous ? undefined : mbByTitle.get(key);
 
     if ((length === undefined || length === null) && sameCount) {
       length = mbTracks[position]?.length ?? undefined;
