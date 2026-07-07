@@ -7,6 +7,7 @@ import { Testing } from "./components/Testing/Testing";
 import { AdminGate } from "./components/AdminGate/AdminGate";
 import { AdminPanel } from "./components/AdminPanel/AdminPanel";
 import { AdminAuthProvider } from "./contexts/AdminAuthContext";
+import { AdminFab } from "./components/AdminFab/AdminFab";
 import { ArtistProgressList } from "./components/ArtistProgress/ArtistProgressList";
 import { ArtistProgressDetail } from "./components/ArtistProgress/ArtistProgressDetail";
 import { Timeline } from "./components/Timeline/Timeline";
@@ -107,6 +108,7 @@ export default function App() {
       <AdminAuthProvider>
         <Router>
           <ThemeToggle />
+          <AdminFab />
           <Routes>
             <Route path="/" element={<RecordList />} />
             <Route path="/listen/:uid" element={<ListenRedirect />} />

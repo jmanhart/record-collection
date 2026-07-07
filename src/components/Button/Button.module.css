@@ -47,12 +47,13 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  height: auto;
+  width: auto;
   border-radius: 8px;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
-  width: auto;
   min-width: fit-content;
   transition: background-color 0.15s ease, border-color 0.15s ease;
 }
