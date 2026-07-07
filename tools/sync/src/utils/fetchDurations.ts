@@ -7,9 +7,15 @@ interface DiscogsTrack {
   position: string;
   title: string;
   duration: string;
+  type_?: string;
 }
 
 interface DiscogsRelease {
+  tracklist: DiscogsTrack[];
+}
+
+interface ReleaseDetails {
+  durationSeconds: number;
   tracklist: DiscogsTrack[];
 }
 
@@ -26,7 +32,7 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function fetchReleaseDuration(releaseId: number): Promise<number> {
+async function fetchReleaseDetails(releaseId: number): Promise<ReleaseDetails> {
   const response = await fetch(
     `https://api.discogs.com/releases/${releaseId}`,
     {
@@ -41,69 +47,73 @@ async function fetchReleaseDuration(releaseId: number): Promise<number> {
   }
 
   const data = (await response.json()) as DiscogsRelease;
-  const totalSeconds = (data.tracklist || []).reduce(
+  const tracklist = data.tracklist || [];
+  const durationSeconds = tracklist.reduce(
     (sum, track) => sum + parseDuration(track.duration),
     0
   );
 
-  return totalSeconds;
+  return { durationSeconds, tracklist };
 }
 
 async function syncDurationsForTable(tableName: string): Promise<void> {
   const { data: records, error } = await supabaseAdmin
     .from(tableName)
     .select("id")
-    .is("duration_seconds", null);
+    .is("tracklist", null);
 
   if (error) {
-    logError(`Error fetching ${tableName} records without durations:`, error);
+    logError(`Error fetching ${tableName} records without tracklists:`, error);
     throw error;
   }
 
   if (!records || records.length === 0) {
-    logInfo(`All ${tableName} records already have durations.`);
+    logInfo(`All ${tableName} records already have tracklists.`);
     return;
   }
 
   logInfo(
-    `Found ${records.length} ${tableName} records without durations. Fetching from Discogs...`
+    `Found ${records.length} ${tableName} records without tracklists. Fetching from Discogs...`
   );
 
   for (let i = 0; i < records.length; i++) {
     const record = records[i];
     try {
-      const duration = await fetchReleaseDuration(record.id);
+      const { durationSeconds, tracklist } = await fetchReleaseDetails(record.id);
 
       const { error: updateError } = await supabaseAdmin
         .from(tableName)
-        .update({ duration_seconds: duration })
+        .update({ duration_seconds: durationSeconds, tracklist })
         .eq("id", record.id);
 
       if (updateError) {
         logError(
-          `Failed to update duration for ${tableName} record ${record.id}:`,
+          `Failed to update duration/tracklist for ${tableName} record ${record.id}:`,
           updateError
         );
       } else {
         const formatted =
-          duration > 0
-            ? `${Math.floor(duration / 60)}m ${duration % 60}s`
+          durationSeconds > 0
+            ? `${Math.floor(durationSeconds / 60)}m ${durationSeconds % 60}s`
             : "0s (no track durations)";
         logInfo(
-          `[${i + 1}/${records.length}] ${tableName} record ${record.id}: ${formatted}`
+          `[${i + 1}/${records.length}] ${tableName} record ${record.id}: ${formatted}, ${tracklist.length} tracks`
         );
-      }
-
-      // Rate limit: 1 request per second
-      if (i < records.length - 1) {
-        await sleep(1000);
       }
     } catch (err) {
       logError(
-        `Error fetching duration for ${tableName} record ${record.id}:`,
+        `Error fetching duration/tracklist for ${tableName} record ${record.id}:`,
         err
       );
       // Continue with next record
+    } finally {
+      // Rate limit: 1 request per second, even after a failed request —
+      // otherwise a single error (e.g. a transient 429) skips the delay
+      // and the next request fires immediately, which can trip the rate
+      // limit again and cascade into a run of back-to-back failures.
+      if (i < records.length - 1) {
+        await sleep(1000);
+      }
     }
   }
 }

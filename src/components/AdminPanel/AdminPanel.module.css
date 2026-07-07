@@ -1,7 +1,6 @@
 .container {
-  max-width: 1100px;
-  margin: 2rem auto;
-  padding: 0 2rem;
+  margin: 2rem 0;
+  padding: 0 2.5rem;
   width: 100%;
   box-sizing: border-box;
 }
@@ -40,7 +39,7 @@
 
 .layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr);
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
   gap: 1.5rem;
   align-items: start;
 }
@@ -53,6 +52,7 @@
   margin-top: 1rem;
   max-height: 500px;
   overflow-y: auto;
+  overflow-x: auto;
   border: 2px solid var(--divider);
   border-radius: 8px;
 }
@@ -110,6 +110,12 @@
   width: 80px;
 }
 
+.locationCol,
+.acquiredCol {
+  text-align: left;
+  width: 160px;
+}
+
 .row {
   cursor: pointer;
   border-bottom: 1px solid var(--divider);
@@ -147,6 +153,13 @@
 .favoriteCell {
   text-align: center;
   color: var(--text-secondary);
+}
+
+.locationCell,
+.acquiredCell {
+  text-align: left;
+  color: var(--text-secondary);
+  white-space: nowrap;
 }
 
 .nfcCheck {

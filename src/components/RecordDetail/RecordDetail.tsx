@@ -10,6 +10,7 @@ import { hasArticle } from "../../content/articles/articleIds";
 import { slugify } from "../../utils/slugify";
 import { NfcPairingDialog } from "../NfcPairingDialog/NfcPairingDialog";
 import { LogListenDialog } from "../LogListenDialog/LogListenDialog";
+import { TrackList } from "../TrackList/TrackList";
 import styles from "./RecordDetail.module.css";
 
 export function RecordDetail() {
@@ -69,6 +70,10 @@ export function RecordDetail() {
           )}
         </div>
       </div>
+
+      {record.tracklist && record.tracklist.length > 0 && (
+        <TrackList tracks={record.tracklist} />
+      )}
 
       {isAdmin && (
         <div className={styles.nfcSection}>

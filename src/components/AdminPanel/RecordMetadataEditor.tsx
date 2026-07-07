@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Star, X } from "lucide-react";
 import { useRecords } from "../../hooks/useRecords";
 import { useTagOptions } from "../../hooks/useTagOptions";
@@ -24,6 +24,13 @@ export function RecordMetadataEditor({ record }: RecordMetadataEditorProps) {
   const [newLocationName, setNewLocationName] = useState("");
   const [newTagName, setNewTagName] = useState("");
 
+  const savedDate = record.acquired_at ? record.acquired_at.slice(0, 10) : "";
+  const [dateInput, setDateInput] = useState(savedDate);
+
+  useEffect(() => {
+    setDateInput(savedDate);
+  }, [record.id, savedDate]);
+
   const save = (updates: Partial<Record>) => {
     updateRecord({ id: String(record.id), updates });
   };
@@ -32,8 +39,10 @@ export function RecordMetadataEditor({ record }: RecordMetadataEditorProps) {
     save({ is_favorite: !record.is_favorite });
   };
 
-  const handleDateChange = (value: string) => {
-    save({ acquired_at: value ? value : null });
+  const commitDate = () => {
+    if (dateInput !== savedDate) {
+      save({ acquired_at: dateInput || null });
+    }
   };
 
   const handleLocationChange = (value: string) => {
@@ -74,8 +83,6 @@ export function RecordMetadataEditor({ record }: RecordMetadataEditorProps) {
     save({ tags: (record.tags ?? []).filter((t) => t !== tag) });
   };
 
-  const dateValue = record.acquired_at ? record.acquired_at.slice(0, 10) : "";
-
   return (
     <div className={styles.container}>
       <div className={styles.field}>
@@ -96,8 +103,9 @@ export function RecordMetadataEditor({ record }: RecordMetadataEditorProps) {
         <input
           type="date"
           className={styles.dateInput}
-          value={dateValue}
-          onChange={(e) => handleDateChange(e.target.value)}
+          value={dateInput}
+          onChange={(e) => setDateInput(e.target.value)}
+          onBlur={commitDate}
         />
       </div>
 

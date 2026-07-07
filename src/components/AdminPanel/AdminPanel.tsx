@@ -10,9 +10,10 @@ import { Button } from "../Button/Button";
 import { NfcPairingDialog } from "../NfcPairingDialog/NfcPairingDialog";
 import { LogListenDialog } from "../LogListenDialog/LogListenDialog";
 import { RecordMetadataEditor } from "./RecordMetadataEditor";
+import { formatDateOnly } from "../../utils/timezone";
 import styles from "./AdminPanel.module.css";
 
-type AdminSortField = "artist" | "listens" | "nfc" | "favorite";
+type AdminSortField = "artist" | "listens" | "nfc" | "favorite" | "location" | "acquired";
 type AdminSortOrder = "asc" | "desc";
 
 export function AdminPanel() {
@@ -49,6 +50,8 @@ export function AdminPanel() {
       listens: listenCountsByReleaseId.get(record.id) ?? 0,
       nfc: hasNfcTag(record.id) ? 1 : 0,
       favorite: record.is_favorite ? 1 : 0,
+      location: record.purchase_location ?? "",
+      acquired: record.acquired_at ? new Date(record.acquired_at).getTime() : 0,
     }));
 
     withMeta.sort((a, b) => {
@@ -59,8 +62,12 @@ export function AdminPanel() {
         diff = a.listens - b.listens;
       } else if (sortField === "nfc") {
         diff = a.nfc - b.nfc;
-      } else {
+      } else if (sortField === "favorite") {
         diff = a.favorite - b.favorite;
+      } else if (sortField === "location") {
+        diff = a.location.localeCompare(b.location);
+      } else {
+        diff = a.acquired - b.acquired;
       }
       return sortOrder === "asc" ? diff : -diff;
     });
@@ -141,6 +148,22 @@ export function AdminPanel() {
                         ★ {sortArrow("favorite")}
                       </button>
                     </th>
+                    <th className={styles.locationCol}>
+                      <button
+                        className={styles.sortButton}
+                        onClick={() => handleSort("location")}
+                      >
+                        Purchase location {sortArrow("location")}
+                      </button>
+                    </th>
+                    <th className={styles.acquiredCol}>
+                      <button
+                        className={styles.sortButton}
+                        onClick={() => handleSort("acquired")}
+                      >
+                        Acquired {sortArrow("acquired")}
+                      </button>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -168,6 +191,14 @@ export function AdminPanel() {
                         {record.is_favorite && (
                           <Star size={16} fill="currentColor" className={styles.favoriteCheck} />
                         )}
+                      </td>
+                      <td className={styles.locationCell}>
+                        {record.purchase_location || "—"}
+                      </td>
+                      <td className={styles.acquiredCell}>
+                        {record.acquired_at
+                          ? formatDateOnly(record.acquired_at)
+                          : "—"}
                       </td>
                     </tr>
                   ))}
