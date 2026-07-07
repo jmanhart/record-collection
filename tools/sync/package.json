@@ -6,6 +6,8 @@
   "scripts": {
     "fetch": "tsx src/run.ts",
     "sync:discography": "tsx src/syncDiscography.ts",
+    "track-durations": "tsx src/fetchMusicBrainzDurations.ts",
+    "report:track-durations": "tsx src/reportMissingDurations.ts",
     "start": "node src/server.js"
   },
   "dependencies": {

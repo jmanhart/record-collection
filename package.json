@@ -12,6 +12,8 @@
     "sync:discogs": "pnpm --filter discogs-supabase-sync run fetch",
     "sync:readme": "pnpm run generate-readme",
     "sync:discography": "pnpm --filter discogs-supabase-sync run sync:discography",
+    "sync:track-durations": "pnpm --filter discogs-supabase-sync run track-durations",
+    "report:track-durations": "pnpm --filter discogs-supabase-sync run report:track-durations",
     "sync:all": "pnpm run sync:discogs && pnpm run sync:readme",
     "tools:dev": "pnpm --filter discogs-supabase-sync run dev",
     "article:new": "node scripts/newArticle.js",
