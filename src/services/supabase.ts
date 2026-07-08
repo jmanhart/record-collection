@@ -213,6 +213,11 @@ export const getListens = async (): Promise<Listen[]> => {
   return data || [];
 };
 
+export const deleteListen = async (id: string): Promise<void> => {
+  const { error } = await supabase.from("listens").delete().eq("id", id);
+  if (error) throw error;
+};
+
 export interface TagOption {
   id: string;
   name: string;
