@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useListens } from "../../hooks/useListens";
 import { useRecords } from "../../hooks/useRecords";
 import { useAdminAuth } from "../../hooks/useAdminAuth";
-import { HoverDeleteButton } from "../HoverDeleteButton/HoverDeleteButton";
+import { OverflowMenu } from "../OverflowMenu/OverflowMenu";
 import { slugify } from "../../utils/slugify";
 import { TIMEZONE } from "../../utils/timezone";
 import type { Listen } from "../../services/supabase";
@@ -82,7 +82,7 @@ function groupByDate(listens: ListenWithRecord[]): Map<string, ListenWithRecord[
 }
 
 export function Timeline() {
-  const { listens, isLoading: isLoadingListens, deleteListen, isDeleting } = useListens();
+  const { listens, isLoading: isLoadingListens, deleteListen } = useListens();
   const { records, isLoading: isLoadingRecords } = useRecords();
   const { isAdmin } = useAdminAuth();
 
@@ -135,16 +135,19 @@ export function Timeline() {
                   </div>
                   <span className={styles.time}>{formatTime(item.listened_at)}</span>
                   {isAdmin && (
-                    <HoverDeleteButton
-                      label="Delete this listen"
-                      confirmMessage={`Delete this listen of "${
-                        record?.title ?? `Release ${item.release_id}`
-                      }"?`}
-                      isDeleting={isDeleting}
-                      className={styles.deleteButton}
-                      onDelete={() =>
-                        deleteListen({ id: item.id, releaseId: item.release_id })
-                      }
+                    <OverflowMenu
+                      label="Listen options"
+                      items={[
+                        {
+                          label: "Delete",
+                          destructive: true,
+                          confirmMessage: `Delete this listen of "${
+                            record?.title ?? `Release ${item.release_id}`
+                          }"?`,
+                          onSelect: () =>
+                            deleteListen({ id: item.id, releaseId: item.release_id }),
+                        },
+                      ]}
                     />
                   )}
                 </div>

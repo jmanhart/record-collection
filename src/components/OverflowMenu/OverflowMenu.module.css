@@ -1,0 +1,45 @@
+.content {
+  min-width: 140px;
+  background: var(--surface100);
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  padding: 0.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 101;
+  animation: fadeIn 0.15s ease;
+}
+
+.item {
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  outline: none;
+}
+
+.item:hover,
+.item:focus {
+  background: var(--surface200);
+}
+
+.destructive {
+  color: var(--red100);
+}
+
+.destructive:hover,
+.destructive:focus {
+  background: var(--red100);
+  color: #fff;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
