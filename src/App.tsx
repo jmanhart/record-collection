@@ -17,6 +17,7 @@ import { Tabs, type TabValue } from "./components/Tabs/Tabs";
 import { WishlistList } from "./components/WishlistList/WishlistList";
 import { useRecords } from "./hooks/useRecords";
 import { useWishlist } from "./hooks/useWishlist";
+import { formatRuntime } from "./utils/formatDuration";
 import "./App.css";
 
 function RecordList() {
@@ -54,18 +55,11 @@ function RecordList() {
 
   const isCollection = activeTab === "collection";
 
-  const formatRuntime = (totalSeconds: number): string => {
-    if (totalSeconds <= 0) return "";
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.round((totalSeconds % 3600) / 60);
-    if (hours > 0) return `${hours} hours${minutes > 0 ? ` ${minutes} min` : ""} of music`;
-    return `${minutes} min of music`;
-  };
-
   const totalDuration = isCollection
     ? (records?.reduce((sum, r) => sum + (r.duration_seconds || 0), 0) || 0)
     : 0;
-  const runtimeSuffix = formatRuntime(totalDuration);
+  const runtime = formatRuntime(totalDuration);
+  const runtimeSuffix = runtime ? `${runtime} of music` : "";
 
   const subtitle = isCollection
     ? `${records?.length || 0} records in collection${runtimeSuffix ? ` · ${runtimeSuffix}` : ""}`

@@ -11,10 +11,12 @@ import { NfcPairingDialog } from "../NfcPairingDialog/NfcPairingDialog";
 import { LogListenDialog } from "../LogListenDialog/LogListenDialog";
 import { RecordMetadataEditor } from "./RecordMetadataEditor";
 import { formatDateOnly } from "../../utils/timezone";
+import { formatRuntimeCompact } from "../../utils/formatDuration";
 import styles from "./AdminPanel.module.css";
 
 type AdminSortField = "artist" | "listens" | "nfc" | "favorite" | "location" | "acquired";
 type AdminSortOrder = "asc" | "desc";
+type StatFilter = "nfc-unlinked" | "missing-duration" | null;
 
 export function AdminPanel() {
   const { records, isLoading } = useRecords();
@@ -25,6 +27,7 @@ export function AdminPanel() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [sortField, setSortField] = useState<AdminSortField>("artist");
   const [sortOrder, setSortOrder] = useState<AdminSortOrder>("asc");
+  const [statFilter, setStatFilter] = useState<StatFilter>(null);
 
   const listenCountsByReleaseId = useMemo(() => {
     const map = new Map<number, number>();
@@ -34,15 +37,39 @@ export function AdminPanel() {
     return map;
   }, [listens]);
 
+  const stats = useMemo(() => {
+    const total = records.length;
+    const nfcLinked = records.filter((r) => hasNfcTag(r.id)).length;
+    const totalSeconds = records.reduce((sum, r) => sum + (r.duration_seconds || 0), 0);
+    const missingDuration = records.filter((r) => !r.duration_seconds).length;
+    return {
+      total,
+      nfcLinked,
+      nfcPercent: total > 0 ? Math.round((nfcLinked / total) * 100) : 0,
+      totalSeconds,
+      missingDuration,
+    };
+  }, [records, hasNfcTag]);
+
   const filtered = useMemo(() => {
+    let result = records;
+    if (statFilter === "nfc-unlinked") {
+      result = result.filter((r) => !hasNfcTag(r.id));
+    } else if (statFilter === "missing-duration") {
+      result = result.filter((r) => !r.duration_seconds);
+    }
     const query = search.trim().toLowerCase();
-    if (!query) return records;
-    return records.filter(
+    if (!query) return result;
+    return result.filter(
       (r) =>
         r.artist.toLowerCase().includes(query) ||
         r.title.toLowerCase().includes(query)
     );
-  }, [records, search]);
+  }, [records, search, statFilter, hasNfcTag]);
+
+  const toggleStatFilter = (filter: Exclude<StatFilter, null>) => {
+    setStatFilter((current) => (current === filter ? null : filter));
+  };
 
   const sorted = useMemo(() => {
     const withMeta = filtered.map((record) => ({
@@ -108,6 +135,72 @@ export function AdminPanel() {
       <div className={styles.layout}>
         <div className={styles.left}>
           <Search value={search} onChange={setSearch} placeholder="Search records..." />
+
+          <div className={styles.statRow}>
+            <button
+              className={`${styles.statCard} ${styles.statCardAction} ${
+                statFilter === "nfc-unlinked" ? styles.statCardActive : ""
+              }`}
+              onClick={() => toggleStatFilter("nfc-unlinked")}
+              aria-pressed={statFilter === "nfc-unlinked"}
+              title="Filter the table to records without an NFC tag"
+            >
+              <span className={styles.statLabel}>NFC linked</span>
+              <span className={styles.statValue}>
+                {isLoading ? "—" : `${stats.nfcPercent}%`}
+              </span>
+              <span className={styles.statMeter}>
+                <span
+                  className={styles.statMeterFill}
+                  style={{ width: `${stats.nfcPercent}%` }}
+                />
+              </span>
+              <span className={styles.statSub}>
+                {statFilter === "nfc-unlinked"
+                  ? "showing unlinked"
+                  : `${stats.nfcLinked} of ${stats.total} linked`}
+              </span>
+            </button>
+
+            <div className={styles.statCard}>
+              <span className={styles.statLabel}>Collection</span>
+              <span className={styles.statValue}>
+                {isLoading ? "—" : stats.total}
+              </span>
+              <span className={styles.statSub}>records</span>
+            </div>
+
+            <div className={styles.statCard}>
+              <span className={styles.statLabel}>Total runtime</span>
+              <span className={styles.statValue}>
+                {isLoading ? "—" : formatRuntimeCompact(stats.totalSeconds)}
+              </span>
+              <span className={styles.statSub}>
+                {stats.totalSeconds >= 86400
+                  ? `${(stats.totalSeconds / 86400).toFixed(1)} days of music`
+                  : "of music"}
+              </span>
+            </div>
+
+            <button
+              className={`${styles.statCard} ${styles.statCardAction} ${
+                statFilter === "missing-duration" ? styles.statCardActive : ""
+              }`}
+              onClick={() => toggleStatFilter("missing-duration")}
+              aria-pressed={statFilter === "missing-duration"}
+              title="Filter the table to records without a track length"
+            >
+              <span className={styles.statLabel}>Missing track length</span>
+              <span className={styles.statValue}>
+                {isLoading ? "—" : stats.missingDuration}
+              </span>
+              <span className={styles.statSub}>
+                {statFilter === "missing-duration"
+                  ? "showing these"
+                  : "need durations"}
+              </span>
+            </button>
+          </div>
 
           {isLoading ? (
             <p className={styles.status}>Loading records...</p>
@@ -205,7 +298,11 @@ export function AdminPanel() {
                 </tbody>
               </table>
               {sorted.length === 0 && (
-                <p className={styles.status}>No records match "{search}"</p>
+                <p className={styles.status}>
+                  {search.trim()
+                    ? `No records match "${search}"`
+                    : "No records match the current filter"}
+                </p>
               )}
             </div>
           )}
