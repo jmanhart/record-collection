@@ -106,14 +106,6 @@
   color: var(--text-tertiary);
 }
 
-/* Calendar + bar chart side by side; both stretch to the row height,
-   which the calendar defines */
-.vizRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-}
-
 .topArtists {
   display: flex;
   flex-direction: column;
@@ -184,27 +176,6 @@
   margin: 0;
 }
 
-.clearChip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  height: auto;
-  width: auto;
-  padding: 0.2rem 0.6rem;
-  border-radius: 999px;
-  border: 1px solid var(--divider);
-  background: var(--surface200);
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  cursor: pointer;
-}
-
-.clearChip:hover {
-  background: var(--surface300);
-  color: var(--text-primary);
-}
-
 /* Short windows: let the metrics pane scroll internally rather than clip */
 @media (min-width: 901px) and (max-height: 740px) {
   .metricsPane {
@@ -232,8 +203,3 @@
   }
 }
 
-@media (max-width: 640px) {
-  .vizRow {
-    grid-template-columns: 1fr;
-  }
-}

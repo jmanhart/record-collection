@@ -1,10 +1,8 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { X } from "lucide-react";
 import { useActivity, toDateKey, type ActivityEvent } from "../../hooks/useActivity";
 import { StatCard, StatCardRow } from "../StatCard/StatCard";
-import { MonthCalendar } from "./MonthCalendar";
-import { WeeklyBars, type WeekBucket } from "./WeeklyBars";
+import { ListeningChart } from "./ListeningChart";
 import { ActivityFeed } from "./ActivityFeed";
 import { slugify } from "../../utils/slugify";
 import { TIMEZONE } from "../../utils/timezone";
@@ -13,47 +11,6 @@ import styles from "./HomePage.module.css";
 
 function pad(n: number): string {
   return String(n).padStart(2, "0");
-}
-
-function getWeekBuckets(
-  year: number,
-  month: number,
-  events: ActivityEvent[]
-): WeekBucket[] {
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstWeekday = new Date(year, month, 1, 12).getDay();
-  const monthShort = new Date(year, month, 1).toLocaleDateString("en-US", {
-    month: "short",
-  });
-
-  // Calendar weeks (Sun–Sat), clipped to the month, matching the grid rows
-  const weeks: { start: number; end: number }[] = [];
-  let start = 1;
-  let end = Math.min(7 - firstWeekday, daysInMonth);
-  while (start <= daysInMonth) {
-    weeks.push({ start, end });
-    start = end + 1;
-    end = Math.min(end + 7, daysInMonth);
-  }
-
-  const prefix = `${year}-${pad(month + 1)}-`;
-  return weeks.map(({ start, end }) => {
-    const startKey = `${prefix}${pad(start)}`;
-    const endKey = `${prefix}${pad(end)}`;
-    const weekListens = events.filter(
-      (e) => e.type === "listen" && e.dateKey >= startKey && e.dateKey <= endKey
-    );
-    const albums = new Set(weekListens.map((e) => e.releaseId)).size;
-    const seconds = weekListens.reduce(
-      (sum, e) => sum + (e.record?.duration_seconds || 0),
-      0
-    );
-    return {
-      label: `${monthShort} ${start}–${end}`,
-      albums,
-      minutes: Math.round(seconds / 60),
-    };
-  });
 }
 
 function formatHeroWhen(event: ActivityEvent, todayKey: string): string {
@@ -74,22 +31,9 @@ function formatHeroWhen(event: ActivityEvent, todayKey: string): string {
 }
 
 export default function HomePage() {
-  const { events, byDay, isLoading } = useActivity();
+  const { events, isLoading } = useActivity();
 
   const todayKey = toDateKey(new Date().toISOString());
-  const [cursor, setCursor] = useState(() => ({
-    year: Number(todayKey.slice(0, 4)),
-    month: Number(todayKey.slice(5, 7)) - 1,
-  }));
-  const [selectedDay, setSelectedDay] = useState<string | null>(null);
-
-  const handleNavigate = (delta: number) => {
-    setCursor(({ year, month }) => {
-      const next = new Date(year, month + delta, 1);
-      return { year: next.getFullYear(), month: next.getMonth() };
-    });
-    setSelectedDay(null);
-  };
 
   const yearPrefix = `${todayKey.slice(0, 4)}-`;
   const yearStats = useMemo(() => {
@@ -132,21 +76,6 @@ export default function HomePage() {
       .slice(0, 5)
       .map(([artist, count]) => ({ artist, count }));
   }, [events, yearPrefix]);
-
-  const monthPrefix = `${cursor.year}-${pad(cursor.month + 1)}-`;
-  const monthEvents = useMemo(
-    () => events.filter((e) => e.dateKey.startsWith(monthPrefix)),
-    [events, monthPrefix]
-  );
-
-  const weekBuckets = useMemo(
-    () => getWeekBuckets(cursor.year, cursor.month, monthEvents),
-    [cursor.year, cursor.month, monthEvents]
-  );
-
-  const feedEvents = selectedDay
-    ? monthEvents.filter((e) => e.dateKey === selectedDay)
-    : monthEvents;
 
   const latestListen = events.find((e) => e.type === "listen");
   const heroRecord = latestListen?.record;
@@ -209,18 +138,7 @@ export default function HomePage() {
               />
             </StatCardRow>
 
-            <div className={styles.vizRow}>
-              <MonthCalendar
-                year={cursor.year}
-                month={cursor.month}
-                byDay={byDay}
-                todayKey={todayKey}
-                selectedDay={selectedDay}
-                onSelectDay={setSelectedDay}
-                onNavigate={handleNavigate}
-              />
-              <WeeklyBars buckets={weekBuckets} />
-            </div>
+            <ListeningChart events={events} todayKey={todayKey} />
 
             {topArtists.length > 0 && (
               <div className={styles.topArtists}>
@@ -245,23 +163,11 @@ export default function HomePage() {
       <section className={styles.feedPane}>
         <div className={styles.feedHeader}>
           <h3 className={styles.feedTitle}>Activity</h3>
-          {selectedDay && (
-            <button
-              className={styles.clearChip}
-              onClick={() => setSelectedDay(null)}
-            >
-              {selectedDay.slice(8, 10).replace(/^0/, "")}{" "}
-              {new Date(cursor.year, cursor.month, 1).toLocaleDateString("en-US", {
-                month: "short",
-              })}
-              <X size={12} />
-            </button>
-          )}
         </div>
         {isLoading ? (
           <p className={styles.status}>Loading...</p>
         ) : (
-          <ActivityFeed events={feedEvents} todayKey={todayKey} />
+          <ActivityFeed events={events} todayKey={todayKey} />
         )}
       </section>
     </div>
