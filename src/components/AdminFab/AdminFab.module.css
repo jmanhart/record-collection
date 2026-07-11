@@ -12,8 +12,8 @@
   align-items: center;
   justify-content: center;
 
-  background: var(--red200);
-  color: #fff;
+  background: var(--inverse);
+  color: var(--surface000);
   border: none;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 
@@ -22,7 +22,14 @@
 }
 
 .fab:hover {
-  background: var(--red100);
+  background: var(--text-secondary);
+}
+
+/* Higher specificity than the global button:focus/:active reset,
+   which otherwise clears the background when the dialog returns focus */
+.fab:focus,
+.fab:active {
+  background: var(--inverse);
 }
 
 .fab:active {

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Plus, X, ArrowLeft } from "lucide-react";
 import { useRecords } from "../../hooks/useRecords";
@@ -15,6 +15,7 @@ export function AdminFab() {
   const { records } = useRecords();
   const { getNfcTag } = useNfcTags();
   const [open, setOpen] = useState(false);
+  const fabRef = useRef<HTMLButtonElement>(null);
   const [search, setSearch] = useState("");
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
@@ -43,14 +44,23 @@ export function AdminFab() {
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>
       <Dialog.Trigger asChild>
-        <button className={styles.fab} aria-label="Quick add">
-          <Plus size={24} />
+        <button ref={fabRef} className={styles.fab} aria-label={open ? "Close" : "Quick add"}>
+          {open ? <X size={24} /> : <Plus size={24} />}
         </button>
       </Dialog.Trigger>
 
       <Dialog.Portal>
         <Dialog.Overlay className={styles.overlay} />
-        <Dialog.Content className={styles.content}>
+        <Dialog.Content
+          className={styles.content}
+          onPointerDownOutside={(event) => {
+            // Let the trigger's own toggle handle the close, otherwise
+            // outside-dismiss closes and the trigger click reopens it
+            if (fabRef.current?.contains(event.target as Node)) {
+              event.preventDefault();
+            }
+          }}
+        >
           <div className={styles.header}>
             {selected ? (
               <button
