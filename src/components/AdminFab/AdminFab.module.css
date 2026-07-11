@@ -3,6 +3,9 @@
   bottom: 1.5rem;
   right: 1.5rem;
   z-index: 9999;
+  /* Radix modal dialogs set pointer-events: none on body while open;
+     keep the FAB clickable so the X can close the menu */
+  pointer-events: auto;
 
   width: 56px;
   height: 56px;
