@@ -1,6 +1,6 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { PenLine, Star } from "lucide-react";
+import { ArrowLeft, PenLine, Star } from "lucide-react";
 import { useRecords } from "../../hooks/useRecords";
 import { useArticle } from "../../hooks/useArticle";
 import { useNfcTags } from "../../hooks/useNfcTags";
@@ -11,10 +11,13 @@ import { slugify } from "../../utils/slugify";
 import { NfcPairingDialog } from "../NfcPairingDialog/NfcPairingDialog";
 import { LogListenDialog } from "../LogListenDialog/LogListenDialog";
 import { TrackList } from "../TrackList/TrackList";
+import { Button } from "../Button/Button";
 import styles from "./RecordDetail.module.css";
 
 export function RecordDetail() {
   const { artist, album } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { records } = useRecords();
   const record = records?.find(
     (r) => slugify(r.artist) === artist && slugify(r.title) === album
@@ -41,8 +44,31 @@ export function RecordDetail() {
     );
   }
 
+  const handleBack = () => {
+    // Go back within the app if there's history, otherwise fall back to the collection
+    if (location.key !== "default") {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
+  };
+
   return (
     <div className={styles.container}>
+      <div className={styles.topBar}>
+        <Button variant="ghost" icon aria-label="Back" onClick={handleBack}>
+          <ArrowLeft size={18} />
+        </Button>
+        <div className={styles.topBarActions}>
+          {isAdmin && (
+            <>
+              <NfcPairingDialog releaseId={record.id} existingTag={getNfcTag(record.id)} />
+              <LogListenDialog releaseId={record.id} title={record.title} artist={record.artist} />
+            </>
+          )}
+        </div>
+      </div>
+
       <div className={styles.header}>
         <img
           src={record.supabase_image_url || record.coverImage}
@@ -73,13 +99,6 @@ export function RecordDetail() {
 
       {record.tracklist && record.tracklist.length > 0 && (
         <TrackList tracks={record.tracklist} />
-      )}
-
-      {isAdmin && (
-        <div className={styles.nfcSection}>
-          <NfcPairingDialog releaseId={record.id} existingTag={getNfcTag(record.id)} />
-          <LogListenDialog releaseId={record.id} title={record.title} artist={record.artist} />
-        </div>
       )}
 
       {(isLoadingArticle || article) && (
