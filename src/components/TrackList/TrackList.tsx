@@ -1,11 +1,13 @@
 import type { TrackListEntry } from "../../types/Record";
+import { formatClock } from "../../utils/formatDuration";
 import styles from "./TrackList.module.css";
 
 interface TrackListProps {
   tracks: TrackListEntry[];
+  totalSeconds?: number;
 }
 
-export function TrackList({ tracks }: TrackListProps) {
+export function TrackList({ tracks, totalSeconds }: TrackListProps) {
   let trackNumber = 0;
   return (
     <div className={styles.container}>
@@ -28,6 +30,12 @@ export function TrackList({ tracks }: TrackListProps) {
           </div>
         );
       })}
+      {(totalSeconds ?? 0) > 0 && (
+        <div className={styles.totalRow}>
+          <span className={styles.totalLabel}>Total Time</span>
+          <span className={styles.duration}>{formatClock(totalSeconds!)}</span>
+        </div>
+      )}
     </div>
   );
 }

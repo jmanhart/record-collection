@@ -98,7 +98,7 @@ export function RecordDetail() {
       </div>
 
       {record.tracklist && record.tracklist.length > 0 && (
-        <TrackList tracks={record.tracklist} />
+        <TrackList tracks={record.tracklist} totalSeconds={record.duration_seconds} />
       )}
 
       {(isLoadingArticle || article) && (
