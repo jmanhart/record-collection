@@ -106,59 +106,6 @@
   color: var(--text-tertiary);
 }
 
-.topArtists {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  background: var(--card-bg);
-  border: 1px solid var(--divider);
-  border-radius: 8px;
-  padding: 0.875rem 1rem;
-}
-
-.topArtistsLabel {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-
-.topArtistsList {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.topArtistRow {
-  display: flex;
-  align-items: baseline;
-  gap: 0.625rem;
-}
-
-.topArtistRank {
-  flex-shrink: 0;
-  width: 1.1rem;
-  font-size: 0.75rem;
-  color: var(--text-tertiary);
-}
-
-.topArtistName {
-  flex: 1;
-  min-width: 0;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.topArtistCount {
-  flex-shrink: 0;
-  font-size: 0.8rem;
-  font-variant-numeric: tabular-nums;
-  color: var(--text-secondary);
-}
-
 /* Feed pane */
 .feedHeader {
   position: sticky;
