@@ -137,43 +137,45 @@ export function AdminPanel() {
         <div className={styles.left}>
           <Search value={search} onChange={setSearch} placeholder="Search records..." />
 
-          <StatCardRow>
-            <StatCard
-              label="NFC linked"
-              value={isLoading ? "—" : `${stats.nfcPercent}%`}
-              meterPercent={stats.nfcPercent}
-              sub={
-                statFilter === "nfc-unlinked"
-                  ? "showing unlinked"
-                  : `${stats.nfcLinked} of ${stats.total} linked`
-              }
-              onClick={() => toggleStatFilter("nfc-unlinked")}
-              active={statFilter === "nfc-unlinked"}
-              title="Filter the table to records without an NFC tag"
-            />
-            <StatCard
-              label="Collection"
-              value={isLoading ? "—" : stats.total}
-              sub="records"
-            />
-            <StatCard
-              label="Total runtime"
-              value={isLoading ? "—" : formatRuntimeCompact(stats.totalSeconds)}
-              sub={
-                stats.totalSeconds >= 86400
-                  ? `${(stats.totalSeconds / 86400).toFixed(1)} days of music`
-                  : "of music"
-              }
-            />
-            <StatCard
-              label="Missing track length"
-              value={isLoading ? "—" : stats.missingDuration}
-              sub={statFilter === "missing-duration" ? "showing these" : "need durations"}
-              onClick={() => toggleStatFilter("missing-duration")}
-              active={statFilter === "missing-duration"}
-              title="Filter the table to records without a track length"
-            />
-          </StatCardRow>
+          <div className={styles.statSection}>
+            <StatCardRow>
+              <StatCard
+                label="NFC linked"
+                value={isLoading ? "—" : `${stats.nfcPercent}%`}
+                meterPercent={stats.nfcPercent}
+                sub={
+                  statFilter === "nfc-unlinked"
+                    ? "showing unlinked"
+                    : `${stats.nfcLinked} of ${stats.total} linked`
+                }
+                onClick={() => toggleStatFilter("nfc-unlinked")}
+                active={statFilter === "nfc-unlinked"}
+                title="Filter the table to records without an NFC tag"
+              />
+              <StatCard
+                label="Collection"
+                value={isLoading ? "—" : stats.total}
+                sub="records"
+              />
+              <StatCard
+                label="Total runtime"
+                value={isLoading ? "—" : formatRuntimeCompact(stats.totalSeconds)}
+                sub={
+                  stats.totalSeconds >= 86400
+                    ? `${(stats.totalSeconds / 86400).toFixed(1)} days of music`
+                    : "of music"
+                }
+              />
+              <StatCard
+                label="Missing track length"
+                value={isLoading ? "—" : stats.missingDuration}
+                sub={statFilter === "missing-duration" ? "showing these" : "need durations"}
+                onClick={() => toggleStatFilter("missing-duration")}
+                active={statFilter === "missing-duration"}
+                title="Filter the table to records without a track length"
+              />
+            </StatCardRow>
+          </div>
 
           {isLoading ? (
             <p className={styles.status}>Loading records...</p>

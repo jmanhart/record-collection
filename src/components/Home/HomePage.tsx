@@ -119,6 +119,20 @@ export default function HomePage() {
     return { listens: yearListens.length, albums, seconds, weekSeconds };
   }, [events, yearPrefix, todayKey]);
 
+  const topArtists = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const event of events) {
+      if (event.type !== "listen" || !event.dateKey.startsWith(yearPrefix)) continue;
+      const artist = event.record?.artist;
+      if (!artist) continue;
+      counts.set(artist, (counts.get(artist) ?? 0) + 1);
+    }
+    return Array.from(counts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([artist, count]) => ({ artist, count }));
+  }, [events, yearPrefix]);
+
   const monthPrefix = `${cursor.year}-${pad(cursor.month + 1)}-`;
   const monthEvents = useMemo(
     () => events.filter((e) => e.dateKey.startsWith(monthPrefix)),
@@ -139,91 +153,117 @@ export default function HomePage() {
   const heroCover = heroRecord?.supabase_image_url || heroRecord?.coverImage;
 
   return (
-    <div className={styles.container}>
-      <header className={styles.pageHeader}>
-        <Link to="/" className={styles.backLink}>
-          ← Collection
-        </Link>
-      </header>
+    <div className={styles.shell}>
+      <section className={styles.metricsPane}>
+        <header className={styles.pageHeader}>
+          <Link to="/" className={styles.backLink}>
+            ← Collection
+          </Link>
+        </header>
 
-      {isLoading ? (
-        <p className={styles.status}>Loading...</p>
-      ) : (
-        <>
-          {latestListen && heroRecord && (
-            <Link
-              to={`/${slugify(heroRecord.artist)}/${slugify(heroRecord.title)}`}
-              className={styles.heroLink}
-            >
-              <div className={styles.hero}>
-                {heroCover ? (
-                  <img src={heroCover} alt="" className={styles.heroCover} />
-                ) : (
-                  <div className={styles.heroCoverPlaceholder} />
-                )}
-                <div className={styles.heroInfo}>
-                  <span className={styles.heroLabel}>Latest listen</span>
-                  <span className={styles.heroTitle}>{heroRecord.title}</span>
-                  <span className={styles.heroArtist}>{heroRecord.artist}</span>
-                  <span className={styles.heroWhen}>
-                    {formatHeroWhen(latestListen, todayKey)}
-                  </span>
+        {isLoading ? (
+          <p className={styles.status}>Loading...</p>
+        ) : (
+          <>
+            {latestListen && heroRecord && (
+              <Link
+                to={`/${slugify(heroRecord.artist)}/${slugify(heroRecord.title)}`}
+                className={styles.heroLink}
+              >
+                <div className={styles.hero}>
+                  {heroCover ? (
+                    <img src={heroCover} alt="" className={styles.heroCover} />
+                  ) : (
+                    <div className={styles.heroCoverPlaceholder} />
+                  )}
+                  <div className={styles.heroMain}>
+                    <span className={styles.heroTitle}>
+                      {heroRecord.title} — {heroRecord.artist}
+                    </span>
+                    <span className={styles.heroWhen}>
+                      Latest listen · {formatHeroWhen(latestListen, todayKey)}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            )}
+
+            <StatCardRow>
+              <StatCard
+                size="sm"
+                label="Listens this year"
+                value={yearStats.listens}
+                sub={`${yearStats.albums} different albums`}
+              />
+              <StatCard
+                size="sm"
+                label="Time listened"
+                value={formatRuntimeCompact(yearStats.seconds)}
+                sub="this year"
+              />
+              <StatCard
+                size="sm"
+                label="This week"
+                value={formatRuntimeCompact(yearStats.weekSeconds)}
+                sub="time listened"
+              />
+            </StatCardRow>
+
+            <div className={styles.vizRow}>
+              <MonthCalendar
+                year={cursor.year}
+                month={cursor.month}
+                byDay={byDay}
+                todayKey={todayKey}
+                selectedDay={selectedDay}
+                onSelectDay={setSelectedDay}
+                onNavigate={handleNavigate}
+              />
+              <WeeklyBars buckets={weekBuckets} />
+            </div>
+
+            {topArtists.length > 0 && (
+              <div className={styles.topArtists}>
+                <span className={styles.topArtistsLabel}>Top artists this year</span>
+                <div className={styles.topArtistsList}>
+                  {topArtists.map(({ artist, count }, index) => (
+                    <div key={artist} className={styles.topArtistRow}>
+                      <span className={styles.topArtistRank}>{index + 1}</span>
+                      <span className={styles.topArtistName}>{artist}</span>
+                      <span className={styles.topArtistCount}>
+                        {count} {count === 1 ? "listen" : "listens"}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </Link>
+            )}
+          </>
+        )}
+      </section>
+
+      <section className={styles.feedPane}>
+        <div className={styles.feedHeader}>
+          <h3 className={styles.feedTitle}>Activity</h3>
+          {selectedDay && (
+            <button
+              className={styles.clearChip}
+              onClick={() => setSelectedDay(null)}
+            >
+              {selectedDay.slice(8, 10).replace(/^0/, "")}{" "}
+              {new Date(cursor.year, cursor.month, 1).toLocaleDateString("en-US", {
+                month: "short",
+              })}
+              <X size={12} />
+            </button>
           )}
-
-          <StatCardRow>
-            <StatCard
-              label="Listens this year"
-              value={yearStats.listens}
-              sub={`${yearStats.albums} different albums`}
-            />
-            <StatCard
-              label="Time listened"
-              value={formatRuntimeCompact(yearStats.seconds)}
-              sub="this year"
-            />
-            <StatCard
-              label="This week"
-              value={formatRuntimeCompact(yearStats.weekSeconds)}
-              sub="time listened"
-            />
-          </StatCardRow>
-
-          <div className={styles.vizSection}>
-            <MonthCalendar
-              year={cursor.year}
-              month={cursor.month}
-              byDay={byDay}
-              todayKey={todayKey}
-              selectedDay={selectedDay}
-              onSelectDay={setSelectedDay}
-              onNavigate={handleNavigate}
-            />
-            <WeeklyBars buckets={weekBuckets} />
-          </div>
-
-          <div className={styles.feedSection}>
-            <div className={styles.feedHeader}>
-              <h3 className={styles.feedTitle}>Activity</h3>
-              {selectedDay && (
-                <button
-                  className={styles.clearChip}
-                  onClick={() => setSelectedDay(null)}
-                >
-                  {selectedDay.slice(8, 10).replace(/^0/, "")}{" "}
-                  {new Date(cursor.year, cursor.month, 1).toLocaleDateString("en-US", {
-                    month: "short",
-                  })}
-                  <X size={12} />
-                </button>
-              )}
-            </div>
-            <ActivityFeed events={feedEvents} todayKey={todayKey} />
-          </div>
-        </>
-      )}
+        </div>
+        {isLoading ? (
+          <p className={styles.status}>Loading...</p>
+        ) : (
+          <ActivityFeed events={feedEvents} todayKey={todayKey} />
+        )}
+      </section>
     </div>
   );
 }

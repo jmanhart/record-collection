@@ -48,6 +48,10 @@
   min-width: 0;
 }
 
+.statSection {
+  margin-top: 1rem;
+}
+
 .tableWrapper {
   margin-top: 1rem;
   max-height: 500px;

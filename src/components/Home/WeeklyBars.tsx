@@ -52,7 +52,7 @@ export function WeeklyBars({ buckets }: WeeklyBarsProps) {
         <p className={styles.empty}>No listens this month.</p>
       ) : (
         <div className={styles.chart}>
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={buckets}
               margin={{ top: 24, right: 8, bottom: 0, left: 8 }}

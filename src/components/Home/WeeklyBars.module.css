@@ -1,4 +1,8 @@
 .container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
   background: var(--card-bg);
   border: 1px solid var(--divider);
   border-radius: 8px;
@@ -55,10 +59,20 @@
 }
 
 .empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--text-tertiary);
-  text-align: center;
   padding: 2rem 0;
   margin: 0;
+}
+
+/* Fills the card beside the calendar; the min-height keeps a sensible
+   chart size when the cards stack in a single column */
+.chart {
+  flex: 1;
+  min-height: 170px;
 }
 
 /* Recharts sets fills as SVG presentation attributes; CSS wins over

@@ -19,6 +19,7 @@ interface StatCardProps {
   onClick?: () => void;
   active?: boolean;
   title?: string;
+  size?: "md" | "sm";
 }
 
 export function StatCard({
@@ -29,7 +30,9 @@ export function StatCard({
   onClick,
   active = false,
   title,
+  size = "md",
 }: StatCardProps) {
+  const sizeClass = size === "sm" ? styles.sm : "";
   const content = (
     <>
       <span className={styles.label}>{label}</span>
@@ -49,7 +52,7 @@ export function StatCard({
   if (onClick) {
     return (
       <button
-        className={`${styles.card} ${styles.action} ${active ? styles.active : ""}`}
+        className={`${styles.card} ${sizeClass} ${styles.action} ${active ? styles.active : ""}`}
         onClick={onClick}
         aria-pressed={active}
         title={title}
@@ -59,5 +62,5 @@ export function StatCard({
     );
   }
 
-  return <div className={styles.card}>{content}</div>;
+  return <div className={`${styles.card} ${sizeClass}`}>{content}</div>;
 }
