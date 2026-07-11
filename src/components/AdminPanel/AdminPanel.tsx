@@ -10,6 +10,7 @@ import { Button } from "../Button/Button";
 import { NfcPairingDialog } from "../NfcPairingDialog/NfcPairingDialog";
 import { LogListenDialog } from "../LogListenDialog/LogListenDialog";
 import { RecordMetadataEditor } from "./RecordMetadataEditor";
+import { StatCard, StatCardRow } from "../StatCard/StatCard";
 import { formatDateOnly } from "../../utils/timezone";
 import { formatRuntimeCompact } from "../../utils/formatDuration";
 import styles from "./AdminPanel.module.css";
@@ -136,71 +137,43 @@ export function AdminPanel() {
         <div className={styles.left}>
           <Search value={search} onChange={setSearch} placeholder="Search records..." />
 
-          <div className={styles.statRow}>
-            <button
-              className={`${styles.statCard} ${styles.statCardAction} ${
-                statFilter === "nfc-unlinked" ? styles.statCardActive : ""
-              }`}
-              onClick={() => toggleStatFilter("nfc-unlinked")}
-              aria-pressed={statFilter === "nfc-unlinked"}
-              title="Filter the table to records without an NFC tag"
-            >
-              <span className={styles.statLabel}>NFC linked</span>
-              <span className={styles.statValue}>
-                {isLoading ? "—" : `${stats.nfcPercent}%`}
-              </span>
-              <span className={styles.statMeter}>
-                <span
-                  className={styles.statMeterFill}
-                  style={{ width: `${stats.nfcPercent}%` }}
-                />
-              </span>
-              <span className={styles.statSub}>
-                {statFilter === "nfc-unlinked"
+          <StatCardRow>
+            <StatCard
+              label="NFC linked"
+              value={isLoading ? "—" : `${stats.nfcPercent}%`}
+              meterPercent={stats.nfcPercent}
+              sub={
+                statFilter === "nfc-unlinked"
                   ? "showing unlinked"
-                  : `${stats.nfcLinked} of ${stats.total} linked`}
-              </span>
-            </button>
-
-            <div className={styles.statCard}>
-              <span className={styles.statLabel}>Collection</span>
-              <span className={styles.statValue}>
-                {isLoading ? "—" : stats.total}
-              </span>
-              <span className={styles.statSub}>records</span>
-            </div>
-
-            <div className={styles.statCard}>
-              <span className={styles.statLabel}>Total runtime</span>
-              <span className={styles.statValue}>
-                {isLoading ? "—" : formatRuntimeCompact(stats.totalSeconds)}
-              </span>
-              <span className={styles.statSub}>
-                {stats.totalSeconds >= 86400
+                  : `${stats.nfcLinked} of ${stats.total} linked`
+              }
+              onClick={() => toggleStatFilter("nfc-unlinked")}
+              active={statFilter === "nfc-unlinked"}
+              title="Filter the table to records without an NFC tag"
+            />
+            <StatCard
+              label="Collection"
+              value={isLoading ? "—" : stats.total}
+              sub="records"
+            />
+            <StatCard
+              label="Total runtime"
+              value={isLoading ? "—" : formatRuntimeCompact(stats.totalSeconds)}
+              sub={
+                stats.totalSeconds >= 86400
                   ? `${(stats.totalSeconds / 86400).toFixed(1)} days of music`
-                  : "of music"}
-              </span>
-            </div>
-
-            <button
-              className={`${styles.statCard} ${styles.statCardAction} ${
-                statFilter === "missing-duration" ? styles.statCardActive : ""
-              }`}
+                  : "of music"
+              }
+            />
+            <StatCard
+              label="Missing track length"
+              value={isLoading ? "—" : stats.missingDuration}
+              sub={statFilter === "missing-duration" ? "showing these" : "need durations"}
               onClick={() => toggleStatFilter("missing-duration")}
-              aria-pressed={statFilter === "missing-duration"}
+              active={statFilter === "missing-duration"}
               title="Filter the table to records without a track length"
-            >
-              <span className={styles.statLabel}>Missing track length</span>
-              <span className={styles.statValue}>
-                {isLoading ? "—" : stats.missingDuration}
-              </span>
-              <span className={styles.statSub}>
-                {statFilter === "missing-duration"
-                  ? "showing these"
-                  : "need durations"}
-              </span>
-            </button>
-          </div>
+            />
+          </StatCardRow>
 
           {isLoading ? (
             <p className={styles.status}>Loading records...</p>

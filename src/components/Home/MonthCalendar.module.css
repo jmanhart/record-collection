@@ -1,0 +1,126 @@
+.calendar {
+  background: var(--card-bg);
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.monthLabel {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.navButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.navButton:hover:not(:disabled) {
+  background: var(--surface200);
+  color: var(--text-primary);
+}
+
+.navButton:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.weekday {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  text-align: center;
+  padding-bottom: 0.25rem;
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  position: relative;
+  aspect-ratio: 1;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: none;
+  cursor: default;
+  padding: 0;
+}
+
+.day:disabled {
+  cursor: default;
+}
+
+.dayNumber {
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+  line-height: 1;
+}
+
+.dayCount {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.dayActive {
+  background: var(--surface200);
+  cursor: pointer;
+}
+
+.dayActive:hover {
+  background: var(--surface300);
+}
+
+/* Beat the global button:focus/:active background reset */
+.dayActive:focus,
+.dayActive:active {
+  background: var(--surface200);
+}
+
+.dayToday {
+  border-color: var(--red200);
+}
+
+.daySelected,
+.daySelected:focus,
+.daySelected:active {
+  background: var(--surface300);
+  border-color: var(--red200);
+}
+
+.purchaseDot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--red200);
+}

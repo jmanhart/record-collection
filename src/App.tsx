@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route, useSearchParams } from "react-router-dom";
 import * as Sentry from "@sentry/react";
 import { RecordGrid } from "./components/RecordGrid/RecordGrid";
@@ -19,6 +20,9 @@ import { useRecords } from "./hooks/useRecords";
 import { useWishlist } from "./hooks/useWishlist";
 import { formatRuntime } from "./utils/formatDuration";
 import "./App.css";
+
+// Lazy so the collection bundle doesn't pay for the charting library
+const HomePage = lazy(() => import("./components/Home/HomePage"));
 
 function RecordList() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -105,6 +109,14 @@ export default function App() {
           <AdminFab />
           <Routes>
             <Route path="/" element={<RecordList />} />
+            <Route
+              path="/home"
+              element={
+                <Suspense fallback={null}>
+                  <HomePage />
+                </Suspense>
+              }
+            />
             <Route path="/listen/:uid" element={<ListenRedirect />} />
             <Route path="/:artist/:album" element={<RecordDetail />} />
             <Route path="/testing" element={<Testing />} />

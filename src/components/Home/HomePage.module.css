@@ -1,0 +1,150 @@
+.container {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.pageHeader {
+  margin-bottom: 1rem;
+}
+
+.backLink {
+  color: var(--link);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.backLink:hover {
+  color: var(--link-hover);
+}
+
+.status {
+  color: var(--text-tertiary);
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.heroLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  background: var(--card-bg);
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  padding: 1.25rem;
+  transition: background-color 0.15s ease;
+}
+
+.hero:hover {
+  background: var(--card-bg-hover);
+}
+
+.heroCover {
+  width: 96px;
+  height: 96px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.heroCoverPlaceholder {
+  width: 96px;
+  height: 96px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: var(--surface200);
+}
+
+.heroInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.heroLabel {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+}
+
+.heroTitle {
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-primary);
+  text-wrap: balance;
+}
+
+.heroArtist {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.heroWhen {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  margin-top: 0.25rem;
+}
+
+.vizSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .vizSection {
+    grid-template-columns: 1fr;
+  }
+}
+
+.feedSection {
+  margin-top: 1.5rem;
+}
+
+.feedHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.feedTitle {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.clearChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  height: auto;
+  width: auto;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--divider);
+  background: var(--surface200);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.clearChip:hover {
+  background: var(--surface300);
+  color: var(--text-primary);
+}

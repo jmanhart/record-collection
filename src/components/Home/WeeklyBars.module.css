@@ -1,0 +1,80 @@
+.container {
+  background: var(--card-bg);
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.toggle {
+  display: inline-flex;
+  gap: 2px;
+  background: var(--surface200);
+  border-radius: 8px;
+  padding: 2px;
+}
+
+.toggleButton {
+  height: auto;
+  width: auto;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  border: none;
+  background: none;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.toggleButton:hover {
+  background: var(--surface300);
+  color: var(--text-primary);
+}
+
+.toggleActive,
+.toggleActive:hover,
+.toggleActive:focus,
+.toggleActive:active {
+  background: var(--card-bg);
+  color: var(--text-primary);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.empty {
+  color: var(--text-tertiary);
+  text-align: center;
+  padding: 2rem 0;
+  margin: 0;
+}
+
+/* Recharts sets fills as SVG presentation attributes; CSS wins over
+   those, which lets the chart follow the theme variables */
+.chart :global(.recharts-bar-rectangle path) {
+  fill: var(--red200);
+}
+
+.chart :global(.recharts-cartesian-axis-tick text),
+.chart :global(.recharts-cartesian-axis-tick-value) {
+  fill: var(--text-tertiary);
+  font-size: 0.7rem;
+}
+
+.chart :global(.recharts-label-list text) {
+  fill: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
