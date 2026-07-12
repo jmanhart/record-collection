@@ -14,6 +14,8 @@ export interface ActivityEvent {
   dateKey: string;
   /** Full timestamp for listens; date-only for purchases */
   timestamp: string;
+  /** Explicit stop time for listens; null/undefined means full-album inferred */
+  endedAt?: string | null;
   record?: Record;
 }
 
@@ -60,6 +62,7 @@ export function useActivity() {
         releaseId: listen.release_id,
         dateKey: toDateKey(listen.listened_at),
         timestamp: listen.listened_at,
+        endedAt: listen.ended_at,
         record: recordMap.get(listen.release_id),
       });
     }

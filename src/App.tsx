@@ -4,6 +4,7 @@ import * as Sentry from "@sentry/react";
 import { RecordGrid } from "./components/RecordGrid/RecordGrid";
 import { RecordDetail } from "./components/RecordDetail/RecordDetail";
 import { ListenRedirect } from "./components/ListenRedirect/ListenRedirect";
+import { StopListenRedirect } from "./components/ListenRedirect/StopListenRedirect";
 import { Testing } from "./components/Testing/Testing";
 import { AdminGate } from "./components/AdminGate/AdminGate";
 import { AdminPanel } from "./components/AdminPanel/AdminPanel";
@@ -117,6 +118,7 @@ export default function App() {
                 </Suspense>
               }
             />
+            <Route path="/listen/stop" element={<StopListenRedirect />} />
             <Route path="/listen/:uid" element={<ListenRedirect />} />
             <Route path="/:artist/:album" element={<RecordDetail />} />
             <Route path="/testing" element={<Testing />} />

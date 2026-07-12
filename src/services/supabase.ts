@@ -167,10 +167,18 @@ export const deleteNfcTag = async (id: string): Promise<void> => {
   if (error) throw error;
 };
 
-export const logListen = async (releaseId: number, source = "nfc"): Promise<void> => {
+export const logListen = async (
+  releaseId: number,
+  source = "nfc",
+  listenedAt?: string
+): Promise<void> => {
   const { error } = await supabase
     .from("listens")
-    .insert({ release_id: releaseId, source });
+    .insert({
+      release_id: releaseId,
+      source,
+      ...(listenedAt ? { listened_at: listenedAt } : {}),
+    });
 
   if (error) {
     console.error("Error logging listen:", error);
@@ -197,7 +205,20 @@ export interface Listen {
   release_id: number;
   listened_at: string;
   source: string;
+  ended_at: string | null;
 }
+
+/** Ends the currently playing listen, if any. Returns true if one was ended. */
+export const endListen = async (): Promise<boolean> => {
+  const { data, error } = await supabase.rpc("end_listen");
+
+  if (error) {
+    console.error("Error ending listen:", error);
+    throw error;
+  }
+
+  return (data?.length ?? 0) > 0;
+};
 
 export const getListens = async (): Promise<Listen[]> => {
   const { data, error } = await supabase
