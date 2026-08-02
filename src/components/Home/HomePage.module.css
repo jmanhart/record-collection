@@ -1,5 +1,7 @@
 /* App-shell layout: the page itself never scrolls; the feed pane does.
-   Extra right padding keeps content clear of the fixed theme toggle. */
+   Extra right padding keeps content clear of the fixed theme toggle.
+   Vertical padding sits on the panes rather than the shell so the rule
+   between them can run the full height of the viewport. */
 .shell {
   display: grid;
   grid-template-columns: 3fr 2fr;
@@ -8,7 +10,7 @@
   overflow: hidden;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 1rem 3.25rem 1.25rem 1.5rem;
+  padding: 0 3.25rem 0 1.5rem;
   box-sizing: border-box;
 }
 
@@ -18,12 +20,15 @@
   gap: 0.75rem;
   min-width: 0;
   min-height: 0;
+  padding: 1rem 0 1.25rem;
 }
 
 .feedPane {
   min-width: 0;
   min-height: 0;
   overflow-y: auto;
+  border-left: 1px solid var(--divider);
+  padding: 0 0 1.25rem 1.5rem;
 }
 
 .pageHeader {
@@ -46,71 +51,9 @@
   text-align: center;
 }
 
-/* Hero: slim one-line strip */
-.hero {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  background: var(--card-bg);
-  border: 1px solid var(--divider);
-  border-radius: 8px;
-  padding: 0.6rem 0.75rem;
-  transition: background-color 0.15s ease;
-}
-
-.hero:hover {
-  background: var(--card-bg-hover);
-}
-
-.heroLink {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  text-decoration: none;
-  color: inherit;
-}
-
-.heroCover {
-  width: 48px;
-  height: 48px;
-  flex-shrink: 0;
-  border-radius: 6px;
-  object-fit: cover;
-}
-
-.heroCoverPlaceholder {
-  width: 48px;
-  height: 48px;
-  flex-shrink: 0;
-  border-radius: 6px;
-  background: var(--surface200);
-}
-
-.heroMain {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-}
-
-.heroTitle {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.heroWhen {
-  font-size: 0.75rem;
-  color: var(--text-tertiary);
-}
-
 /* Feed pane */
+/* Carries the pane's top padding so it survives being pinned — the pane
+   itself can't hold it without insetting the divider from the viewport top */
 .feedHeader {
   position: sticky;
   top: 0;
@@ -119,7 +62,7 @@
   align-items: center;
   gap: 0.75rem;
   background: var(--surface000);
-  padding: 0.25rem 0 0.5rem;
+  padding: 1rem 0 0.5rem;
 }
 
 .feedTitle {
@@ -144,13 +87,21 @@
     padding: 1.5rem 1.25rem 2rem;
   }
 
+  .metricsPane {
+    padding: 0;
+  }
+
+  /* Stacked, so the columns no longer sit side by side to be divided */
   .feedPane {
     overflow: visible;
     margin-top: 1.5rem;
+    border-left: none;
+    padding: 0;
   }
 
   .feedHeader {
     position: static;
+    padding: 0.25rem 0 0.5rem;
   }
 }
 

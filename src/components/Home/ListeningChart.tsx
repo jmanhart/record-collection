@@ -246,26 +246,28 @@ export function ListeningChart({ events, todayKey }: ListeningChartProps) {
         </div>
       </div>
 
-      <StatCardRow>
-        <StatCard
-          size="sm"
-          label="Listens"
-          value={stats.listens}
-          sub={`${stats.albums} different albums`}
-        />
-        <StatCard
-          size="sm"
-          label="Time listened"
-          value={formatRuntimeCompact(stats.seconds)}
-          sub={`this ${range}`}
-        />
-        <StatCard
-          size="sm"
-          label={`Last ${range}`}
-          value={formatRuntimeCompact(stats.prevSeconds)}
-          sub="time listened"
-        />
-      </StatCardRow>
+      <div className={styles.stats}>
+        <StatCardRow>
+          <StatCard
+            size="sm"
+            label="Listens"
+            value={stats.listens}
+            sub={`${stats.albums} different albums`}
+          />
+          <StatCard
+            size="sm"
+            label="Time listened"
+            value={formatRuntimeCompact(stats.seconds)}
+            sub={`this ${range}`}
+          />
+          <StatCard
+            size="sm"
+            label={`Last ${range}`}
+            value={formatRuntimeCompact(stats.prevSeconds)}
+            sub="time listened"
+          />
+        </StatCardRow>
+      </div>
 
       {isEmpty ? (
         <p className={styles.empty}>No listens this {range}.</p>

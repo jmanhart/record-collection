@@ -1,12 +1,17 @@
+/* Pure layout wrapper: the metrics sit directly on the page background so the
+   pane reads as flat as the activity feed beside it. */
 .container {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   box-sizing: border-box;
-  background: var(--card-bg);
-  border: 1px solid var(--divider);
-  border-radius: 8px;
-  padding: 1rem;
+}
+
+/* StatCard paints itself from --card-bg; rebinding the variable here empties
+   those cards to outlines without threading a prop through the component. */
+.stats {
+  --card-bg: transparent;
+  --card-bg-hover: var(--surface100);
 }
 
 .header {
@@ -19,7 +24,7 @@
 .toggle {
   display: inline-flex;
   gap: 2px;
-  background: var(--surface200);
+  background: var(--surface100);
   border-radius: 8px;
   padding: 2px;
 }
@@ -89,10 +94,8 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  background: var(--card-bg);
-  border: 1px solid var(--divider);
-  border-radius: 8px;
-  padding: 0.875rem 1rem;
+  padding: 0.875rem 0 0;
+  margin-top: 0.25rem;
 }
 
 .topArtistsLabel {
