@@ -208,18 +208,6 @@ export interface Listen {
   ended_at: string | null;
 }
 
-/** Ends the currently playing listen, if any. Returns true if one was ended. */
-export const endListen = async (): Promise<boolean> => {
-  const { data, error } = await supabase.rpc("end_listen");
-
-  if (error) {
-    console.error("Error ending listen:", error);
-    throw error;
-  }
-
-  return (data?.length ?? 0) > 0;
-};
-
 export const getListens = async (): Promise<Listen[]> => {
   const { data, error } = await supabase
     .from("listens")
