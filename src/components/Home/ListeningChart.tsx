@@ -197,9 +197,9 @@ export function ListeningChart({ events, todayKey }: ListeningChartProps) {
       const artist = e.record?.artist;
       if (artist) counts.set(artist, (counts.get(artist) ?? 0) + 1);
     }
+    // Uncapped: the list sits in a fixed-height slot and scrolls internally
     const topArtists = Array.from(counts.entries())
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
       .map(([artist, count]) => ({ artist, count }));
 
     return { listens: listens.length, albums, seconds, prevSeconds, topArtists };

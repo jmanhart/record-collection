@@ -1,10 +1,14 @@
 /* Pure layout wrapper: the metrics sit directly on the page background so the
-   pane reads as flat as the activity feed beside it. */
+   pane reads as flat as the activity feed beside it. Claims the pane's full
+   height so the chart inside can absorb whatever the fixed rows don't use;
+   min-height:0 is what lets it shrink past its content instead of overflowing. */
 .container {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   box-sizing: border-box;
+  flex: 1;
+  min-height: 0;
 }
 
 /* StatCard paints itself from --card-bg; rebinding the variable here empties
@@ -12,6 +16,7 @@
 .stats {
   --card-bg: transparent;
   --card-bg-hover: var(--surface100);
+  flex-shrink: 0;
 }
 
 .header {
@@ -19,6 +24,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
+  flex-shrink: 0;
 }
 
 .toggle {
@@ -56,6 +62,14 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
+/* Both the chart and its empty state take every pixel the fixed rows above
+   and below leave behind, down to a floor that keeps the bars readable */
+.empty,
+.chart {
+  flex: 1;
+  min-height: 180px;
+}
+
 .empty {
   display: flex;
   align-items: center;
@@ -63,13 +77,7 @@
   color: var(--text-tertiary);
   padding: 2rem 0;
   margin: 0;
-  height: 240px;
   box-sizing: border-box;
-}
-
-/* Full-width card sets its own height now that no calendar defines the row */
-.chart {
-  height: 240px;
 }
 
 /* Recharts sets fills as SVG presentation attributes; CSS wins over
@@ -90,30 +98,41 @@
   font-weight: 500;
 }
 
+/* Pinned to the bottom of the pane at a fixed height, so switching range
+   never resizes the chart above it */
 .topArtists {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   padding: 0.875rem 0 0;
   margin-top: 0.25rem;
+  flex-shrink: 0;
 }
 
 .topArtistsLabel {
   font-size: 0.75rem;
   font-weight: 500;
   color: var(--text-secondary);
+  flex-shrink: 0;
 }
 
+/* Exactly five rows — five 1.3125rem rows plus the four gaps between them.
+   Longer rankings scroll within the slot rather than stealing height from
+   the chart, so switching range never moves the chart's baseline. */
 .topArtistsList {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  height: calc(5 * 1.3125rem + 4 * 0.4rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .topArtistRow {
   display: flex;
   align-items: baseline;
   gap: 0.625rem;
+  flex-shrink: 0;
 }
 
 .topArtistRank {
