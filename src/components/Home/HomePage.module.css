@@ -23,7 +23,11 @@
   padding: 1rem 0 1.25rem;
 }
 
+/* --feed-header-height is the pinned "Activity" bar's height; the feed's
+   date headings read it to stack directly beneath it. Custom properties
+   cascade by DOM, so it crosses the CSS-module boundary. */
 .feedPane {
+  --feed-header-height: 3.5rem;
   min-width: 0;
   min-height: 0;
   overflow-y: auto;
@@ -91,8 +95,11 @@
     padding: 0;
   }
 
-  /* Stacked, so the columns no longer sit side by side to be divided */
+  /* Stacked, so the columns no longer sit side by side to be divided.
+     The document scrolls instead of the pane and the header stops
+     pinning, so date headings stick to the viewport top. */
   .feedPane {
+    --feed-header-height: 0px;
     overflow: visible;
     margin-top: 1.5rem;
     border-left: none;

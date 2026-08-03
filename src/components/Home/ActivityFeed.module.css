@@ -12,7 +12,15 @@
   margin-bottom: 1.5rem;
 }
 
+/* Pins under the "Activity" bar while its group is in view, then gets
+   pushed out by the next group's heading. The spacing below is padding
+   rather than margin so the background covers it while pinned — margin
+   sits outside the painted box and entries would show through. */
 .dateHeading {
+  position: sticky;
+  top: var(--feed-header-height, 0px);
+  z-index: 1;
+  background: var(--surface000);
   display: flex;
   justify-content: space-between;
   align-items: baseline;
@@ -21,8 +29,8 @@
   color: var(--text-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  margin: 0 0 0.5rem;
-  padding-bottom: 0.4rem;
+  margin: 0;
+  padding-bottom: 0.9rem;
 }
 
 .daySummary {

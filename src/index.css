@@ -103,7 +103,11 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  /* clip, not hidden: `overflow-x: hidden` forces overflow-y to `auto`, which
+     turns body into a scrollport that never scrolls and stops position:sticky
+     descendants from ever activating. clip contains the same overflow without
+     establishing one. */
+  overflow-x: clip;
 }
 
 /* ===========================================
