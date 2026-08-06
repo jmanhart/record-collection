@@ -1,4 +1,11 @@
-import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Link } from "react-router-dom";
 import type { CSSProperties } from "react";
 import {
@@ -12,6 +19,7 @@ import {
   zoomToSlider,
 } from "../../hooks/useTimelineZoom";
 import { DayRow } from "./DayRow";
+import { TimelineDetail } from "./TimelineDetail";
 import styles from "./TimelinePage.module.css";
 
 /**
@@ -62,6 +70,59 @@ export default function TimelinePage() {
     getTrack,
     focusFraction: nowMinutes / MINUTES_PER_DAY,
   });
+
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  const selection = useMemo(() => {
+    if (!selectedId) return null;
+    for (const day of days) {
+      const block = day.blocks.find((b) => b.id === selectedId);
+      if (block) return { block, dateKey: day.dateKey };
+    }
+    return null;
+  }, [selectedId, days]);
+
+  /** How often the selected record appears anywhere on the timeline */
+  const selectionListens = useMemo(() => {
+    if (!selection) return 0;
+    return days.reduce(
+      (sum, day) =>
+        sum +
+        day.blocks.filter((b) => b.releaseId === selection.block.releaseId).length,
+      0
+    );
+  }, [selection, days]);
+
+  // Bring the selection into the middle of whatever width is left beside the
+  // panel. Runs after the panel has taken its space, so the measurement is of
+  // the shrunken scrollport rather than the full-width one.
+  useEffect(() => {
+    if (!selectedId) return;
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+
+    const frame = requestAnimationFrame(() => {
+      const el = scroller.querySelector<HTMLElement>(
+        `[data-block-id="${CSS.escape(selectedId)}"]`
+      );
+      if (!el) return;
+
+      const scrollerRect = scroller.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      const blockCentre =
+        elRect.left - scrollerRect.left + scroller.scrollLeft + elRect.width / 2;
+      scroller.scrollLeft = blockCentre - scroller.clientWidth / 2;
+
+      // Vertical only when the row would otherwise sit against an edge
+      const top = elRect.top - scrollerRect.top;
+      const margin = scroller.clientHeight * 0.15;
+      if (top < margin || top > scroller.clientHeight - margin) {
+        scroller.scrollTop +=
+          top - (scroller.clientHeight - elRect.height) / 2;
+      }
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [selectedId, hourWidth]);
 
   const { labelEvery, tickEvery } = axisScaleFor(hourWidth);
 
@@ -138,6 +199,7 @@ export default function TimelinePage() {
         </div>
       </header>
 
+      <div className={styles.body}>
       {/* Scrolls in both directions. The axis pins to its top and the day
           labels to its left, which only works because this container is the
           scrollport for both axes. */}
@@ -172,10 +234,22 @@ export default function TimelinePage() {
                 key={day.dateKey}
                 day={day}
                 nowMinutes={day.isToday ? nowMinutes : undefined}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
               />
             ))
           )}
         </div>
+      </div>
+
+        {selection && (
+          <TimelineDetail
+            block={selection.block}
+            dateKey={selection.dateKey}
+            totalListens={selectionListens}
+            onClose={() => setSelectedId(null)}
+          />
+        )}
       </div>
     </div>
   );

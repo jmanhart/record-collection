@@ -98,17 +98,27 @@
    of its own — padding here would set a floor on the border box and make a
    short record wider than its runtime, overlapping the next one.
    No overflow:hidden either: the tooltip is a child and has to escape. */
+/* Height is explicit rather than derived from top + bottom: a <button> is a
+   form control, and browsers size it from its content instead of stretching
+   it between those offsets the way a div would. */
 .block {
   container-type: inline-size;
   position: absolute;
   top: 0.5rem;
-  bottom: 0.5rem;
+  height: calc(100% - 1rem);
   min-width: 4px;
-  text-decoration: none;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
 .block:hover,
-.block:focus-visible {
+.block:focus-visible,
+.selected {
   z-index: 3;
 }
 
@@ -129,6 +139,13 @@
 .block:hover .card,
 .block:focus-visible .card {
   background: var(--surface300);
+}
+
+/* The open selection keeps a ring so it stays findable once the panel covers
+   part of the grid */
+.selected .card {
+  background: var(--surface300);
+  box-shadow: 0 0 0 2px var(--red200);
 }
 
 /* Square, sized to the card's inner height but allowed to shrink: zoomed out

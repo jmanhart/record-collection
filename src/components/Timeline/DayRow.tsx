@@ -1,32 +1,18 @@
-import { Link } from "react-router-dom";
 import { MINUTES_PER_DAY, type TimelineDay } from "../../hooks/useTimelineDays";
-import { slugify } from "../../utils/slugify";
+import { formatSpan, formatTimeOfDay } from "./format";
 import styles from "./DayRow.module.css";
 
 interface DayRowProps {
   day: TimelineDay;
   /** Minutes from midnight for the live "now" marker; only on today's row */
   nowMinutes?: number;
+  selectedId?: string | null;
+  onSelect: (blockId: string) => void;
 }
 
 const percent = (minutes: number) => `${(minutes / MINUTES_PER_DAY) * 100}%`;
 
-function formatClock(minutes: number): string {
-  const hour = Math.floor(minutes / 60) % 24;
-  const minute = Math.round(minutes % 60);
-  const suffix = hour < 12 ? "am" : "pm";
-  const display = hour % 12 === 0 ? 12 : hour % 12;
-  return `${display}:${String(minute).padStart(2, "0")}${suffix}`;
-}
-
-function formatSpan(minutes: number): string {
-  if (minutes < 60) return `${minutes}min`;
-  const hours = Math.floor(minutes / 60);
-  const rest = minutes % 60;
-  return rest === 0 ? `${hours}hr` : `${hours}hr ${rest}min`;
-}
-
-export function DayRow({ day, nowMinutes }: DayRowProps) {
+export function DayRow({ day, nowMinutes, selectedId, onSelect }: DayRowProps) {
   const [year, month, dayOfMonth] = day.dateKey.split("-").map(Number);
   const date = new Date(year, month - 1, dayOfMonth, 12);
   const weekday = date.toLocaleDateString("en-US", { weekday: "short" });
@@ -61,7 +47,7 @@ export function DayRow({ day, nowMinutes }: DayRowProps) {
                 {record?.artist ?? "Unknown artist"}
               </span>
               <span className={styles.tooltipMeta}>
-                {formatClock(block.startMin)} · {formatSpan(shownMin)}
+                {formatTimeOfDay(block.startMin)} · {formatSpan(shownMin)}
                 {block.truncated && ` of ${formatSpan(block.fullRuntimeMin)}`}
               </span>
             </span>
@@ -69,7 +55,7 @@ export function DayRow({ day, nowMinutes }: DayRowProps) {
 
           const label = `${record?.title ?? `Release ${block.releaseId}`} by ${
             record?.artist ?? "unknown artist"
-          }, ${formatClock(block.startMin)}`;
+          }, ${formatTimeOfDay(block.startMin)}`;
 
           // The card carries the chrome rather than the block itself: a
           // container query can't style its own container, and the block is
@@ -89,7 +75,7 @@ export function DayRow({ day, nowMinutes }: DayRowProps) {
                     {record?.title ?? `Release ${block.releaseId}`}
                   </span>
                   <span className={styles.blockTime}>
-                    {formatClock(block.startMin)}
+                    {formatTimeOfDay(block.startMin)}
                   </span>
                 </span>
               </span>
@@ -97,27 +83,24 @@ export function DayRow({ day, nowMinutes }: DayRowProps) {
             </>
           );
 
-          const style = {
-            left: percent(block.startMin),
-            width: percent(shownMin),
-          };
-
-          const className = styles.block;
-
-          return record ? (
-            <Link
+          return (
+            <button
               key={block.id}
-              to={`/${slugify(record.artist)}/${slugify(record.title)}`}
-              className={className}
-              style={style}
+              type="button"
+              data-block-id={block.id}
+              className={`${styles.block} ${
+                selectedId === block.id ? styles.selected : ""
+              }`}
+              style={{
+                left: percent(block.startMin),
+                width: percent(shownMin),
+              }}
               aria-label={label}
+              aria-pressed={selectedId === block.id}
+              onClick={() => onSelect(block.id)}
             >
               {body}
-            </Link>
-          ) : (
-            <span key={block.id} className={className} style={style} aria-label={label}>
-              {body}
-            </span>
+            </button>
           );
         })}
       </div>

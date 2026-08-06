@@ -10,6 +10,8 @@
   --day-width: calc(24 * var(--hour-width));
   --timeline-gutter: 5rem;
   --timeline-rule: 1px solid var(--divider);
+  /* Panel width; trimming the detail panel is this one value */
+  --detail-width: 450px;
   display: flex;
   flex-direction: column;
   height: 100dvh;
@@ -100,10 +102,20 @@
 
 /* The scrollport for both axes — what makes the sticky axis and sticky day
    labels resolve. min-height:0 lets it shrink inside the flex column. */
+/* Grid and detail panel side by side. The grid shrinks when the panel opens,
+   so nothing ends up hidden behind it. */
+.body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
 /* pan-x pan-y deliberately omits pinch-zoom: it leaves one-finger panning to
    the browser while handing the pinch gesture to our own zoom handler. */
 .scroller {
   flex: 1;
+  min-width: 0;
   min-height: 0;
   overflow: auto;
   overscroll-behavior: contain;
