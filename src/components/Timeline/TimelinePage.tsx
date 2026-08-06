@@ -1,19 +1,46 @@
-import { useLayoutEffect, useMemo, useRef } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
+import type { CSSProperties } from "react";
 import {
   useTimelineDays,
   toLocalMinutes,
   MINUTES_PER_DAY,
 } from "../../hooks/useTimelineDays";
+import {
+  useTimelineZoom,
+  sliderToZoom,
+  zoomToSlider,
+} from "../../hooks/useTimelineZoom";
 import { DayRow } from "./DayRow";
 import styles from "./TimelinePage.module.css";
 
-/** One tick an hour, plus the closing midnight. */
-const AXIS_TICKS = Array.from({ length: 25 }, (_, hour) => {
-  const suffix = hour < 12 || hour === 24 ? "a" : "p";
-  const display = hour % 12 === 0 ? 12 : hour % 12;
-  return { hour, label: `${display}${suffix}` };
-});
+/**
+ * How finely the axis is divided at a given zoom. Chosen so labels stay
+ * roughly 60–150px apart and hash marks 30–50px apart at every level —
+ * dense enough to read against, never crowded.
+ */
+const AXIS_SCALE = [
+  { from: 460, labelEvery: 15, tickEvery: 5 },
+  { from: 260, labelEvery: 30, tickEvery: 10 },
+  { from: 150, labelEvery: 60, tickEvery: 15 },
+  { from: 56, labelEvery: 60, tickEvery: 30 },
+  { from: 40, labelEvery: 120, tickEvery: 60 },
+  { from: 26, labelEvery: 180, tickEvery: 60 },
+  { from: 0, labelEvery: 360, tickEvery: 120 },
+];
+
+function axisScaleFor(hourWidth: number) {
+  return AXIS_SCALE.find((step) => hourWidth >= step.from) ?? AXIS_SCALE[AXIS_SCALE.length - 1];
+}
+
+/** Hours read as "5p"; anything finer is a bare ":15" under its hour. */
+function axisLabel(minutes: number): string {
+  const minute = minutes % 60;
+  if (minute !== 0) return `:${String(minute).padStart(2, "0")}`;
+  const hour = Math.floor(minutes / 60) % 24;
+  const suffix = hour < 12 ? "a" : "p";
+  return `${hour % 12 === 0 ? 12 : hour % 12}${suffix}`;
+}
 
 export default function TimelinePage() {
   const { days, isLoading } = useTimelineDays();
@@ -25,6 +52,29 @@ export default function TimelinePage() {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const hasCentered = useRef(false);
 
+  const getTrack = useCallback(
+    () => scrollerRef.current?.querySelector<HTMLElement>(`.${styles.axisTrack}`) ?? null,
+    []
+  );
+
+  const { hourWidth, minHourWidth, zoomTo } = useTimelineZoom({
+    scrollerRef,
+    getTrack,
+    focusFraction: nowMinutes / MINUTES_PER_DAY,
+  });
+
+  const { labelEvery, tickEvery } = axisScaleFor(hourWidth);
+
+  // Only the labels are elements; the hash marks are painted by a gradient,
+  // which keeps the DOM flat while a pinch re-renders this every frame.
+  const axisMarks = useMemo(() => {
+    const marks: { at: number; label: string }[] = [];
+    for (let m = 0; m <= MINUTES_PER_DAY; m += labelEvery) {
+      marks.push({ at: m, label: axisLabel(m) });
+    }
+    return marks;
+  }, [labelEvery]);
+
   // Open on the current time of day rather than at midnight, which is seven
   // hours of empty canvas away from anything. Measured off the rendered track
   // so it stays right if the zoom changes. Layout effect so it lands before
@@ -32,7 +82,7 @@ export default function TimelinePage() {
   useLayoutEffect(() => {
     if (isLoading || hasCentered.current) return;
     const scroller = scrollerRef.current;
-    const track = scroller?.querySelector<HTMLElement>(`.${styles.axisTrack}`);
+    const track = getTrack();
     if (!scroller || !track) return;
 
     const trackRect = track.getBoundingClientRect();
@@ -43,19 +93,49 @@ export default function TimelinePage() {
     // The browser clamps for us at either end of the day
     scroller.scrollLeft = nowX - scroller.clientWidth / 2;
     hasCentered.current = true;
-  }, [isLoading, nowMinutes]);
+  }, [isLoading, nowMinutes, getTrack]);
 
   return (
-    <div className={styles.page}>
+    <div
+      className={styles.page}
+      style={
+        {
+          "--hour-width": `${hourWidth}px`,
+          // Grid lines follow the labels so every labelled column has an edge;
+          // the finer hash marks live only in the axis bar.
+          "--grid-step": `${(labelEvery / 60) * hourWidth}px`,
+          "--tick-step": `${(tickEvery / 60) * hourWidth}px`,
+        } as CSSProperties
+      }
+    >
       <header className={styles.appBar}>
         <Link to="/" className={styles.backLink}>
           <span aria-hidden="true">←</span> Timeline
         </Link>
-        {!isLoading && (
-          <span className={styles.appBarMeta}>
-            {totalListens} listens · {days.length} days
-          </span>
-        )}
+
+        <div className={styles.appBarRight}>
+          <label className={styles.zoom}>
+            <span className={styles.zoomLabel}>Zoom</span>
+            <input
+              type="range"
+              className={styles.zoomSlider}
+              min={0}
+              max={100}
+              step={0.5}
+              value={zoomToSlider(hourWidth, minHourWidth)}
+              onChange={(event) =>
+                zoomTo(sliderToZoom(Number(event.target.value), minHourWidth))
+              }
+              aria-label="Timeline zoom"
+              aria-valuetext={`${Math.round(hourWidth)} pixels per hour`}
+            />
+          </label>
+          {!isLoading && (
+            <span className={styles.appBarMeta}>
+              {totalListens} listens · {days.length} days
+            </span>
+          )}
+        </div>
       </header>
 
       {/* Scrolls in both directions. The axis pins to its top and the day
@@ -66,11 +146,17 @@ export default function TimelinePage() {
           <div className={styles.axis}>
             <div className={styles.axisGutter} />
             <div className={styles.axisTrack}>
-              {AXIS_TICKS.map(({ hour, label }) => (
+              {axisMarks.map(({ at, label }) => (
                 <span
-                  key={hour}
-                  className={`${styles.axisTick} ${hour === 12 ? styles.axisNoon : ""}`}
-                  style={{ left: `${(hour / 24) * 100}%` }}
+                  key={at}
+                  className={[
+                    styles.axisTick,
+                    at % 60 === 0 ? styles.axisHour : styles.axisMinute,
+                    at === 720 ? styles.axisNoon : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  style={{ left: `${(at / MINUTES_PER_DAY) * 100}%` }}
                 >
                   {label}
                 </span>

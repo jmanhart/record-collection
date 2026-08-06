@@ -39,8 +39,9 @@
   color: var(--text-tertiary);
 }
 
-/* Hour gridlines are painted rather than rendered: one element per hour per
-   day would be 800+ nodes for the same result. */
+/* Gridlines are painted rather than rendered: one element per division per
+   day would be 800+ nodes for the same result. They step with the axis
+   labels, so every labelled column has an edge under it. */
 .track {
   position: relative;
   flex: 0 0 var(--day-width);
@@ -48,7 +49,7 @@
   background-image: repeating-linear-gradient(
     to right,
     color-mix(in srgb, var(--divider) 40%, transparent) 0 1px,
-    transparent 1px var(--hour-width)
+    transparent 1px var(--grid-step)
   );
 }
 
@@ -92,39 +93,52 @@
   background: var(--red200);
 }
 
-/* A minimal card: sleeve, then title and time stacked beside it. The block's
-   width is still its duration, so container queries — not media queries —
-   decide whether the text fits. No overflow:hidden: the tooltip is a child
-   and has to escape. */
+/* The block is pure geometry: its width is the duration, and it declares the
+   container that the card inside is measured against. It carries no padding
+   of its own — padding here would set a floor on the border box and make a
+   short record wider than its runtime, overlapping the next one.
+   No overflow:hidden either: the tooltip is a child and has to escape. */
 .block {
   container-type: inline-size;
   position: absolute;
   top: 0.5rem;
   bottom: 0.5rem;
-  min-width: 5px;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem;
-  box-sizing: border-box;
-  border-radius: 6px;
-  background: var(--surface200);
+  min-width: 4px;
   text-decoration: none;
-  transition: background-color 0.12s ease;
 }
 
 .block:hover,
 .block:focus-visible {
-  background: var(--surface300);
   z-index: 3;
 }
 
-/* Square so the sleeve is never cropped, and capped by the card's height */
+/* A minimal card: sleeve, then title and time stacked beside it. Separate
+   from .block because a container query can't style its own container. */
+.card {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 100%;
+  padding: 0.4rem;
+  box-sizing: border-box;
+  border-radius: 6px;
+  background: var(--surface200);
+  transition: background-color 0.12s ease;
+}
+
+.block:hover .card,
+.block:focus-visible .card {
+  background: var(--surface300);
+}
+
+/* Square, sized to the card's inner height but allowed to shrink: zoomed out
+   a block is narrower than it is tall, and a fixed-size sleeve would spill
+   over its neighbours. flex-shrink keeps it inside the block at any zoom. */
 .blockCover,
 .blockFallback {
-  flex: 0 0 auto;
+  flex: 0 1 3.7rem;
   display: block;
-  height: 100%;
+  min-width: 0;
   aspect-ratio: 1;
   object-fit: cover;
   border-radius: 3px;
@@ -163,17 +177,15 @@
   }
 }
 
-/* Narrow blocks drop the card chrome and show just the sleeve */
+/* Zoomed out far enough and the card chrome no longer fits inside the record's
+   own duration, so it drops away and leaves the bare sleeve */
 @container (max-width: 149px) {
-  .block {
+  .card,
+  .block:hover .card,
+  .block:focus-visible .card {
     padding: 0;
     background: transparent;
     justify-content: center;
-  }
-
-  .block:hover,
-  .block:focus-visible {
-    background: transparent;
   }
 }
 

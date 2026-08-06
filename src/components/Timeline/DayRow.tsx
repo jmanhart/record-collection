@@ -71,21 +71,26 @@ export function DayRow({ day, nowMinutes }: DayRowProps) {
             record?.artist ?? "unknown artist"
           }, ${formatClock(block.startMin)}`;
 
-          // The text hides itself via a container query once the block is too
-          // narrow to hold it, leaving just the sleeve
+          // The card carries the chrome rather than the block itself: a
+          // container query can't style its own container, and the block is
+          // the container whose width is being queried.
           const body = (
             <>
-              {cover ? (
-                <img src={cover} alt="" className={styles.blockCover} />
-              ) : (
-                <span className={styles.blockFallback} />
-              )}
-              <span className={styles.blockText}>
-                <span className={styles.blockTitle}>
-                  {record?.title ?? `Release ${block.releaseId}`}
-                </span>
-                <span className={styles.blockTime}>
-                  {formatClock(block.startMin)}
+              <span
+                className={`${styles.card} ${block.continues ? styles.continues : ""}`}
+              >
+                {cover ? (
+                  <img src={cover} alt="" className={styles.blockCover} />
+                ) : (
+                  <span className={styles.blockFallback} />
+                )}
+                <span className={styles.blockText}>
+                  <span className={styles.blockTitle}>
+                    {record?.title ?? `Release ${block.releaseId}`}
+                  </span>
+                  <span className={styles.blockTime}>
+                    {formatClock(block.startMin)}
+                  </span>
                 </span>
               </span>
               {detail}
@@ -97,7 +102,7 @@ export function DayRow({ day, nowMinutes }: DayRowProps) {
             width: percent(shownMin),
           };
 
-          const className = `${styles.block} ${block.continues ? styles.continues : ""}`;
+          const className = styles.block;
 
           return record ? (
             <Link

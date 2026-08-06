@@ -3,6 +3,8 @@
    typical 40-minute album is ~200px, which is the room a card needs.
    --timeline-gutter is shared with every DayRow's label column so the labels
    and the hour axis stay on the same grid. */
+/* --hour-width is set inline by the zoom control; this is the fallback for
+   the first paint before React applies it. */
 .page {
   --hour-width: 300px;
   --day-width: calc(24 * var(--hour-width));
@@ -38,11 +40,57 @@
   color: var(--link-hover);
 }
 
+.appBarRight {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
 .appBarMeta {
   font-size: 0.75rem;
   color: var(--text-tertiary);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+.zoom {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.zoomLabel {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.zoomSlider {
+  width: 8rem;
+  height: 1rem;
+  margin: 0;
+  cursor: pointer;
+  accent-color: var(--red200);
+  background: none;
+}
+
+.zoomSlider:focus-visible {
+  outline: 2px solid var(--red200);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+@media (max-width: 640px) {
+  .zoomLabel {
+    display: none;
+  }
+
+  .appBarMeta {
+    display: none;
+  }
+
+  .zoomSlider {
+    width: 6rem;
+  }
 }
 
 .status {
@@ -52,11 +100,14 @@
 
 /* The scrollport for both axes — what makes the sticky axis and sticky day
    labels resolve. min-height:0 lets it shrink inside the flex column. */
+/* pan-x pan-y deliberately omits pinch-zoom: it leaves one-finger panning to
+   the browser while handing the pinch gesture to our own zoom handler. */
 .scroller {
   flex: 1;
   min-height: 0;
   overflow: auto;
   overscroll-behavior: contain;
+  touch-action: pan-x pan-y;
 }
 
 .canvas {
@@ -89,19 +140,51 @@
   border-right: var(--timeline-rule);
 }
 
+/* Hash marks are painted rather than rendered: at the deepest zoom they'd be
+   288 elements re-rendering on every frame of a pinch. */
 .axisTrack {
   position: relative;
   flex: 0 0 var(--day-width);
   height: 100%;
+  background-image: repeating-linear-gradient(
+    to right,
+    color-mix(in srgb, var(--divider) 70%, transparent) 0 1px,
+    transparent 1px var(--tick-step)
+  );
+  background-repeat: repeat-x;
+  background-position: bottom left;
+  background-size: 100% 0.3rem;
 }
 
 .axisTick {
   position: absolute;
-  bottom: 0.4rem;
+  bottom: 0.55rem;
   transform: translateX(-50%);
   font-size: 0.8rem;
-  color: var(--text-secondary);
   white-space: nowrap;
+  line-height: 1;
+}
+
+/* A taller tick under each label, so the text is anchored to its own moment
+   rather than floating above the hash row */
+.axisTick::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 0.12rem);
+  width: 1px;
+  height: 0.42rem;
+  background: var(--divider);
+}
+
+.axisHour {
+  color: var(--text-secondary);
+}
+
+/* Sub-hour callouts sit quieter than the hours they divide */
+.axisMinute {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
 }
 
 /* Endpoints would hang off the canvas if they stayed centred on their tick */
@@ -109,8 +192,17 @@
   transform: none;
 }
 
+.axisTick:first-child::after {
+  left: 0;
+}
+
 .axisTick:last-child {
   transform: translateX(-100%);
+}
+
+.axisTick:last-child::after {
+  left: auto;
+  right: 0;
 }
 
 .axisNoon {
