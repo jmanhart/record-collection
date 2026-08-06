@@ -46,6 +46,7 @@
   font-weight: 500;
   color: var(--text-secondary);
   cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .toggleButton:hover {
@@ -84,6 +85,13 @@
    those, which lets the chart follow the theme variables */
 .chart :global(.recharts-bar-rectangle path) {
   fill: var(--red200);
+  transition: fill 0.15s ease;
+}
+
+/* The value already sits above each bar, so hover only needs to acknowledge
+   the pointer — a lighter fill, no tooltip restating what's on screen */
+.chart :global(.recharts-bar-rectangle:hover path) {
+  fill: var(--red300);
 }
 
 .chart :global(.recharts-cartesian-axis-tick text),
@@ -158,4 +166,13 @@
   font-size: 0.8rem;
   font-variant-numeric: tabular-nums;
   color: var(--text-secondary);
+}
+
+/* Recharts sits its own animation out via isAnimationActive="auto"; these
+   are the CSS-side transitions, which have to opt out separately */
+@media (prefers-reduced-motion: reduce) {
+  .toggleButton,
+  .chart :global(.recharts-bar-rectangle path) {
+    transition: none;
+  }
 }

@@ -284,11 +284,17 @@ export function ListeningChart({ events, todayKey }: ListeningChartProps) {
                 axisLine={false}
                 interval={0}
               />
+              {/* Keyed on the current selection so switching range or measure
+                  remounts the series and replays the grow-in, rather than
+                  snapping to the new values. Animation is left at its 'auto'
+                  default, which sits out when prefers-reduced-motion is set. */}
               <Bar
+                key={`${range}-${measure}`}
                 dataKey={measure === "time" ? "minutes" : "albums"}
                 radius={[4, 4, 0, 0]}
                 maxBarSize={48}
-                isAnimationActive={false}
+                animationDuration={450}
+                animationEasing="ease-out"
               >
                 <LabelList
                   dataKey={measure === "time" ? "minutes" : "albums"}
