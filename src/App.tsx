@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter as Router, Routes, Route, useSearchParams } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useSearchParams, useNavigate } from "react-router-dom";
 import * as Sentry from "@sentry/react";
 import { RecordGrid } from "./components/RecordGrid/RecordGrid";
 import { RecordDetail } from "./components/RecordDetail/RecordDetail";
@@ -11,7 +11,6 @@ import { AdminAuthProvider } from "./contexts/AdminAuthContext";
 import { AdminFab } from "./components/AdminFab/AdminFab";
 import { ArtistProgressList } from "./components/ArtistProgress/ArtistProgressList";
 import { ArtistProgressDetail } from "./components/ArtistProgress/ArtistProgressDetail";
-import { Timeline } from "./components/Timeline/Timeline";
 import { ThemeToggle } from "./components/ThemeToggle/ThemeToggle";
 import { AlphabetIndicator } from "./components/AlphabetIndicator/AlphabetIndicator";
 import { Tabs, type TabValue } from "./components/Tabs/Tabs";
@@ -23,9 +22,11 @@ import "./App.css";
 
 // Lazy so the collection bundle doesn't pay for the charting library
 const HomePage = lazy(() => import("./components/Home/HomePage"));
+const TimelinePage = lazy(() => import("./components/Timeline/TimelinePage"));
 
 function RecordList() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const activeTab = (searchParams.get("tab") as TabValue) || "collection";
   const artistSlug = searchParams.get("artist");
 
@@ -33,6 +34,11 @@ function RecordList() {
   const { records: wishlistRecords, isLoading: isLoadingWishlist, error: wishlistError } = useWishlist();
 
   const handleTabChange = (tab: TabValue) => {
+    // Timeline is its own page now; the rest stay as tabs on this route
+    if (tab === "timeline") {
+      navigate("/timeline");
+      return;
+    }
     const params = new URLSearchParams();
     if (tab !== "collection") {
       params.set("tab", tab);
@@ -69,8 +75,6 @@ function RecordList() {
     ? `${records?.length || 0} records in collection${runtimeSuffix ? ` · ${runtimeSuffix}` : ""}`
     : activeTab === "wishlist"
     ? `${wishlistRecords?.length || 0} records on wishlist`
-    : activeTab === "timeline"
-    ? "Recent listening activity"
     : "Tracking progress on artist discographies";
 
   return (
@@ -83,9 +87,7 @@ function RecordList() {
         </header>
         <Tabs activeTab={activeTab} onTabChange={handleTabChange} />
         <main className="main">
-          {activeTab === "timeline" ? (
-            <Timeline />
-          ) : activeTab === "collection" ? (
+          {activeTab === "collection" ? (
             <RecordGrid records={records || []} isLoading={isLoadingRecords} />
           ) : activeTab === "wishlist" ? (
             <WishlistList records={wishlistRecords || []} isLoading={isLoadingWishlist} />
@@ -114,6 +116,14 @@ export default function App() {
               element={
                 <Suspense fallback={null}>
                   <HomePage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/timeline"
+              element={
+                <Suspense fallback={null}>
+                  <TimelinePage />
                 </Suspense>
               }
             />
