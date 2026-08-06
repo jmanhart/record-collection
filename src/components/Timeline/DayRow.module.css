@@ -17,10 +17,13 @@
   align-items: flex-start;
   justify-content: center;
   gap: 0.1rem;
-  padding-right: 0.75rem;
-  font-size: 0.75rem;
+  padding: 0 0.75rem 0 1.25rem;
+  box-sizing: border-box;
+  font-size: 0.8rem;
   color: var(--text-tertiary);
   background: var(--surface000);
+  border-right: var(--timeline-rule);
+  border-bottom: var(--timeline-rule);
 }
 
 .labelDate {
@@ -29,7 +32,7 @@
 }
 
 .labelWeekday {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
 }
 
 .weekend .labelDate {
@@ -41,7 +44,7 @@
 .track {
   position: relative;
   flex: 0 0 var(--day-width);
-  border-bottom: 1px solid var(--divider);
+  border-bottom: var(--timeline-rule);
   background-image: repeating-linear-gradient(
     to right,
     color-mix(in srgb, var(--divider) 40%, transparent) 0 1px,

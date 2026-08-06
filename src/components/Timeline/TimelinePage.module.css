@@ -7,42 +7,47 @@
   --hour-width: 300px;
   --day-width: calc(24 * var(--hour-width));
   --timeline-gutter: 5rem;
+  --timeline-rule: 1px solid var(--divider);
   display: flex;
   flex-direction: column;
   height: 100dvh;
-  padding: 1.5rem 0 0 2rem;
   box-sizing: border-box;
 }
 
-.pageHeader {
+/* App bar: full-bleed, fixed height, its own rule. The theme toggle is fixed
+   at top:1rem and lands inside this bar, so the right side keeps clear of it. */
+.appBar {
   flex-shrink: 0;
-  padding-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  height: 3.5rem;
+  padding: 0 4rem 0 1.25rem;
+  border-bottom: var(--timeline-rule);
 }
 
 .backLink {
-  color: var(--link);
+  color: var(--text-primary);
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .backLink:hover {
   color: var(--link-hover);
 }
 
-.title {
-  margin: 0.5rem 0 0.25rem;
-  font-size: 1.5rem;
-}
-
-.subtitle {
-  margin: 0;
-  font-size: 0.85rem;
+.appBarMeta {
+  font-size: 0.75rem;
   color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .status {
   color: var(--text-tertiary);
-  padding: 2rem 0;
+  padding: 2rem 1.25rem;
 }
 
 /* The scrollport for both axes — what makes the sticky axis and sticky day
@@ -59,18 +64,21 @@
   padding-bottom: 2rem;
 }
 
+/* Header row of the table: pinned to the top of the scrollport */
 .axis {
   position: sticky;
   top: 0;
   z-index: 4;
   display: flex;
   align-items: flex-end;
-  height: 1.75rem;
+  height: 2.25rem;
   background: var(--surface000);
+  border-bottom: var(--timeline-rule);
 }
 
 /* The corner cell: pinned on both axes, so it stays put while the hour ticks
-   scroll under it horizontally and the rows scroll under it vertically. */
+   scroll under it horizontally and the rows scroll under it vertically. Its
+   right edge continues the date column's rule up through the header. */
 .axisGutter {
   position: sticky;
   left: 0;
@@ -78,6 +86,7 @@
   flex: 0 0 var(--timeline-gutter);
   height: 100%;
   background: var(--surface000);
+  border-right: var(--timeline-rule);
 }
 
 .axisTrack {
@@ -88,10 +97,10 @@
 
 .axisTick {
   position: absolute;
-  bottom: 0.3rem;
+  bottom: 0.4rem;
   transform: translateX(-50%);
-  font-size: 0.7rem;
-  color: var(--text-tertiary);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
   white-space: nowrap;
 }
 
@@ -105,5 +114,6 @@
 }
 
 .axisNoon {
-  color: var(--text-secondary);
+  color: var(--text-primary);
+  font-weight: 500;
 }

@@ -1,6 +1,10 @@
-import { useMemo } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
-import { useTimelineDays, toLocalMinutes } from "../../hooks/useTimelineDays";
+import {
+  useTimelineDays,
+  toLocalMinutes,
+  MINUTES_PER_DAY,
+} from "../../hooks/useTimelineDays";
 import { DayRow } from "./DayRow";
 import styles from "./TimelinePage.module.css";
 
@@ -18,24 +22,46 @@ export default function TimelinePage() {
 
   const totalListens = days.reduce((sum, d) => sum + d.blocks.length, 0);
 
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const hasCentered = useRef(false);
+
+  // Open on the current time of day rather than at midnight, which is seven
+  // hours of empty canvas away from anything. Measured off the rendered track
+  // so it stays right if the zoom changes. Layout effect so it lands before
+  // paint instead of visibly jumping.
+  useLayoutEffect(() => {
+    if (isLoading || hasCentered.current) return;
+    const scroller = scrollerRef.current;
+    const track = scroller?.querySelector<HTMLElement>(`.${styles.axisTrack}`);
+    if (!scroller || !track) return;
+
+    const trackRect = track.getBoundingClientRect();
+    const trackStart =
+      trackRect.left - scroller.getBoundingClientRect().left + scroller.scrollLeft;
+    const nowX = trackStart + (nowMinutes / MINUTES_PER_DAY) * trackRect.width;
+
+    // The browser clamps for us at either end of the day
+    scroller.scrollLeft = nowX - scroller.clientWidth / 2;
+    hasCentered.current = true;
+  }, [isLoading, nowMinutes]);
+
   return (
     <div className={styles.page}>
-      <header className={styles.pageHeader}>
+      <header className={styles.appBar}>
         <Link to="/" className={styles.backLink}>
-          ← Collection
+          <span aria-hidden="true">←</span> Timeline
         </Link>
-        <h2 className={styles.title}>Timeline</h2>
-        <p className={styles.subtitle}>
-          {isLoading
-            ? "Loading…"
-            : `${totalListens} listens across ${days.length} days · each row is one day, midnight to midnight`}
-        </p>
+        {!isLoading && (
+          <span className={styles.appBarMeta}>
+            {totalListens} listens · {days.length} days
+          </span>
+        )}
       </header>
 
       {/* Scrolls in both directions. The axis pins to its top and the day
           labels to its left, which only works because this container is the
           scrollport for both axes. */}
-      <div className={styles.scroller}>
+      <div className={styles.scroller} ref={scrollerRef}>
         <div className={styles.canvas}>
           <div className={styles.axis}>
             <div className={styles.axisGutter} />
