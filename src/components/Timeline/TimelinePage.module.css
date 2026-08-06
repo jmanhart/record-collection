@@ -1,15 +1,22 @@
-/* The gutter width is shared with every DayRow's label column so the day
-   labels and the hour axis stay on the same grid. */
+/* --hour-width is the zoom: every horizontal measurement derives from it, so
+   changing this one value rescales the whole timeline. At 300px an hour a
+   typical 40-minute album is ~200px, which is the room a card needs.
+   --timeline-gutter is shared with every DayRow's label column so the labels
+   and the hour axis stay on the same grid. */
 .page {
-  --timeline-gutter: 4.5rem;
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 1.5rem 1.5rem 3rem;
+  --hour-width: 300px;
+  --day-width: calc(24 * var(--hour-width));
+  --timeline-gutter: 5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  padding: 1.5rem 0 0 2rem;
   box-sizing: border-box;
 }
 
 .pageHeader {
-  margin-bottom: 1.25rem;
+  flex-shrink: 0;
+  padding-bottom: 1rem;
 }
 
 .backLink {
@@ -36,27 +43,38 @@
 .status {
   color: var(--text-tertiary);
   padding: 2rem 0;
-  text-align: center;
 }
 
-/* Pinned hour scale — the reference for every row scrolling beneath it */
+/* The scrollport for both axes — what makes the sticky axis and sticky day
+   labels resolve. min-height:0 lets it shrink inside the flex column. */
+.scroller {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.canvas {
+  width: max-content;
+  padding-bottom: 2rem;
+}
+
 .axis {
   position: sticky;
   top: 0;
   z-index: 4;
   display: flex;
   align-items: flex-end;
-  gap: 0.75rem;
-  height: 2rem;
+  height: 1.75rem;
   background: var(--surface000);
 }
 
-/* Sticks left for the same reason the day labels do — keeps the hour ticks
-   from sliding under the gutter when scrolled sideways */
+/* The corner cell: pinned on both axes, so it stays put while the hour ticks
+   scroll under it horizontally and the rows scroll under it vertically. */
 .axisGutter {
   position: sticky;
   left: 0;
-  z-index: 2;
+  z-index: 5;
   flex: 0 0 var(--timeline-gutter);
   height: 100%;
   background: var(--surface000);
@@ -64,8 +82,7 @@
 
 .axisTrack {
   position: relative;
-  flex: 1;
-  min-width: 0;
+  flex: 0 0 var(--day-width);
   height: 100%;
 }
 
@@ -89,66 +106,4 @@
 
 .axisNoon {
   color: var(--text-secondary);
-}
-
-.month {
-  margin-bottom: 1.25rem;
-}
-
-/* Sits directly under the axis while its month is in view */
-.monthHeading {
-  position: sticky;
-  top: 2rem;
-  z-index: 3;
-  margin: 0;
-  padding: 0.75rem 0 0.4rem;
-  background: var(--surface000);
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.footnote {
-  margin: 1.5rem 0 0;
-  font-size: 0.7rem;
-  color: var(--text-tertiary);
-}
-
-/* Below this a full day compresses so far that blocks stop being tappable, so
-   the canvas holds a floor width and scrolls sideways instead.
-   The scroll has to live here rather than on the document: body sets
-   `overflow-x: clip`, which would silently clip the overflow away instead of
-   letting it scroll. overflow-x:auto forces overflow-y to auto, making this a
-   scrollport that sticky can't resolve against — so the axis and month
-   headings stop pinning at this size. */
-@media (max-width: 720px) {
-  .page {
-    --timeline-gutter: 3.25rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
-  .scroller {
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-  }
-
-  .canvas {
-    min-width: 640px;
-  }
-
-  .axis {
-    position: static;
-  }
-
-  /* Can't pin to the top inside the scrollport, but it still pins left so the
-     month stays readable while scrolling through the day */
-  .monthHeading {
-    top: auto;
-    left: 0;
-    width: max-content;
-    padding-right: 0.75rem;
-  }
 }

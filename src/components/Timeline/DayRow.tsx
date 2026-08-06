@@ -41,9 +41,7 @@ export function DayRow({ day, nowMinutes }: DayRowProps) {
       </div>
 
       <div className={styles.track}>
-        <span className={styles.gridline} style={{ left: "25%" }} />
-        <span className={`${styles.gridline} ${styles.noon}`} style={{ left: "50%" }} />
-        <span className={styles.gridline} style={{ left: "75%" }} />
+        <span className={styles.noon} style={{ left: "50%" }} />
 
         {nowMinutes !== undefined && (
           <span className={styles.now} style={{ left: percent(nowMinutes) }} />
@@ -73,6 +71,8 @@ export function DayRow({ day, nowMinutes }: DayRowProps) {
             record?.artist ?? "unknown artist"
           }, ${formatClock(block.startMin)}`;
 
+          // The text hides itself via a container query once the block is too
+          // narrow to hold it, leaving just the sleeve
           const body = (
             <>
               {cover ? (
@@ -80,6 +80,14 @@ export function DayRow({ day, nowMinutes }: DayRowProps) {
               ) : (
                 <span className={styles.blockFallback} />
               )}
+              <span className={styles.blockText}>
+                <span className={styles.blockTitle}>
+                  {record?.title ?? `Release ${block.releaseId}`}
+                </span>
+                <span className={styles.blockTime}>
+                  {formatClock(block.startMin)}
+                </span>
+              </span>
               {detail}
             </>
           );

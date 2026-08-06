@@ -1,23 +1,23 @@
 .row {
   display: flex;
   align-items: stretch;
-  gap: 0.75rem;
-  height: 2.75rem;
+  height: 5.5rem;
 }
 
-/* Day label gutter — width is shared with the axis header via --timeline-gutter.
-   Sticks to the left so the day stays identifiable when the canvas is scrolled
-   sideways on narrow screens; a no-op at full width, where nothing scrolls. */
+/* Day label gutter — width is shared with the axis header via
+   --timeline-gutter. Pinned left so the day stays identifiable however far
+   the canvas is scrolled sideways. */
 .label {
   position: sticky;
   left: 0;
   z-index: 2;
   flex: 0 0 var(--timeline-gutter);
   display: flex;
-  align-items: baseline;
-  justify-content: flex-end;
-  gap: 0.375rem;
-  padding-top: 0.75rem;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.1rem;
+  padding-right: 0.75rem;
   font-size: 0.75rem;
   color: var(--text-tertiary);
   background: var(--surface000);
@@ -36,16 +36,21 @@
   color: var(--text-tertiary);
 }
 
+/* Hour gridlines are painted rather than rendered: one element per hour per
+   day would be 800+ nodes for the same result. */
 .track {
   position: relative;
-  flex: 1;
-  min-width: 0;
+  flex: 0 0 var(--day-width);
   border-bottom: 1px solid var(--divider);
+  background-image: repeating-linear-gradient(
+    to right,
+    color-mix(in srgb, var(--divider) 40%, transparent) 0 1px,
+    transparent 1px var(--hour-width)
+  );
 }
 
-/* Today gets a faint wash so it reads as the live row */
 .today .track {
-  background: color-mix(in srgb, var(--red300) 6%, transparent);
+  background-color: color-mix(in srgb, var(--red300) 5%, transparent);
 }
 
 .today .labelDate {
@@ -53,19 +58,14 @@
   font-weight: 600;
 }
 
-.gridline {
+/* Noon anchors the day's midpoint, so it reads stronger than the hour ticks */
+.noon {
   position: absolute;
   top: 0;
   bottom: 0;
   width: 1px;
   background: var(--divider);
-  opacity: 0.4;
   pointer-events: none;
-}
-
-/* Noon anchors the row's midpoint, so it reads stronger than 6a/6p */
-.noon {
-  opacity: 0.85;
 }
 
 .now {
@@ -75,6 +75,7 @@
   width: 1px;
   background: var(--red200);
   pointer-events: none;
+  z-index: 1;
 }
 
 .now::before {
@@ -88,42 +89,89 @@
   background: var(--red200);
 }
 
-/* No overflow:hidden here — the tooltip is a child and has to escape. The
-   radius lives on the artwork instead, which is the only thing that needs
-   clipping. A transform would distort the tooltip's text, so hover is a
-   ring rather than a scale. */
+/* A minimal card: sleeve, then title and time stacked beside it. The block's
+   width is still its duration, so container queries — not media queries —
+   decide whether the text fits. No overflow:hidden: the tooltip is a child
+   and has to escape. */
 .block {
+  container-type: inline-size;
   position: absolute;
-  top: 0.3rem;
-  bottom: 0.3rem;
+  top: 0.5rem;
+  bottom: 0.5rem;
   min-width: 5px;
-  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem;
+  box-sizing: border-box;
+  border-radius: 6px;
+  background: var(--surface200);
   text-decoration: none;
-  background: var(--surface300);
-  transition: box-shadow 0.12s ease, filter 0.12s ease;
+  transition: background-color 0.12s ease;
 }
 
 .block:hover,
 .block:focus-visible {
-  box-shadow: 0 0 0 2px var(--red200);
-  filter: brightness(1.12);
+  background: var(--surface300);
   z-index: 3;
 }
 
+/* Square so the sleeve is never cropped, and capped by the card's height */
 .blockCover,
 .blockFallback {
+  flex: 0 0 auto;
   display: block;
-  width: 100%;
   height: 100%;
-  border-radius: 3px;
-}
-
-.blockCover {
+  aspect-ratio: 1;
   object-fit: cover;
+  border-radius: 3px;
 }
 
 .blockFallback {
   background: var(--surface400);
+}
+
+.blockText {
+  display: none;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.blockTitle {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.blockTime {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Only once the card is wide enough to read does the text appear */
+@container (min-width: 150px) {
+  .blockText {
+    display: flex;
+  }
+}
+
+/* Narrow blocks drop the card chrome and show just the sleeve */
+@container (max-width: 149px) {
+  .block {
+    padding: 0;
+    background: transparent;
+    justify-content: center;
+  }
+
+  .block:hover,
+  .block:focus-visible {
+    background: transparent;
+  }
 }
 
 /* Ran past midnight — flatten the trailing edge so it reads as continuing */
