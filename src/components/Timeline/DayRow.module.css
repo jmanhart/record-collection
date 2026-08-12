@@ -46,11 +46,25 @@
   position: relative;
   flex: 0 0 var(--day-width);
   border-bottom: var(--timeline-rule);
+}
+
+/* Grid lines live on their own layer, separate from the blocks stacked in
+   this same container, so gap-closed mode can fade just the grid. */
+.track::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
   background-image: repeating-linear-gradient(
     to right,
     color-mix(in srgb, var(--divider) 40%, transparent) 0 1px,
     transparent 1px var(--grid-step)
   );
+  transition: opacity var(--flip-duration) ease;
+}
+
+.track.closeGaps::before {
+  opacity: 0;
 }
 
 .today .track {
@@ -70,6 +84,7 @@
   width: 1px;
   background: var(--divider);
   pointer-events: none;
+  transition: opacity var(--flip-duration) ease;
 }
 
 .now {
@@ -80,6 +95,7 @@
   background: var(--red200);
   pointer-events: none;
   z-index: 1;
+  transition: opacity var(--flip-duration) ease;
 }
 
 .now::before {
@@ -91,6 +107,11 @@
   height: 5px;
   border-radius: 50%;
   background: var(--red200);
+}
+
+.track.closeGaps .now,
+.track.closeGaps .noon {
+  opacity: 0;
 }
 
 /* The block is pure geometry: its width is the duration, and it declares the
@@ -114,6 +135,7 @@
   color: inherit;
   text-align: left;
   cursor: pointer;
+  transition: left var(--flip-duration) ease, width var(--flip-duration) ease;
 }
 
 .block:hover,
@@ -254,7 +276,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .block {
+  .block,
+  .track::before,
+  .now,
+  .noon {
     transition: none;
   }
 }

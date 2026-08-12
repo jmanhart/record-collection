@@ -44,6 +44,12 @@ export interface TimelineBlock {
   truncated: boolean;
   /** Ran past midnight and was clamped to the end of the day */
   continues: boolean;
+  /** Minutes from midnight if every gap were closed — this block packed
+   * back-to-back after every earlier block in the day, instead of at its
+   * real time of day */
+  packedStartMin: number;
+  /** packedStartMin plus this block's duration */
+  packedEndMin: number;
 }
 
 export interface TimelineDay {
@@ -110,6 +116,7 @@ export function useTimelineDays(startKey: string = TIMELINE_START_KEY) {
             new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
         );
 
+      let packedCursor = 0;
       const blocks: TimelineBlock[] = listens.map((listen, index) => {
         const startMin = toLocalMinutes(listen.timestamp);
         const runtimeSec =
@@ -124,13 +131,21 @@ export function useTimelineDays(startKey: string = TIMELINE_START_KEY) {
         // Whichever comes first: the album ending, the next record starting,
         // or midnight
         const cappedEnd = Math.min(naturalEnd, nextStart, MINUTES_PER_DAY);
+        const endMin = Math.max(cappedEnd, Math.min(startMin + MIN_BLOCK_MINUTES, MINUTES_PER_DAY));
+
+        // Gap-closed layout: the same block, positioned back-to-back with
+        // its neighbours instead of at its real time of day.
+        const packedStartMin = packedCursor;
+        packedCursor += endMin - startMin;
 
         return {
           id: listen.id,
           releaseId: listen.releaseId,
           record: listen.record,
           startMin,
-          endMin: Math.max(cappedEnd, Math.min(startMin + MIN_BLOCK_MINUTES, MINUTES_PER_DAY)),
+          endMin,
+          packedStartMin,
+          packedEndMin: packedCursor,
           fullRuntimeMin,
           truncated: nextStart < naturalEnd,
           continues: naturalEnd > MINUTES_PER_DAY,

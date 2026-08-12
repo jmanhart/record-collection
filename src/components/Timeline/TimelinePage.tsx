@@ -20,6 +20,7 @@ import {
 } from "../../hooks/useTimelineZoom";
 import { DayRow } from "./DayRow";
 import { TimelineDetail } from "./TimelineDetail";
+import { Button } from "../Button/Button";
 import styles from "./TimelinePage.module.css";
 
 /**
@@ -72,6 +73,7 @@ export default function TimelinePage() {
   });
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [closeGaps, setCloseGaps] = useState(false);
 
   const selection = useMemo(() => {
     if (!selectedId) return null;
@@ -158,7 +160,7 @@ export default function TimelinePage() {
 
   return (
     <div
-      className={styles.page}
+      className={`${styles.page} ${closeGaps ? styles.closeGaps : ""}`}
       style={
         {
           "--hour-width": `${hourWidth}px`,
@@ -175,6 +177,15 @@ export default function TimelinePage() {
         </Link>
 
         <div className={styles.appBarRight}>
+          <Button
+            type="button"
+            variant={closeGaps ? "primary" : "ghost"}
+            size="sm"
+            aria-pressed={closeGaps}
+            onClick={() => setCloseGaps((value) => !value)}
+          >
+            {closeGaps ? "Spread Out" : "Close the Gaps"}
+          </Button>
           <label className={styles.zoom}>
             <span className={styles.zoomLabel}>Zoom</span>
             <input
@@ -189,6 +200,8 @@ export default function TimelinePage() {
               }
               aria-label="Timeline zoom"
               aria-valuetext={`${Math.round(hourWidth)} pixels per hour`}
+              disabled={closeGaps}
+              tabIndex={closeGaps ? -1 : 0}
             />
           </label>
           {!isLoading && (
@@ -236,6 +249,7 @@ export default function TimelinePage() {
                 nowMinutes={day.isToday ? nowMinutes : undefined}
                 selectedId={selectedId}
                 onSelect={setSelectedId}
+                closeGaps={closeGaps}
               />
             ))
           )}

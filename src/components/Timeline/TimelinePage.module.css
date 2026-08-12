@@ -12,6 +12,7 @@
   --timeline-rule: 1px solid var(--divider);
   /* Panel width; trimming the detail panel is this one value */
   --detail-width: 450px;
+  --flip-duration: 420ms;
   display: flex;
   flex-direction: column;
   height: 100dvh;
@@ -59,6 +60,12 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  transition: opacity var(--flip-duration) ease;
+}
+
+.closeGaps .zoom {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .zoomLabel {
@@ -166,6 +173,11 @@
   background-repeat: repeat-x;
   background-position: bottom left;
   background-size: 100% 0.3rem;
+  transition: opacity var(--flip-duration) ease;
+}
+
+.closeGaps .axisTrack {
+  opacity: 0;
 }
 
 .axisTick {
@@ -220,4 +232,11 @@
 .axisNoon {
   color: var(--text-primary);
   font-weight: 500;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zoom,
+  .axisTrack {
+    transition: none;
+  }
 }

@@ -8,11 +8,12 @@ interface DayRowProps {
   nowMinutes?: number;
   selectedId?: string | null;
   onSelect: (blockId: string) => void;
+  closeGaps: boolean;
 }
 
 const percent = (minutes: number) => `${(minutes / MINUTES_PER_DAY) * 100}%`;
 
-export function DayRow({ day, nowMinutes, selectedId, onSelect }: DayRowProps) {
+export function DayRow({ day, nowMinutes, selectedId, onSelect, closeGaps }: DayRowProps) {
   const [year, month, dayOfMonth] = day.dateKey.split("-").map(Number);
   const date = new Date(year, month - 1, dayOfMonth, 12);
   const weekday = date.toLocaleDateString("en-US", { weekday: "short" });
@@ -26,7 +27,7 @@ export function DayRow({ day, nowMinutes, selectedId, onSelect }: DayRowProps) {
         <span className={styles.labelWeekday}>{weekday}</span>
       </div>
 
-      <div className={styles.track}>
+      <div className={`${styles.track} ${closeGaps ? styles.closeGaps : ""}`}>
         <span className={styles.noon} style={{ left: "50%" }} />
 
         {nowMinutes !== undefined && (
@@ -37,6 +38,7 @@ export function DayRow({ day, nowMinutes, selectedId, onSelect }: DayRowProps) {
           const record = block.record;
           const cover = record?.supabase_image_url || record?.coverImage;
           const shownMin = block.endMin - block.startMin;
+          const layoutStart = closeGaps ? block.packedStartMin : block.startMin;
 
           const detail = (
             <span className={styles.tooltip} aria-hidden="true">
@@ -92,7 +94,7 @@ export function DayRow({ day, nowMinutes, selectedId, onSelect }: DayRowProps) {
                 selectedId === block.id ? styles.selected : ""
               }`}
               style={{
-                left: percent(block.startMin),
+                left: percent(layoutStart),
                 width: percent(shownMin),
               }}
               aria-label={label}
