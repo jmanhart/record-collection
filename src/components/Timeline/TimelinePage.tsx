@@ -42,6 +42,28 @@ function axisScaleFor(hourWidth: number) {
   return AXIS_SCALE.find((step) => hourWidth >= step.from) ?? AXIS_SCALE[AXIS_SCALE.length - 1];
 }
 
+/** Must track --flip-duration in TimelinePage.module.css, so the viewport
+ * pan reads as the same motion as the blocks' own left/width transition. */
+const FLIP_DURATION_MS = 420;
+
+/** Hand-rolled rather than scrollTo({behavior:"smooth"}) so its duration and
+ * easing stay in lockstep with the block transition instead of drifting. */
+function animateScrollLeft(el: HTMLElement, to: number, duration: number): () => void {
+  const from = el.scrollLeft;
+  const distance = to - from;
+  if (distance === 0) return () => {};
+
+  const start = performance.now();
+  let frame = requestAnimationFrame(function step(now: number) {
+    const t = Math.min((now - start) / duration, 1);
+    // ease-in-out-cubic
+    const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    el.scrollLeft = from + distance * eased;
+    if (t < 1) frame = requestAnimationFrame(step);
+  });
+  return () => cancelAnimationFrame(frame);
+}
+
 /** Hours read as "5p"; anything finer is a bare ":15" under its hour. */
 function axisLabel(minutes: number): string {
   const minute = minutes % 60;
@@ -74,6 +96,42 @@ export default function TimelinePage() {
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [closeGaps, setCloseGaps] = useState(false);
+
+  // Closing the gaps packs every block toward the start of the track, which
+  // scrolls off whatever's currently in view unless the viewport pans there
+  // too. Panning back to the pre-close position on the way out — rather than
+  // always landing on track-start — keeps the toggle reversible.
+  const prevScrollLeftRef = useRef<number | null>(null);
+  const skipScrollPan = useRef(true);
+
+  useEffect(() => {
+    if (skipScrollPan.current) {
+      skipScrollPan.current = false;
+      return;
+    }
+    const scroller = scrollerRef.current;
+    const track = getTrack();
+    if (!scroller || !track) return;
+
+    const trackRect = track.getBoundingClientRect();
+    const trackStart =
+      trackRect.left - scroller.getBoundingClientRect().left + scroller.scrollLeft;
+    const currentScrollLeft = scroller.scrollLeft;
+
+    let target: number;
+    if (closeGaps) {
+      prevScrollLeftRef.current = currentScrollLeft;
+      target = trackStart;
+    } else {
+      target = prevScrollLeftRef.current ?? currentScrollLeft;
+    }
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      scroller.scrollLeft = target;
+      return;
+    }
+    return animateScrollLeft(scroller, target, FLIP_DURATION_MS);
+  }, [closeGaps, getTrack]);
 
   const selection = useMemo(() => {
     if (!selectedId) return null;
