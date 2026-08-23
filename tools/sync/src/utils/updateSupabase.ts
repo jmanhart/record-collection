@@ -1,15 +1,17 @@
 import { logInfo, logWarn, logError } from "./log.js";
-import { supabase, SUPABASE_STORAGE_URL } from "./supabase.js";
+import { supabase, supabaseAdmin } from "./supabase.js";
+import { uploadImageToSupabase } from "./uploadImageToSupabase.js";
 import { DiscogsRecord } from "./fetchDiscogs.js";
 
 const TABLE_NAME = "records";
 
 /**
- * Updates the Supabase `records` table with new records from Discogs.
- * - Ensures only new/missing records are added.
- * - Updates missing `supabase_image_url` values.
+ * Syncs the Supabase `records` table to match the current Discogs collection.
+ * - Upserts every current record (adds new ones, refreshes metadata on existing ones).
+ * - Uploads cover images for any record that doesn't have one yet.
+ * - Removes rows whose release is no longer in the Discogs collection.
  *
- * @param {DiscogsRecord[]} records - The records to insert/update in Supabase.
+ * @param {DiscogsRecord[]} records - The current Discogs collection.
  */
 export async function updateSupabaseRecords(records: DiscogsRecord[]) {
   try {
@@ -19,18 +21,14 @@ export async function updateSupabaseRecords(records: DiscogsRecord[]) {
     }
 
     if (records.length === 0) {
-      logWarn("⚠️ No new records to insert. Skipping Supabase update.");
+      logWarn("⚠️ No records fetched from Discogs. Skipping Supabase update.");
       return;
     }
 
-    logInfo(
-      `📦 Preparing to insert ${records.length} records into Supabase...`
-    );
-
-    // First, fetch existing records to check their image status
+    // Fetch existing records to diff against and to preserve known image URLs
     const { data: existingRecords, error: fetchError } = await supabase
       .from(TABLE_NAME)
-      .select("id, release_id, supabase_image_url");
+      .select("id, release_id, title, artist, supabase_image_url");
 
     if (fetchError) {
       logError("❌ Error fetching existing records:", fetchError);
@@ -40,14 +38,20 @@ export async function updateSupabaseRecords(records: DiscogsRecord[]) {
     const existingImageMap = new Map(
       existingRecords.map((r) => [r.id, r.supabase_image_url])
     );
+    const currentReleaseIds = new Set(
+      records.map((record) => record.basic_information.id)
+    );
+
+    const newCount = records.filter(
+      (r) => !existingImageMap.has(r.basic_information.id)
+    ).length;
+    logInfo(`🆕 Found ${newCount} new records.`);
 
     // Clean records and preserve existing image URLs
     const cleanedRecords = records.map((record) => {
       const releaseId = record.basic_information.id;
-      const existingImageUrl = existingImageMap.get(releaseId);
       const format = record.basic_information.formats?.[0] || {};
 
-      // Log if we're missing a cover image
       if (!record.basic_information.cover_image) {
         logWarn(
           `⚠️ No cover image URL for "${record.basic_information.title}" (ID: ${releaseId})`
@@ -60,33 +64,108 @@ export async function updateSupabaseRecords(records: DiscogsRecord[]) {
         title: record.basic_information.title || "Unknown Title",
         artist: record.basic_information.artists?.[0]?.name || "Unknown Artist",
         image_url: record.basic_information.cover_image || "",
-        // Keep existing image URL if available, otherwise expect .jpeg format
-        supabase_image_url:
-          existingImageUrl || `${SUPABASE_STORAGE_URL}${releaseId}.jpeg`,
+        // Keep the confirmed uploaded URL if we have one; otherwise leave it
+        // null so the upload pass below picks it up.
+        supabase_image_url: existingImageMap.get(releaseId) || null,
         genres: record.basic_information.genres || [],
         styles: record.basic_information.styles || [],
         format_name: format.name || "Unknown",
         format_descriptions: format.descriptions || [],
         format_quantity: parseInt(format.qty || "1", 10),
         year: record.basic_information.year,
+        acquired_at: record.date_added || null,
       };
     });
 
     // Insert/update records, using id for conflict resolution
+    logInfo(`📦 Upserting ${cleanedRecords.length} records into Supabase...`);
     const { error } = await supabase.from(TABLE_NAME).upsert(cleanedRecords, {
       onConflict: "id",
     });
 
     if (error) {
-      throw new Error(`❌ Supabase insert error: ${error.message}`);
+      throw new Error(`❌ Supabase upsert error: ${error.message}`);
     }
 
     logInfo("✅ Supabase update successful!");
 
-    // Log statistics about image status
-    const missingImages = cleanedRecords.filter((r) => !r.image_url).length;
-    if (missingImages > 0) {
-      logWarn(`⚠️ Found ${missingImages} records without Discogs cover images`);
+    // Upload cover images for any record that doesn't have a confirmed one yet
+    const missingImageRecords = cleanedRecords.filter(
+      (r) => !r.supabase_image_url
+    );
+
+    if (missingImageRecords.length > 0) {
+      logInfo(
+        `📸 Uploading images for ${missingImageRecords.length} records...`
+      );
+
+      for (const record of missingImageRecords) {
+        if (!record.image_url) {
+          logWarn(
+            `⚠️ No cover image available for "${record.title}" (ID: ${record.id})`
+          );
+          continue;
+        }
+
+        try {
+          const uploadedUrl = await uploadImageToSupabase(
+            record.image_url,
+            record.id
+          );
+
+          if (!uploadedUrl) {
+            logWarn(
+              `⚠️ Failed to upload image for "${record.title}" (ID: ${record.id})`
+            );
+            continue;
+          }
+
+          const { error: updateError } = await supabase
+            .from(TABLE_NAME)
+            .update({ supabase_image_url: uploadedUrl })
+            .eq("id", record.id);
+
+          if (updateError) {
+            logError(
+              `❌ Failed to update image URL for "${record.title}":`,
+              updateError
+            );
+            continue;
+          }
+
+          logInfo(`✅ Image uploaded for "${record.title}" (ID: ${record.id})`);
+        } catch (error) {
+          logError(`❌ Error processing image for "${record.title}":`, error);
+        }
+      }
+    }
+
+    // Remove records that are no longer in the Discogs collection
+    const recordsToRemove = existingRecords.filter(
+      (r) => !currentReleaseIds.has(r.id)
+    );
+
+    if (recordsToRemove.length > 0) {
+      logInfo(
+        `🗑️ Removing ${recordsToRemove.length} records no longer in collection:`
+      );
+      recordsToRemove.forEach((r) => {
+        logInfo(`  - ${r.artist ? `${r.artist} — ` : ""}${r.title} (ID: ${r.id})`);
+      });
+
+      const { error: deleteError } = await supabaseAdmin
+        .from(TABLE_NAME)
+        .delete()
+        .in(
+          "id",
+          recordsToRemove.map((r) => r.id)
+        );
+
+      if (deleteError) {
+        logError("❌ Error removing stale records:", deleteError);
+      } else {
+        logInfo("✅ Stale records removed.");
+      }
     }
   } catch (error) {
     logError("❌ Error updating Supabase records:", error);
