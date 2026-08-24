@@ -3,6 +3,14 @@ import { Link } from "react-router-dom";
 import * as Sentry from "@sentry/react";
 import styles from "./Testing.module.css";
 
+// Promise.withResolvers() is ES2024 — this project targets ES2020 (see
+// tsconfig.json's lib) and has no build-time polyfill for missing runtime
+// APIs, so it would throw on browsers older than ~Chrome 119/Firefox 121.
+// Executor form works everywhere the app already supports.
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export function Testing() {
   const triggerError = () => {
     throw new Error("This is a test error for Sentry!");
@@ -21,15 +29,9 @@ export function Testing() {
   };
 
   const triggerPerformanceIssue = () => {
-    const transaction = Sentry.startTransaction({
-      name: "Test Transaction",
-      op: "test",
-    });
-
-    // Simulate some work
-    setTimeout(() => {
-      transaction.finish();
-    }, 100);
+    Sentry.startSpan({ name: "Test Transaction", op: "test" }, () =>
+      delay(100)
+    );
   };
 
   const triggerUnhandledRejection = () => {
@@ -73,30 +75,19 @@ export function Testing() {
   };
 
   const testPerformanceMonitoring = () => {
-    const transaction = Sentry.startTransaction({
-      name: "Complex Test Transaction",
-      op: "test.complex",
-    });
-
-    // Add child spans
-    const span1 = transaction.startChild({
-      op: "test.span1",
-      description: "First test span",
-    });
-
-    setTimeout(() => {
-      span1.finish();
-
-      const span2 = transaction.startChild({
-        op: "test.span2",
-        description: "Second test span",
-      });
-
-      setTimeout(() => {
-        span2.finish();
-        transaction.finish();
-      }, 200);
-    }, 150);
+    Sentry.startSpan(
+      { name: "Complex Test Transaction", op: "test.complex" },
+      async () => {
+        await Sentry.startSpan(
+          { name: "First test span", op: "test.span1" },
+          () => delay(150)
+        );
+        await Sentry.startSpan(
+          { name: "Second test span", op: "test.span2" },
+          () => delay(200)
+        );
+      }
+    );
   };
 
   const testErrorWithTags = () => {
@@ -105,6 +96,14 @@ export function Testing() {
     Sentry.setTag("component", "testing_page");
 
     Sentry.captureException(new Error("This is a tagged error for Sentry!"));
+  };
+
+  const testStructuredLogs = () => {
+    Sentry.logger.trace("Structured log: trace", { source: "testing_page" });
+    Sentry.logger.debug("Structured log: debug", { source: "testing_page" });
+    Sentry.logger.info("Structured log: info", { source: "testing_page" });
+    Sentry.logger.warn("Structured log: warn", { source: "testing_page" });
+    Sentry.logger.error("Structured log: error", { source: "testing_page" });
   };
 
   const testMemoryLeak = () => {
@@ -228,6 +227,18 @@ export function Testing() {
       </div>
 
       <div className={styles.section}>
+        <h3>Structured Logs</h3>
+        <div className={styles.buttonGrid}>
+          <button
+            onClick={testStructuredLogs}
+            className={styles.contextButton}
+          >
+            Test Structured Logs (trace → fatal)
+          </button>
+        </div>
+      </div>
+
+      <div className={styles.section}>
         <h3>Advanced Testing</h3>
         <div className={styles.buttonGrid}>
           <button onClick={testNetworkError} className={styles.advancedButton}>
@@ -269,6 +280,9 @@ export function Testing() {
           <li>
             <strong>Context:</strong> Test user data, tags, breadcrumbs, and
             custom context
+          </li>
+          <li>
+            <strong>Structured Logs:</strong> Test Sentry.logger at every level
           </li>
           <li>
             <strong>Advanced:</strong> Test network errors, console logging, and

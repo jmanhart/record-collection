@@ -1,6 +1,7 @@
 // Import environment module first to ensure variables are loaded
 import "./utils/env.js";
 
+import { initSentry, Sentry } from "./utils/sentry.js";
 import { fetchDiscogsRecords } from "./utils/fetchDiscogs.js";
 import { updateSupabaseRecords } from "./utils/updateSupabase.js";
 import { syncWishlist } from "./utils/fetchWantlist.js";
@@ -8,6 +9,8 @@ import { syncDurations } from "./utils/fetchDurations.js";
 import { syncMusicBrainzDurations } from "./utils/fetchMusicBrainzDurations.js";
 import { syncDiscographyTargets } from "./utils/syncDiscographyTargets.js";
 import { logInfo, logError } from "./utils/log.js";
+
+initSentry();
 
 async function run() {
   try {
@@ -42,8 +45,12 @@ async function run() {
     logInfo("✅ All syncs completed successfully!");
   } catch (error) {
     logError("❌ Sync failed", error);
+    // Short-lived script: events would otherwise be lost on process.exit.
+    await Sentry.flush(5000);
     process.exit(1);
   }
+
+  await Sentry.flush(5000);
 }
 
 run();

@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { Sentry } from "./sentry.js";
 
 const LOG_DIR = path.join(process.cwd(), "logs"); // ✅ Store logs in a separate folder
 const LOG_FILE = path.join(LOG_DIR, "app.log"); // ✅ Main log file
@@ -47,6 +48,7 @@ export function logInfo(message: string) {
   const logMessage = `ℹ️ [INFO] [${formatTimestamp()}]: ${message}`;
   console.log(logMessage);
   writeToFile(logMessage);
+  Sentry.logger.info(message);
 }
 
 /**
@@ -56,14 +58,30 @@ export function logWarn(message: string) {
   const logMessage = `⚠️ [WARN] [${formatTimestamp()}]: ${message}`;
   console.warn(logMessage);
   writeToFile(logMessage);
+  Sentry.logger.warn(message);
 }
 
 /**
- * Logs an error message with optional details.
+ * Logs an error message with optional details. Forwards to Sentry both as
+ * a structured log entry and, when given an Error, as a captured
+ * exception so it shows up in Issues with a stack trace.
  */
-export function logError(message: string, error?: any) {
-  const errorDetails = error ? `\n   Details: ${error.message || error}` : "";
+export function logError(message: string, error?: unknown) {
+  const details =
+    error instanceof Error
+      ? error.message
+      : error !== undefined
+      ? String(error)
+      : undefined;
+  const errorDetails = details ? `\n   Details: ${details}` : "";
   const logMessage = `❌ [ERROR] [${formatTimestamp()}]: ${message}${errorDetails}`;
   console.error(logMessage);
   writeToFile(logMessage);
+
+  Sentry.logger.error(message, details ? { details } : undefined);
+  if (error instanceof Error) {
+    Sentry.captureException(error, { extra: { message } });
+  } else if (error !== undefined) {
+    Sentry.captureMessage(`${message}: ${details}`, "error");
+  }
 }

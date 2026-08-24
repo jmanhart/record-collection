@@ -1,12 +1,39 @@
-import { defineConfig, Plugin } from "vite";
+import { defineConfig, loadEnv, Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import mdx from "@mdx-js/rollup";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { resolve, join, dirname } from "path";
 import { promises as fs } from "fs";
 import { fileURLToPath } from "url";
+import { execSync } from "child_process";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// Vite only auto-loads .env values prefixed VITE_ into the client bundle;
+// it does NOT put non-prefixed values (SENTRY_AUTH_TOKEN, SENTRY_ORG,
+// SENTRY_PROJECT) into process.env for this config file itself. Vercel's
+// build container injects those directly into process.env already, so
+// this only matters for local builds — existing process.env values (real
+// env, Vercel) always win over the .env file.
+const fileEnv = loadEnv(process.env.NODE_ENV || "production", process.cwd(), "");
+for (const [key, value] of Object.entries(fileEnv)) {
+  if (process.env[key] === undefined) process.env[key] = value;
+}
+
+// Release identifier shared between the build-time source map upload and
+// the runtime SDK (src/config/sentry.ts), so uploaded source maps actually
+// match what the browser reports at runtime. Vercel provides the commit
+// SHA at build time; fall back to reading it from git for local builds.
+function resolveRelease(): string {
+  if (process.env.VERCEL_GIT_COMMIT_SHA) return process.env.VERCEL_GIT_COMMIT_SHA;
+  try {
+    return execSync("git rev-parse HEAD").toString().trim();
+  } catch {
+    return "dev";
+  }
+}
+
+const release = resolveRelease();
 
 // Plugin to generate article manifest for production builds
 const generateArticleManifest = (): Plugin => {
@@ -162,12 +189,26 @@ export default defineConfig({
       include: ["**/*.mdx", "**/*.md"],
     }),
     sentryVitePlugin({
-      org: "your-org",
-      project: "records",
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT || "recordslist",
       authToken: process.env.SENTRY_AUTH_TOKEN,
+      release: {
+        name: release,
+        setCommits: { auto: true },
+      },
+      sourcemaps: {
+        // Upload for symbolication, then remove from the deployed output so
+        // unminified source isn't publicly servable.
+        filesToDeleteAfterUpload: ["**/*.js.map"],
+      },
     }),
     articlesWatcher(),
   ],
+
+  define: {
+    "import.meta.env.VITE_APP_VERSION": JSON.stringify(release),
+    "import.meta.env.VITE_VERCEL_ENV": JSON.stringify(process.env.VERCEL_ENV || ""),
+  },
 
   build: {
     sourcemap: true, // Required for Sentry source maps
