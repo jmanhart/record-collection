@@ -3,10 +3,12 @@ import { Link } from "react-router-dom";
 import * as Sentry from "@sentry/react";
 import styles from "./Testing.module.css";
 
+// Promise.withResolvers() is ES2024 — this project targets ES2020 (see
+// tsconfig.json's lib) and has no build-time polyfill for missing runtime
+// APIs, so it would throw on browsers older than ~Chrome 119/Firefox 121.
+// Executor form works everywhere the app already supports.
 function delay(ms: number): Promise<void> {
-  const { promise, resolve } = Promise.withResolvers<void>();
-  setTimeout(resolve, ms);
-  return promise;
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export function Testing() {
