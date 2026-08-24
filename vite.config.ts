@@ -1,4 +1,4 @@
-import { defineConfig, Plugin } from "vite";
+import { defineConfig, loadEnv, Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import mdx from "@mdx-js/rollup";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
@@ -8,6 +8,17 @@ import { fileURLToPath } from "url";
 import { execSync } from "child_process";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// Vite only auto-loads .env values prefixed VITE_ into the client bundle;
+// it does NOT put non-prefixed values (SENTRY_AUTH_TOKEN, SENTRY_ORG,
+// SENTRY_PROJECT) into process.env for this config file itself. Vercel's
+// build container injects those directly into process.env already, so
+// this only matters for local builds — existing process.env values (real
+// env, Vercel) always win over the .env file.
+const fileEnv = loadEnv(process.env.NODE_ENV || "production", process.cwd(), "");
+for (const [key, value] of Object.entries(fileEnv)) {
+  if (process.env[key] === undefined) process.env[key] = value;
+}
 
 // Release identifier shared between the build-time source map upload and
 // the runtime SDK (src/config/sentry.ts), so uploaded source maps actually
@@ -179,7 +190,7 @@ export default defineConfig({
     }),
     sentryVitePlugin({
       org: process.env.SENTRY_ORG,
-      project: process.env.SENTRY_PROJECT || "records",
+      project: process.env.SENTRY_PROJECT || "recordslist",
       authToken: process.env.SENTRY_AUTH_TOKEN,
       release: {
         name: release,

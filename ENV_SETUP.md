@@ -70,7 +70,7 @@ Used for error tracking, tracing, session replay, and structured logs:
   - Where to find: the org slug in your Sentry dashboard URL
   - Required for source map upload/release creation to work at all
 
-- **`SENTRY_PROJECT`** - Your Sentry project slug (optional, defaults to `records`)
+- **`SENTRY_PROJECT`** - Your Sentry project slug (optional, defaults to `recordslist`)
   - Used in: `vite.config.ts` (for Sentry Vite plugin)
 
 Release tracking (`VITE_APP_VERSION`) no longer needs to be set manually —
