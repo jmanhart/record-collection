@@ -16,7 +16,7 @@ export const sentryConfig: Sentry.BrowserOptions = {
   integrations: [
     Sentry.browserTracingIntegration(),
     Sentry.replayIntegration(),
-    Sentry.consoleLoggingIntegration({ levels: ["warn", "error"] }),
+    Sentry.consoleLoggingIntegration({ levels: ["log", "warn", "error"] }),
   ],
 
   // Performance tracing (spans) - 100% sampling for all environments
