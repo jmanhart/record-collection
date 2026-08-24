@@ -44,11 +44,12 @@ for (const envVar of requiredEnvVars) {
   }
 }
 
-// Export validated environment variables
 export const env = {
   SUPABASE_URL: process.env.VITE_SUPABASE_URL as string,
   SUPABASE_ANON_KEY: process.env.VITE_SUPABASE_ANON_KEY as string,
   SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY as string,
   DISCOGS_USER: process.env.DISCOGS_USER as string,
   DISCOGS_API_TOKEN: process.env.PUBLIC_DISCOGS_API_TOKEN as string,
+  // Optional: the sync tool runs fine without error monitoring configured.
+  SENTRY_DSN: process.env.SENTRY_DSN,
 } as const;

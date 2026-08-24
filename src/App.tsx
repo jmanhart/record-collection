@@ -129,7 +129,14 @@ export default function App() {
             />
             <Route path="/listen/:uid" element={<ListenRedirect />} />
             <Route path="/:artist/:album" element={<RecordDetail />} />
-            <Route path="/testing" element={<Testing />} />
+            <Route
+              path="/testing"
+              element={
+                <AdminGate>
+                  <Testing />
+                </AdminGate>
+              }
+            />
             <Route
               path="/admin"
               element={

@@ -47,22 +47,37 @@ Used for syncing your record collection from Discogs:
   - Used in: `src/api/updateSupabase.ts`
   - Note: This might be the same as `PUBLIC_DISCOGS_API_TOKEN`
 
-### Sentry Configuration (Optional)
-Used for error tracking and monitoring:
+### Sentry Configuration (Optional, recommended)
+Used for error tracking, tracing, session replay, and structured logs:
 
 - **`VITE_SENTRY_DSN`** - Sentry DSN for error tracking
   - Used in: `src/config/sentry.ts`
   - Note: There's a fallback DSN in the code, but you should set your own
   - Where to find: Sentry Dashboard → Settings → Client Keys (DSN)
 
+- **`SENTRY_DSN`** - Sentry DSN for the sync tool (Node, not client-side)
+  - Used in: `tools/sync/src/utils/sentry.ts`
+  - No fallback — if unset, the sync tool runs with Sentry disabled
+  - Can be the same DSN as `VITE_SENTRY_DSN`, or a separate project
+
 - **`SENTRY_AUTH_TOKEN`** - Sentry authentication token (for build/source maps)
   - Used in: `vite.config.ts` (for Sentry Vite plugin)
   - Where to get: Sentry Dashboard → Settings → Auth Tokens → Create New Token
   - Required scopes: `project:releases`, `org:read`
 
-- **`VITE_APP_VERSION`** - App version for Sentry release tracking (optional)
-  - Used in: `src/config/sentry.ts`
-  - Example: `1.0.0`
+- **`SENTRY_ORG`** - Your Sentry organization slug
+  - Used in: `vite.config.ts` (for Sentry Vite plugin)
+  - Where to find: the org slug in your Sentry dashboard URL
+  - Required for source map upload/release creation to work at all
+
+- **`SENTRY_PROJECT`** - Your Sentry project slug (optional, defaults to `records`)
+  - Used in: `vite.config.ts` (for Sentry Vite plugin)
+
+Release tracking (`VITE_APP_VERSION`) no longer needs to be set manually —
+`vite.config.ts` derives it automatically from the git commit SHA
+(`VERCEL_GIT_COMMIT_SHA` on Vercel, `git rev-parse HEAD` locally) at build
+time, and injects it into both the client SDK and the uploaded source maps
+so they match.
 
 ## Example .env File
 
@@ -82,10 +97,12 @@ DISCOGS_USER=your-discogs-username
 PUBLIC_DISCOGS_API_TOKEN=your-discogs-token-here
 VITE_DISCOGS_TOKEN=your-discogs-token-here
 
-# Sentry Configuration (Optional)
+# Sentry Configuration (Optional, recommended)
 VITE_SENTRY_DSN=https://your-sentry-dsn@sentry.io/project-id
+SENTRY_DSN=https://your-sentry-dsn@sentry.io/project-id
 SENTRY_AUTH_TOKEN=your-sentry-auth-token
-VITE_APP_VERSION=1.0.0
+SENTRY_ORG=your-org-slug
+SENTRY_PROJECT=records
 ```
 
 ## Where to Get These Values
