@@ -28,7 +28,7 @@ pnpm run dev       # Start dev server
 
 ## Collection
 
-Total Records: 213
+Total Records: 268
 
 <table>
 <tbody>
@@ -56,15 +56,25 @@ Total Records: 213
       <sub>24 Hours A Day - The Bottle Rockets</sub>
     </td>
     <td width="33%" align="center" valign="top">
-      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/4834205.jpeg" width="200" alt="6 Feet Beneath The Moon"/><br/>
-      <sub>6 Feet Beneath The Moon - King Krule</sub>
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/15988977.jpeg" width="200" alt="50 Push Ups For A Dollar "/><br/>
+      <sub>50 Push Ups For A Dollar  - Skegss</sub>
     </td>
   </tr>
   <tr>
     <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/4834205.jpeg" width="200" alt="6 Feet Beneath The Moon"/><br/>
+      <sub>6 Feet Beneath The Moon - King Krule</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/24327164.jpeg" width="200" alt="A Charlie Brown Christmas "/><br/>
+      <sub>A Charlie Brown Christmas  - Vince Guaraldi Trio</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/765072.jpeg" width="200" alt="Aftermath"/><br/>
       <sub>Aftermath - The Rolling Stones</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/2147575.jpeg" width="200" alt="A Good Feelin' To Know"/><br/>
       <sub>A Good Feelin' To Know - Poco (3)</sub>
@@ -72,6 +82,10 @@ Total Records: 213
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/2652389.jpeg" width="200" alt="A Little Street Music"/><br/>
       <sub>A Little Street Music - The Cambridge Buskers</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/9882471.jpeg" width="200" alt="All Things Must Pass"/><br/>
+      <sub>All Things Must Pass - George Harrison</sub>
     </td>
   </tr>
   <tr>
@@ -104,9 +118,33 @@ Total Records: 213
   </tr>
   <tr>
     <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/596450.jpeg" width="200" alt="Aqualung"/><br/>
+      <sub>Aqualung - Jethro Tull</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/18747253.jpeg" width="200" alt="Armchair Apocrypha"/><br/>
+      <sub>Armchair Apocrypha - Andrew Bird</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/14083740.jpeg" width="200" alt="Attack & Release"/><br/>
+      <sub>Attack & Release - The Black Keys</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/10136731.jpeg" width="200" alt="At The Point Live"/><br/>
+      <sub>At The Point Live - Christy Moore</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/11851167.jpeg" width="200" alt="Baby Blue Eyes...May The First Voice You Hear Be Mine"/><br/>
+      <sub>Baby Blue Eyes...May The First Voice You Hear Be Mine - Frank Sinatra</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/700498.jpeg" width="200" alt="Bachman-Turner Overdrive II"/><br/>
       <sub>Bachman-Turner Overdrive II - Bachman-Turner Overdrive</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/16368330.jpeg" width="200" alt="Balloonerism"/><br/>
       <sub>Balloonerism - Mac Miller</sub>
@@ -115,11 +153,15 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/2363745.jpeg" width="200" alt="Barry Goudreau"/><br/>
       <sub>Barry Goudreau - Barry Goudreau</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/16233494.jpeg" width="200" alt="Because The Internet"/><br/>
       <sub>Because The Internet - Childish Gambino</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/3613242.jpeg" width="200" alt="Before And After"/><br/>
+      <sub>Before And After - Chad & Jeremy</sub>
     </td>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/2165840.jpeg" width="200" alt="Beggars Banquet"/><br/>
@@ -136,12 +178,26 @@ Total Records: 213
       <sub>Benny Goodman Plays World Favorites In High-Fidelity - Benny Goodman</sub>
     </td>
     <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/14669315.jpeg" width="200" alt="Between Two Worlds"/><br/>
+      <sub>Between Two Worlds - Jonny Oso</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/32237577.jpeg" width="200" alt="Bird In Kansas City"/><br/>
       <sub>Bird In Kansas City - Charlie Parker</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/29771140.jpeg" width="200" alt="Bite The Hand That Feeds"/><br/>
+      <sub>Bite The Hand That Feeds - Upchuck (2)</sub>
     </td>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/2520757.jpeg" width="200" alt="Black And Blue"/><br/>
       <sub>Black And Blue - The Rolling Stones</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/6097666.jpeg" width="200" alt="Black Moon Spell"/><br/>
+      <sub>Black Moon Spell - King Tuff</sub>
     </td>
   </tr>
   <tr>
@@ -178,8 +234,22 @@ Total Records: 213
       <sub>Bridge Over Troubled Water - Simon & Garfunkel</sub>
     </td>
     <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/944418.jpeg" width="200" alt="Bridges To Babylon"/><br/>
+      <sub>Bridges To Babylon - The Rolling Stones</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/6549215.jpeg" width="200" alt="Carrie & Lowell"/><br/>
+      <sub>Carrie & Lowell - Sufjan Stevens</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/6117480.jpeg" width="200" alt="Cavalo"/><br/>
       <sub>Cavalo - Rodrigo Amarante</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/26005339.jpeg" width="200" alt="Celebration Rock"/><br/>
+      <sub>Celebration Rock - Japandroids</sub>
     </td>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/8255546.jpeg" width="200" alt="Changes"/><br/>
@@ -230,6 +300,10 @@ Total Records: 213
   </tr>
   <tr>
     <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/11271072.jpeg" width="200" alt="Dave Brubeck Quartet, Paul Desmond Quartet, Cal Tjader"/><br/>
+      <sub>Dave Brubeck Quartet, Paul Desmond Quartet, Cal Tjader - The Dave Brubeck Quartet</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/1481054.jpeg" width="200" alt="Dear Science"/><br/>
       <sub>Dear Science - TV On The Radio</sub>
     </td>
@@ -237,16 +311,22 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/1132195.jpeg" width="200" alt="Déjà Vu"/><br/>
       <sub>Déjà Vu - Crosby, Stills, Nash & Young</sub>
     </td>
+  </tr>
+  <tr>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/29377117.jpeg" width="200" alt="Deluxe Edition "/><br/>
+      <sub>Deluxe Edition  - Sadgirl</sub>
+    </td>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/3566933.jpeg" width="200" alt="Diamond Rugs"/><br/>
       <sub>Diamond Rugs - Diamond Rugs</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/4538845.jpeg" width="200" alt="Dirty Work"/><br/>
       <sub>Dirty Work - The Rolling Stones</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/25136785.jpeg" width="200" alt="Disco Two Step"/><br/>
       <sub>Disco Two Step - Me Like Bees</sub>
@@ -255,12 +335,12 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/3190006.jpeg" width="200" alt="Divine Providence"/><br/>
       <sub>Divine Providence - Deer Tick</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/31471502.jpeg" width="200" alt="Dummy"/><br/>
       <sub>Dummy - Portishead</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/2760013.jpeg" width="200" alt="Dust"/><br/>
       <sub>Dust - Screaming Trees</sub>
@@ -269,12 +349,12 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/6173334.jpeg" width="200" alt="Eating Us"/><br/>
       <sub>Eating Us - Black Moth Super Rainbow</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/706098.jpeg" width="200" alt="Either / Or"/><br/>
       <sub>Either / Or - Elliott Smith</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/399579.jpeg" width="200" alt="Electric Ladyland"/><br/>
       <sub>Electric Ladyland - The Jimi Hendrix Experience</sub>
@@ -283,15 +363,19 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/451183.jpeg" width="200" alt="Electric Warrior"/><br/>
       <sub>Electric Warrior - T. Rex</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/27368748.jpeg" width="200" alt="Emotional Contracts"/><br/>
       <sub>Emotional Contracts - Deer Tick</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/774235.jpeg" width="200" alt="Emotional Rescue"/><br/>
       <sub>Emotional Rescue - The Rolling Stones</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/32850174.jpeg" width="200" alt="Es Geht Bergab"/><br/>
+      <sub>Es Geht Bergab - Rolltreppe</sub>
     </td>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/1454102.jpeg" width="200" alt="Every Damn Time"/><br/>
@@ -332,19 +416,29 @@ Total Records: 213
       <sub>Floating Coffin - Thee Oh Sees</sub>
     </td>
     <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/37828668.jpeg" width="200" alt="Foreign Tongues"/><br/>
+      <sub>Foreign Tongues - The Rolling Stones</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/24142475.jpeg" width="200" alt="Françoise Hardy"/><br/>
       <sub>Françoise Hardy - Françoise Hardy</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/4887298.jpeg" width="200" alt="Fuzz"/><br/>
+      <sub>Fuzz - Fuzz (16)</sub>
     </td>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/5423326.jpeg" width="200" alt="Geffery Morgan"/><br/>
       <sub>Geffery Morgan - UB40</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/33676614.jpeg" width="200" alt="Get Behind The Mule (Spiritual)"/><br/>
       <sub>Get Behind The Mule (Spiritual) - Tom Waits</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/24234656.jpeg" width="200" alt="Get Fucked"/><br/>
       <sub>Get Fucked - The Chats (2)</sub>
@@ -353,12 +447,12 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/23836325.jpeg" width="200" alt="'Get Yer Ya-Ya's Out!' The Rolling Stones In Concert"/><br/>
       <sub>'Get Yer Ya-Ya's Out!' The Rolling Stones In Concert - The Rolling Stones</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/15229038.jpeg" width="200" alt="Ghostbusters (Original Soundtrack Album)"/><br/>
       <sub>Ghostbusters (Original Soundtrack Album) - Various</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/2916148.jpeg" width="200" alt="Gimme Some"/><br/>
       <sub>Gimme Some - Peter Bjorn And John</sub>
@@ -367,6 +461,10 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/441777.jpeg" width="200" alt="Goats Head Soup"/><br/>
       <sub>Goats Head Soup - The Rolling Stones</sub>
     </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/5097927.jpeg" width="200" alt="God Hates Us All"/><br/>
+      <sub>God Hates Us All - Slayer</sub>
+    </td>
   </tr>
   <tr>
     <td width="33%" align="center" valign="top">
@@ -374,15 +472,19 @@ Total Records: 213
       <sub>Greatest Hits - The Brothers Four</sub>
     </td>
     <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/22620167.jpeg" width="200" alt="Greatest Hits"/><br/>
+      <sub>Greatest Hits - Blink-182</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/34889003.jpeg" width="200" alt="Guitar"/><br/>
       <sub>Guitar - Mac Demarco</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/11747418.jpeg" width="200" alt="Gumboot Soup"/><br/>
       <sub>Gumboot Soup - King Gizzard And The Lizard Wizard</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/28524538.jpeg" width="200" alt="Hackney Diamonds"/><br/>
       <sub>Hackney Diamonds - The Rolling Stones</sub>
@@ -391,12 +493,12 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/6138354.jpeg" width="200" alt="Hail Mega Boys"/><br/>
       <sub>Hail Mega Boys - J Roddy Walston And The Business</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/7986029.jpeg" width="200" alt="Half The City"/><br/>
       <sub>Half The City - St. Paul & The Broken Bones</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/13798684.jpeg" width="200" alt="Harvest"/><br/>
       <sub>Harvest - Neil Young</sub>
@@ -405,12 +507,12 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/8258120.jpeg" width="200" alt="Heartattack And Vine"/><br/>
       <sub>Heartattack And Vine - Tom Waits</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/13114012.jpeg" width="200" alt="Heart On"/><br/>
       <sub>Heart On - Eagles Of Death Metal</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/14962141.jpeg" width="200" alt="High Risk Behaviour"/><br/>
       <sub>High Risk Behaviour - The Chats (2)</sub>
@@ -419,12 +521,26 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/7227829.jpeg" width="200" alt="Highway 61 Revisited"/><br/>
       <sub>Highway 61 Revisited - Bob Dylan</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/5473862.jpeg" width="200" alt="Holly"/><br/>
       <sub>Holly - Nick Waterhouse (2)</sub>
     </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/1801227.jpeg" width="200" alt="Hombre Lobo (12 Songs Of Desire)"/><br/>
+      <sub>Hombre Lobo (12 Songs Of Desire) - Eels</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/29982643.jpeg" width="200" alt="I Got Heaven"/><br/>
+      <sub>I Got Heaven - Mannequin Pussy</sub>
+    </td>
   </tr>
   <tr>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/7498033.jpeg" width="200" alt="II"/><br/>
+      <sub>II - Fuzz (16)</sub>
+    </td>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/4245199.jpeg" width="200" alt="II"/><br/>
       <sub>II - Unknown Mortal Orchestra</sub>
@@ -433,12 +549,12 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/6377274.jpeg" width="200" alt="I'm In Your Mind Fuzz"/><br/>
       <sub>I'm In Your Mind Fuzz - King Gizzard And The Lizard Wizard</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/35911765.jpeg" width="200" alt="I'm Nice Now"/><br/>
       <sub>I'm Nice Now - Upchuck (2)</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/6091558.jpeg" width="200" alt="In Concert"/><br/>
       <sub>In Concert - The Clancy Brothers & Tommy Makem</sub>
@@ -447,26 +563,40 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/4062017.jpeg" width="200" alt="In Sweden 1950"/><br/>
       <sub>In Sweden 1950 - Charlie Parker</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/13505187.jpeg" width="200" alt="Interaction"/><br/>
       <sub>Interaction - Art Farmer Quartet</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/12753004.jpeg" width="200" alt="In The Aeroplane Over The Sea"/><br/>
       <sub>In The Aeroplane Over The Sea - Neutral Milk Hotel</sub>
     </td>
     <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/667892.jpeg" width="200" alt="Is This It"/><br/>
+      <sub>Is This It - The Strokes</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/33542085.jpeg" width="200" alt="I Want To Grow Up"/><br/>
+      <sub>I Want To Grow Up - Colleen Green</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/24818843.jpeg" width="200" alt="Jake Bugg"/><br/>
+      <sub>Jake Bugg - Jake Bugg</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/12415623.jpeg" width="200" alt="Jazz At Massey Hall"/><br/>
       <sub>Jazz At Massey Hall - Charlie Parker</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/1696796.jpeg" width="200" alt="Jazz Goes To College"/><br/>
       <sub>Jazz Goes To College - The Dave Brubeck Quartet</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/15929556.jpeg" width="200" alt="John Prine"/><br/>
       <sub>John Prine - John Prine</sub>
@@ -475,9 +605,19 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/7539360.jpeg" width="200" alt="JR JR"/><br/>
       <sub>JR JR - Jr Jr</sub>
     </td>
+  </tr>
+  <tr>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/28508125.jpeg" width="200" alt="Keep It Hid"/><br/>
+      <sub>Keep It Hid - Dan Auerbach</sub>
+    </td>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/2825456.jpeg" width="200" alt="Kind Of Blue"/><br/>
       <sub>Kind Of Blue - Miles Davis</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/4775939.jpeg" width="200" alt="Kristofferson"/><br/>
+      <sub>Kristofferson - Kris Kristofferson</sub>
     </td>
   </tr>
   <tr>
@@ -486,6 +626,16 @@ Total Records: 213
       <sub>Labor Days - Aesop Rock</sub>
     </td>
     <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/31866524.jpeg" width="200" alt="Last Echo"/><br/>
+      <sub>Last Echo - The Timber Rattlers</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/5852270.jpeg" width="200" alt="Legend (The Best Of Bob Marley And The Wailers)"/><br/>
+      <sub>Legend (The Best Of Bob Marley And The Wailers) - Bob Marley & The Wailers</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/377554.jpeg" width="200" alt="Let It Be"/><br/>
       <sub>Let It Be - The Beatles</sub>
     </td>
@@ -493,12 +643,12 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/443148.jpeg" width="200" alt="Let It Bleed"/><br/>
       <sub>Let It Bleed - The Rolling Stones</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/2744901.jpeg" width="200" alt="Let It Sway"/><br/>
       <sub>Let It Sway - Someone Still Loves You Boris Yeltsin</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/13812915.jpeg" width="200" alt="'Let's Rock'"/><br/>
       <sub>'Let's Rock' - The Black Keys</sub>
@@ -507,12 +657,12 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/6641236.jpeg" width="200" alt="Let The Good Times Roll"/><br/>
       <sub>Let The Good Times Roll - JD McPherson</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/25568572.jpeg" width="200" alt="“Limited Edition” - Vol. 1 & Vol. 2"/><br/>
       <sub>“Limited Edition” - Vol. 1 & Vol. 2 - Sadgirl</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/3236115.jpeg" width="200" alt="Little Toot"/><br/>
       <sub>Little Toot - Don Wilson (4)</sub>
@@ -521,12 +671,12 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/13485627.jpeg" width="200" alt="Live At Easy Street"/><br/>
       <sub>Live At Easy Street - Pearl Jam</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/33676644.jpeg" width="200" alt="Live At KEXP"/><br/>
       <sub>Live At KEXP - Frankie And The Witch Fingers</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/20210761.jpeg" width="200" alt="Live From Fort Adams"/><br/>
       <sub>Live From Fort Adams - Deer Tick</sub>
@@ -535,11 +685,15 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/33667446.jpeg" width="200" alt="Live Houston Music Theatre '67"/><br/>
       <sub>Live Houston Music Theatre '67 - 13th Floor Elevators</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/723002.jpeg" width="200" alt="Live In Las Vegas"/><br/>
       <sub>Live In Las Vegas - Tom Jones</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/6555458.jpeg" width="200" alt="Live in San Francisco"/><br/>
+      <sub>Live in San Francisco - Ty Segall Band</sub>
     </td>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/1224660.jpeg" width="200" alt="Love You Live"/><br/>
@@ -566,8 +720,8 @@ Total Records: 213
   </tr>
   <tr>
     <td width="33%" align="center" valign="top">
-      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/10174618.jpeg" width="200" alt="Marcy Playground"/><br/>
-      <sub>Marcy Playground - Marcy Playground</sub>
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/35619385.jpeg" width="200" alt="Master Of Reality"/><br/>
+      <sub>Master Of Reality - Black Sabbath</sub>
     </td>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/13145359.jpeg" width="200" alt="Mayonnaise"/><br/>
@@ -580,9 +734,19 @@ Total Records: 213
   </tr>
   <tr>
     <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/563823.jpeg" width="200" alt="McLemore Avenue"/><br/>
+      <sub>McLemore Avenue - Booker T & The MG's</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/1766802.jpeg" width="200" alt="Memories"/><br/>
       <sub>Memories - Barbra Streisand</sub>
     </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/37788825.jpeg" width="200" alt="Miami"/><br/>
+      <sub>Miami - The Gun Club</sub>
+    </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/19923829.jpeg" width="200" alt="Midnight Blue"/><br/>
       <sub>Midnight Blue - Kenny Burrell</sub>
@@ -591,12 +755,12 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/4666796.jpeg" width="200" alt="Modern Vampires Of The City"/><br/>
       <sub>Modern Vampires Of The City - Vampire Weekend</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/34497226.jpeg" width="200" alt="Moisturizer"/><br/>
       <sub>Moisturizer - Wet Leg</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/4228036.jpeg" width="200" alt="Morning View"/><br/>
       <sub>Morning View - Incubus (2)</sub>
@@ -605,26 +769,26 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/19790008.jpeg" width="200" alt="(Moving)"/><br/>
       <sub>(Moving) - Peter, Paul & Mary</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/16533159.jpeg" width="200" alt="Music From And Inspired By Disney Pixar &quot;Soul&quot;"/><br/>
       <sub>Music From And Inspired By Disney Pixar "Soul" - Jon Batiste</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/14957811.jpeg" width="200" alt="My Baby Just Cares For Me"/><br/>
+      <sub>My Baby Just Cares For Me - Nina Simone</sub>
     </td>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/11915831.jpeg" width="200" alt="My Baby Just Cares For Me"/><br/>
       <sub>My Baby Just Cares For Me - Nina Simone</sub>
     </td>
     <td width="33%" align="center" valign="top">
-      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/14957811.jpeg" width="200" alt="My Baby Just Cares For Me"/><br/>
-      <sub>My Baby Just Cares For Me - Nina Simone</sub>
-    </td>
-  </tr>
-  <tr>
-    <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/8971083.jpeg" width="200" alt="My Woman"/><br/>
       <sub>My Woman - Angel Olsen</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/4929194.jpeg" width="200" alt="Negativity"/><br/>
       <sub>Negativity - Deer Tick</sub>
@@ -633,8 +797,16 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/9120695.jpeg" width="200" alt="Never Twice "/><br/>
       <sub>Never Twice  - Nick Waterhouse (2)</sub>
     </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/1099708.jpeg" width="200" alt="New Music From London"/><br/>
+      <sub>New Music From London - Peter Maxwell Davies</sub>
+    </td>
   </tr>
   <tr>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/860579.jpeg" width="200" alt="Night Moves"/><br/>
+      <sub>Night Moves - Bob Seger And The Silver Bullet Band</sub>
+    </td>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/2681475.jpeg" width="200" alt="No Time For Dreaming"/><br/>
       <sub>No Time For Dreaming - Charles Bradley</sub>
@@ -643,12 +815,12 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/9436179.jpeg" width="200" alt="Odelay"/><br/>
       <sub>Odelay - Beck</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/400097.jpeg" width="200" alt="Oh, Inverted World"/><br/>
       <sub>Oh, Inverted World - The Shins</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/19288888.jpeg" width="200" alt="Our Endless Numbered Days"/><br/>
       <sub>Our Endless Numbered Days - Iron And Wine</sub>
@@ -657,16 +829,22 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/33674250.jpeg" width="200" alt="Out Of Our Heads"/><br/>
       <sub>Out Of Our Heads - The Rolling Stones</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/8572856.jpeg" width="200" alt="Out Of The Blue"/><br/>
       <sub>Out Of The Blue - Electric Light Orchestra</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/6875270.jpeg" width="200" alt="Painted Shut"/><br/>
       <sub>Painted Shut - Hop Along</sub>
     </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/33251085.jpeg" width="200" alt="Passenger"/><br/>
+      <sub>Passenger - Small Million</sub>
+    </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/6047722.jpeg" width="200" alt="Paul Desmond"/><br/>
       <sub>Paul Desmond - Paul Desmond</sub>
@@ -675,26 +853,40 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/8363317.jpeg" width="200" alt="Peace, Love & Death Metal"/><br/>
       <sub>Peace, Love & Death Metal - Eagles Of Death Metal</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/2379457.jpeg" width="200" alt="Perch Patchwork"/><br/>
       <sub>Perch Patchwork - Maps And Atlases</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/10983572.jpeg" width="200" alt="Piano Music Of Erik Satie, Vol. 1"/><br/>
+      <sub>Piano Music Of Erik Satie, Vol. 1 - Erik Satie</sub>
     </td>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/30026881.jpeg" width="200" alt="Playing Favorites"/><br/>
       <sub>Playing Favorites - Sheer Mag</sub>
     </td>
     <td width="33%" align="center" valign="top">
-      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/26237564.jpeg" width="200" alt="Prime"/><br/>
-      <sub>Prime - Christian McBride's New Jawn</sub>
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/1995189.jpeg" width="200" alt="Post-Nothing"/><br/>
+      <sub>Post-Nothing - Japandroids</sub>
     </td>
   </tr>
   <tr>
     <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/26237564.jpeg" width="200" alt="Prime"/><br/>
+      <sub>Prime - Christian McBride's New Jawn</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/18089446.jpeg" width="200" alt="Promenade Blue"/><br/>
       <sub>Promenade Blue - Nick Waterhouse (2)</sub>
     </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/13806832.jpeg" width="200" alt="Raindrops & Rooftops "/><br/>
+      <sub>Raindrops & Rooftops  - S.Knoll</sub>
+    </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/9216088.jpeg" width="200" alt="Random Access Memories"/><br/>
       <sub>Random Access Memories - Daft Punk</sub>
@@ -703,15 +895,19 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/3234844.jpeg" width="200" alt="Raw Delta Blues"/><br/>
       <sub>Raw Delta Blues - Son House</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/20190169.jpeg" width="200" alt="Reverberation"/><br/>
       <sub>Reverberation - The Queers</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/6173840.jpeg" width="200" alt="Rock And Roll Night Club"/><br/>
       <sub>Rock And Roll Night Club - Mac Demarco</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/26748182.jpeg" width="200" alt="Rotten Bun For An Eggless Century"/><br/>
+      <sub>Rotten Bun For An Eggless Century - Mui Zyu</sub>
     </td>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/10949522.jpeg" width="200" alt="'Round About Midnight"/><br/>
@@ -762,8 +958,22 @@ Total Records: 213
   </tr>
   <tr>
     <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/37041180.jpeg" width="200" alt="Self Defense Techniques"/><br/>
+      <sub>Self Defense Techniques - Dry Socket (3)</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/2940313.jpeg" width="200" alt="Sincerely, Jack Scott"/><br/>
+      <sub>Sincerely, Jack Scott - Jack Scott</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/3303574.jpeg" width="200" alt="Sings &quot;A Night In The Caribbean&quot;"/><br/>
       <sub>Sings "A Night In The Caribbean" - Richie Delamore</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/6472820.jpeg" width="200" alt="Slap Back"/><br/>
+      <sub>Slap Back - Sallie Ford</sub>
     </td>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/2843706.jpeg" width="200" alt="Smooth Sailing"/><br/>
@@ -790,9 +1000,19 @@ Total Records: 213
   </tr>
   <tr>
     <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/1825412.jpeg" width="200" alt="Songs For Bedtime"/><br/>
+      <sub>Songs For Bedtime - Various</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/11542970.jpeg" width="200" alt="Split EP"/><br/>
+      <sub>Split EP - Patient (2)</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/1843683.jpeg" width="200" alt="Star Wars / A Stereo Space Odyssey"/><br/>
       <sub>Star Wars / A Stereo Space Odyssey - John Williams (4)</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/15527143.jpeg" width="200" alt="Steel Wheels"/><br/>
       <sub>Steel Wheels - The Rolling Stones</sub>
@@ -801,11 +1021,15 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/7084781.jpeg" width="200" alt="Sticky Fingers"/><br/>
       <sub>Sticky Fingers - The Rolling Stones</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/2686987.jpeg" width="200" alt="Street Machine"/><br/>
       <sub>Street Machine - Sammy Hagar</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/1813378.jpeg" width="200" alt="Street Survivors"/><br/>
+      <sub>Street Survivors - Lynyrd Skynyrd</sub>
     </td>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/5564792.jpeg" width="200" alt="Sweet Disarray"/><br/>
@@ -826,11 +1050,15 @@ Total Records: 213
       <sub>Tattoo You - The Rolling Stones</sub>
     </td>
     <td width="33%" align="center" valign="top">
-      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/26227589.jpeg" width="200" alt="The Bad Plus."/><br/>
-      <sub>The Bad Plus. - The Bad Plus</sub>
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/14756037.jpeg" width="200" alt="Texas Sun"/><br/>
+      <sub>Texas Sun - Khruangbin</sub>
     </td>
   </tr>
   <tr>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/26227589.jpeg" width="200" alt="The Bad Plus."/><br/>
+      <sub>The Bad Plus. - The Bad Plus</sub>
+    </td>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/1626912.jpeg" width="200" alt="The Best Of Eddy Arnold"/><br/>
       <sub>The Best Of Eddy Arnold - Eddy Arnold</sub>
@@ -839,12 +1067,12 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/963568.jpeg" width="200" alt="The Best Of Sam Cooke"/><br/>
       <sub>The Best Of Sam Cooke - Sam Cooke</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/7043223.jpeg" width="200" alt="The Big Come Up"/><br/>
       <sub>The Big Come Up - The Black Keys</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/28180618.jpeg" width="200" alt="The Black Dirt Sessions"/><br/>
       <sub>The Black Dirt Sessions - Deer Tick</sub>
@@ -853,16 +1081,22 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/33984606.jpeg" width="200" alt="The Chats EP"/><br/>
       <sub>The Chats EP - The Chats (2)</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/367104.jpeg" width="200" alt="The Dark Side Of The Moon"/><br/>
       <sub>The Dark Side Of The Moon - Pink Floyd</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/5601696.jpeg" width="200" alt="The Double EP: A Sea Of Split Peas"/><br/>
       <sub>The Double EP: A Sea Of Split Peas - Courtney Barnett</sub>
     </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/38021151.jpeg" width="200" alt="The Ecstatic"/><br/>
+      <sub>The Ecstatic - Mos Def</sub>
+    </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/23301983.jpeg" width="200" alt="Their Ultimate Collection"/><br/>
       <sub>Their Ultimate Collection - Daryl Hall & John Oates</sub>
@@ -870,6 +1104,10 @@ Total Records: 213
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/30115127.jpeg" width="200" alt="The Messthetics And James Brandon Lewis "/><br/>
       <sub>The Messthetics And James Brandon Lewis  - The Messthetics</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/8159410.jpeg" width="200" alt="The Middle Symphonies"/><br/>
+      <sub>The Middle Symphonies - Wolfgang Amadeus Mozart</sub>
     </td>
   </tr>
   <tr>
@@ -902,6 +1140,10 @@ Total Records: 213
   </tr>
   <tr>
     <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/32095941.jpeg" width="200" alt="The Slider"/><br/>
+      <sub>The Slider - T. Rex</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/26535725.jpeg" width="200" alt="The Sophtware Slump"/><br/>
       <sub>The Sophtware Slump - Grandaddy</sub>
     </td>
@@ -909,16 +1151,22 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/26740190.jpeg" width="200" alt="The Way I See It"/><br/>
       <sub>The Way I See It - Raphael Saadiq</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/918621.jpeg" width="200" alt="Thick As A Brick"/><br/>
       <sub>Thick As A Brick - Jethro Tull</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/2981783.jpeg" width="200" alt="Thickfreakness"/><br/>
       <sub>Thickfreakness - The Black Keys</sub>
     </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/34446916.jpeg" width="200" alt="Third Eye Blind"/><br/>
+      <sub>Third Eye Blind - Third Eye Blind</sub>
+    </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/2685808.jpeg" width="200" alt="This Is Glenn Miller"/><br/>
       <sub>This Is Glenn Miller - Glenn Miller And His Orchestra</sub>
@@ -927,12 +1175,12 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/10022995.jpeg" width="200" alt="This Old Dog"/><br/>
       <sub>This Old Dog - Mac Demarco</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/10844247.jpeg" width="200" alt="Time Out"/><br/>
       <sub>Time Out - The Dave Brubeck Quartet</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/4123997.jpeg" width="200" alt="Time's All Gone"/><br/>
       <sub>Time's All Gone - Nick Waterhouse (2)</sub>
@@ -941,12 +1189,12 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/402897.jpeg" width="200" alt="Tommy"/><br/>
       <sub>Tommy - The Who</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/2131760.jpeg" width="200" alt="Twenty Greatest Hits"/><br/>
       <sub>Twenty Greatest Hits - Kenny Rogers</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/23410463.jpeg" width="200" alt="Undercurrent"/><br/>
       <sub>Undercurrent - Bill Evans</sub>
@@ -955,12 +1203,12 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/17800651.jpeg" width="200" alt="Violent Femmes"/><br/>
       <sub>Violent Femmes - Violent Femmes</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/10717677.jpeg" width="200" alt="Vol. 1"/><br/>
       <sub>Vol. 1 - Deer Tick</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/31203541.jpeg" width="200" alt="Vol.1"/><br/>
       <sub>Vol.1 - Angine De Poitrine</sub>
@@ -969,12 +1217,12 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/10717712.jpeg" width="200" alt="Vol. 2"/><br/>
       <sub>Vol. 2 - Deer Tick</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/37334592.jpeg" width="200" alt="Vol. II"/><br/>
       <sub>Vol. II - Angine De Poitrine</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/1649633.jpeg" width="200" alt="War Elephant"/><br/>
       <sub>War Elephant - Deer Tick</sub>
@@ -983,12 +1231,12 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/15878365.jpeg" width="200" alt="Water"/><br/>
       <sub>Water - Sadgirl</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/7133403.jpeg" width="200" alt="Waves"/><br/>
       <sub>Waves - Charles Lloyd</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/15980871.jpeg" width="200" alt="Weezer"/><br/>
       <sub>Weezer - Weezer</sub>
@@ -997,12 +1245,12 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/23616278.jpeg" width="200" alt="Wet Leg"/><br/>
       <sub>Wet Leg - Wet Leg</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/1768826.jpeg" width="200" alt="Whatever Tickles Your Fancy"/><br/>
       <sub>Whatever Tickles Your Fancy - Christy Moore</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/1694416.jpeg" width="200" alt="What's For Dinner?"/><br/>
       <sub>What's For Dinner? - The King Khan & BBQ Show</sub>
@@ -1011,12 +1259,12 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/20701471.jpeg" width="200" alt="White Blood Cells"/><br/>
       <sub>White Blood Cells - The White Stripes</sub>
     </td>
-  </tr>
-  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/3354750.jpeg" width="200" alt="Wish You Were Here"/><br/>
       <sub>Wish You Were Here - Pink Floyd</sub>
     </td>
+  </tr>
+  <tr>
     <td width="33%" align="center" valign="top">
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/2985227.jpeg" width="200" alt="Within And Without"/><br/>
       <sub>Within And Without - Washed Out</sub>
@@ -1025,6 +1273,18 @@ Total Records: 213
       <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/4535648.jpeg" width="200" alt="Workingman's Dead"/><br/>
       <sub>Workingman's Dead - The Grateful Dead</sub>
     </td>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/4662218.jpeg" width="200" alt="Wyoming"/><br/>
+      <sub>Wyoming - Water Liars</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" align="center" valign="top">
+      <img src="https://bwrsabjywxnrvorxoizc.supabase.co/storage/v1/object/public/record-images/covers/27170811.jpeg" width="200" alt="Yesterday's News"/><br/>
+      <sub>Yesterday's News - Robert Ellis (2)</sub>
+    </td>
+    <td width="33%"></td>
+    <td width="33%"></td>
   </tr>
 </tbody>
 </table>
