@@ -114,20 +114,22 @@
   opacity: 0;
 }
 
-/* The block is pure geometry: its width is the duration, and it declares the
-   container that the card inside is measured against. It carries no padding
-   of its own — padding here would set a floor on the border box and make a
-   short record wider than its runtime, overlapping the next one.
-   No overflow:hidden either: the tooltip is a child and has to escape. */
+/* The block's width tracks the record's duration and declares the container
+   the card is measured against. It keeps no padding of its own, but its width
+   is floored at --cover-size (min-width) so every cover reserves a full,
+   uniform slot even when the runtime is narrower than the sleeve — trading a
+   little time-accuracy at very short durations for covers that stay one size
+   at any zoom. No overflow:hidden either: the tooltip is a child and escapes. */
 /* Height is explicit rather than derived from top + bottom: a <button> is a
    form control, and browsers size it from its content instead of stretching
    it between those offsets the way a div would. */
 .block {
   container-type: inline-size;
+  --cover-size: 3.7rem;
   position: absolute;
   top: 0.5rem;
   height: calc(100% - 1rem);
-  min-width: 4px;
+  min-width: var(--cover-size);
   padding: 0;
   border: none;
   background: none;
@@ -170,12 +172,12 @@
   box-shadow: 0 0 0 2px var(--red200);
 }
 
-/* Square, sized to the card's inner height but allowed to shrink: zoomed out
-   a block is narrower than it is tall, and a fixed-size sleeve would spill
-   over its neighbours. flex-shrink keeps it inside the block at any zoom. */
+/* Square, held at a fixed --cover-size so every sleeve is identical regardless
+   of the block's duration or the zoom level. No flex-shrink: the block's
+   min-width reserves exactly this much room for it. */
 .blockCover,
 .blockFallback {
-  flex: 0 1 3.7rem;
+  flex: 0 0 var(--cover-size);
   display: block;
   min-width: 0;
   aspect-ratio: 1;
