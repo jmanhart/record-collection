@@ -1,0 +1,154 @@
+/* Fixed drawer pinned to the right; the timeline scrolls behind it. Close
+   button sits top-left so it never collides with the fixed theme toggle. */
+.panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: min(420px, 100%);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface000);
+  border-left: 1px solid var(--divider);
+  box-shadow: -12px 0 32px rgba(0, 0, 0, 0.18);
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel {
+    animation: none;
+  }
+}
+
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 3.5rem 1.5rem 2rem;
+}
+
+.close {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: 0;
+  border: 1px solid var(--divider);
+  border-radius: 6px;
+  background: var(--surface100);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.close:hover {
+  background: var(--surface300);
+  color: var(--text-primary);
+}
+
+.cover {
+  display: block;
+  width: 12rem;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.coverPlaceholder {
+  width: 12rem;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  background: var(--surface300);
+  margin-bottom: 1rem;
+}
+
+.title {
+  margin: 0 0 0.15rem;
+  font-size: 1.35rem;
+  line-height: 1.25;
+  color: var(--text-primary);
+}
+
+.artist {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.meta {
+  margin: 0 0 1.25rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--text-tertiary);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin: 0 0 1.25rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  min-width: 0;
+}
+
+.statWide {
+  grid-column: 1 / -1;
+}
+
+.statLabel {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.statValue {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.statSub {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+}
+
+.tracks {
+  border-top: 1px solid var(--divider);
+  padding-top: 0.9rem;
+}
+
+@media (max-width: 640px) {
+  .panel {
+    width: 100%;
+  }
+}

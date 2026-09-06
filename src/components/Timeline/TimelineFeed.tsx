@@ -1,9 +1,8 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import { useActivity, toDateKey } from "../../hooks/useActivity";
 import { useListens } from "../../hooks/useListens";
 import type { ActivityEvent } from "../../hooks/useActivity";
-import { slugify } from "../../utils/slugify";
+import { RecordPanel } from "./RecordPanel";
 import { TIMEZONE } from "../../utils/timezone";
 import { formatRuntimeCompact } from "../../utils/formatDuration";
 import { DateIndicator, type MonthMarker } from "../DateIndicator/DateIndicator";
@@ -78,16 +77,19 @@ function TimelineRow({
   event,
   plays,
   playing,
+  selected,
+  onSelect,
 }: {
   event: ActivityEvent;
   plays: number;
   playing: boolean;
+  selected: boolean;
+  onSelect: (event: ActivityEvent) => void;
 }) {
   const [imageError, setImageError] = useState(false);
   const record = event.record;
   if (!record) return null;
 
-  const to = `/${slugify(record.artist)}/${slugify(record.title)}`;
   const showImage = record.supabase_image_url && !imageError;
 
   return (
@@ -95,7 +97,11 @@ function TimelineRow({
       <span className={styles.node}>
         <TimelineDot pulsing={playing} />
       </span>
-      <Link to={to} className={styles.card}>
+      <button
+        type="button"
+        className={`${styles.card} ${selected ? styles.cardActive : ""}`}
+        onClick={() => onSelect(event)}
+      >
         <div className={styles.thumb}>
           {showImage ? (
             <img
@@ -124,7 +130,7 @@ function TimelineRow({
           <h3 className={styles.title}>{record.title}</h3>
           <p className={styles.artist}>{record.artist}</p>
         </div>
-      </Link>
+      </button>
     </div>
   );
 }
@@ -133,6 +139,7 @@ export function TimelineFeed({ search }: TimelineFeedProps) {
   const { events, isLoading } = useActivity();
   const { listens } = useListens();
   const todayKey = toDateKey(new Date().toISOString());
+  const [selected, setSelected] = useState<ActivityEvent | null>(null);
 
   const playsByReleaseId = useMemo(() => {
     const counts = new Map<number, number>();
@@ -220,12 +227,23 @@ export function TimelineFeed({ search }: TimelineFeedProps) {
                   event={event}
                   plays={playsByReleaseId.get(event.releaseId) ?? 0}
                   playing={false}
+                  selected={selected?.id === event.id}
+                  onSelect={setSelected}
                 />
               ))}
             </section>
           );
         })}
       </div>
+      {selected && (
+        <RecordPanel
+          event={selected}
+          plays={playsByReleaseId.get(selected.releaseId) ?? 0}
+          dayLabel={formatDay(selected.dateKey, todayKey)}
+          timeRange={timeRange(selected)}
+          onClose={() => setSelected(null)}
+        />
+      )}
     </>
   );
 }
