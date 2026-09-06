@@ -2,11 +2,11 @@
    of the spine line. */
 .dot {
   display: block;
-  width: 14px;
-  height: 14px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: var(--text-primary);
-  border: 3px solid var(--surface000);
+  border: 2.5px solid var(--surface000);
   box-sizing: content-box;
 }
 

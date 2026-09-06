@@ -5,6 +5,7 @@ import { useListens } from "../../hooks/useListens";
 import type { ActivityEvent } from "../../hooks/useActivity";
 import { slugify } from "../../utils/slugify";
 import { TIMEZONE } from "../../utils/timezone";
+import { formatRuntimeCompact } from "../../utils/formatDuration";
 import { DateIndicator, type MonthMarker } from "../DateIndicator/DateIndicator";
 import { TimelineDot } from "./TimelineDot";
 import styles from "./TimelineFeed.module.css";
@@ -57,9 +58,20 @@ function timeOf(timestamp: string): string {
   });
 }
 
+// The stop time is explicit when logged, otherwise inferred from the album's
+// runtime (a full listen), so a range is always available.
+function endOf(event: ActivityEvent): string | null {
+  if (event.endedAt) return timeOf(event.endedAt);
+  const duration = event.record?.duration_seconds;
+  if (!duration) return null;
+  const end = new Date(new Date(event.timestamp).getTime() + duration * 1000);
+  return timeOf(end.toISOString());
+}
+
 function timeRange(event: ActivityEvent): string {
   const start = timeOf(event.timestamp);
-  return event.endedAt ? `${start} – ${timeOf(event.endedAt)}` : start;
+  const end = endOf(event);
+  return end ? `${start} – ${end}` : start;
 }
 
 function TimelineRow({
@@ -178,26 +190,41 @@ export function TimelineFeed({ search }: TimelineFeedProps) {
     <>
       <DateIndicator months={months} />
       <div className={styles.feed}>
-        {days.map(([dateKey, dayEvents]) => (
-          <section
-            key={dateKey}
-            className={styles.dayGroup}
-            data-month={monthKey(dateKey)}
-          >
-            <div className={styles.dayHeader}>
-              <span className={styles.dayMarker} />
-              <span className={styles.dayLabel}>{formatDay(dateKey, todayKey)}</span>
-            </div>
-            {dayEvents.map((event) => (
-              <TimelineRow
-                key={event.id}
-                event={event}
-                plays={playsByReleaseId.get(event.releaseId) ?? 0}
-                playing={false}
-              />
-            ))}
-          </section>
-        ))}
+        {days.map(([dateKey, dayEvents]) => {
+          const albumCount = new Set(dayEvents.map((e) => e.releaseId)).size;
+          const seconds = dayEvents.reduce(
+            (sum, e) => sum + (e.record?.duration_seconds || 0),
+            0
+          );
+          return (
+            <section
+              key={dateKey}
+              className={styles.dayGroup}
+              data-month={monthKey(dateKey)}
+            >
+              <div className={styles.dayHeader}>
+                <span className={styles.dayMarker} />
+                <div className={styles.dayHeading}>
+                  <span className={styles.dayLabel}>
+                    {formatDay(dateKey, todayKey)}
+                  </span>
+                  <span className={styles.dayStats}>
+                    {albumCount} {albumCount === 1 ? "album" : "albums"} ·{" "}
+                    {formatRuntimeCompact(seconds)}
+                  </span>
+                </div>
+              </div>
+              {dayEvents.map((event) => (
+                <TimelineRow
+                  key={event.id}
+                  event={event}
+                  plays={playsByReleaseId.get(event.releaseId) ?? 0}
+                  playing={false}
+                />
+              ))}
+            </section>
+          );
+        })}
       </div>
     </>
   );

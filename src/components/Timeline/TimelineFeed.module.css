@@ -37,18 +37,31 @@
   left: 1.25rem;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 11px;
-  height: 11px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: var(--surface000);
-  border: 2px solid var(--text-tertiary);
+  border: 3px solid var(--text-secondary);
   box-sizing: border-box;
 }
 
+/* The date anchors each day; stats ride alongside it on the same baseline. */
+.dayHeading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
 .dayLabel {
-  font-size: 1.0625rem;
-  font-weight: 600;
-  color: var(--text-secondary);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.dayStats {
+  font-size: 0.95rem;
+  color: var(--text-tertiary);
 }
 
 .row {
@@ -61,7 +74,7 @@
 .node {
   position: absolute;
   left: 1.25rem;
-  top: 0.15rem;
+  top: 0.3rem;
   transform: translateX(-50%);
 }
 
