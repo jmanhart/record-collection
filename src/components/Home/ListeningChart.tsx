@@ -262,20 +262,40 @@ export function ListeningChart({ events, todayKey }: ListeningChartProps) {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <div className={styles.toggle} role="group" aria-label="Chart range">
-          {RANGE_OPTIONS.map(({ value, label }) => (
+        <div className={styles.headerGroup}>
+          <div className={styles.toggle} role="group" aria-label="Chart range">
+            {RANGE_OPTIONS.map(({ value, label }) => (
+              <button
+                key={value}
+                className={`${styles.toggleButton} ${range === value ? styles.toggleActive : ""}`}
+                onClick={() => {
+                  setRange(value);
+                  setOffset(0);
+                }}
+                aria-pressed={range === value}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <div className={styles.periodNav}>
             <button
-              key={value}
-              className={`${styles.toggleButton} ${range === value ? styles.toggleActive : ""}`}
-              onClick={() => {
-                setRange(value);
-                setOffset(0);
-              }}
-              aria-pressed={range === value}
+              className={styles.navButton}
+              onClick={() => setOffset((o) => o + 1)}
+              aria-label={`Previous ${range}`}
             >
-              {label}
+              <ChevronLeft size={16} aria-hidden />
             </button>
-          ))}
+            <span className={styles.periodLabel}>{periodTitle}</span>
+            <button
+              className={styles.navButton}
+              onClick={() => setOffset((o) => Math.max(0, o - 1))}
+              disabled={offset === 0}
+              aria-label={`Next ${range}`}
+            >
+              <ChevronRight size={16} aria-hidden />
+            </button>
+          </div>
         </div>
         <div className={styles.toggle} role="group" aria-label="Chart measure">
           <button
@@ -293,25 +313,6 @@ export function ListeningChart({ events, todayKey }: ListeningChartProps) {
             Albums
           </button>
         </div>
-      </div>
-
-      <div className={styles.periodNav}>
-        <button
-          className={styles.navButton}
-          onClick={() => setOffset((o) => o + 1)}
-          aria-label={`Previous ${range}`}
-        >
-          <ChevronLeft size={18} aria-hidden />
-        </button>
-        <span className={styles.periodLabel}>{periodTitle}</span>
-        <button
-          className={styles.navButton}
-          onClick={() => setOffset((o) => Math.max(0, o - 1))}
-          disabled={offset === 0}
-          aria-label={`Next ${range}`}
-        >
-          <ChevronRight size={18} aria-hidden />
-        </button>
       </div>
 
       <div className={styles.stats}>

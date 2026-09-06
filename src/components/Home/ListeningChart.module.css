@@ -27,6 +27,15 @@
   flex-shrink: 0;
 }
 
+/* Range toggle + frame nav ride together on the left; both scope the time
+   window, so they read as one control cluster. */
+.headerGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
 .toggle {
   display: inline-flex;
   gap: 2px;
@@ -63,13 +72,16 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
-/* Prev/next frame controls, centered under the toggles. Fixed-shrink so the
-   chart below never reclaims its height when the label wraps. */
+/* Frame stepper, styled as a segmented pill to rhyme with the toggles it
+   sits beside. The label carries the same surface as the group so the
+   arrows read as its flanking controls. */
 .periodNav {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
+  gap: 2px;
+  background: var(--surface100);
+  border-radius: 8px;
+  padding: 2px;
   flex-shrink: 0;
 }
 
@@ -77,12 +89,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 1.75rem;
+  height: 1.75rem;
   padding: 0;
   border: none;
   border-radius: 6px;
-  background: var(--surface100);
+  background: none;
   color: var(--text-secondary);
   cursor: pointer;
   transition: background-color 0.15s ease, color 0.15s ease;
@@ -99,11 +111,13 @@
 }
 
 .periodLabel {
-  min-width: 9rem;
+  min-width: 6rem;
+  padding: 0 0.25rem;
   text-align: center;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-primary);
+  white-space: nowrap;
 }
 
 /* Both the chart and its empty state take every pixel the fixed rows above
