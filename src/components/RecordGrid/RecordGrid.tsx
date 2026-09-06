@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from "react";
-import { Search } from "../Search/Search";
 import type { Record, SortField, SortOrder } from "../../types/Record";
 import { SortControls } from "./SortControls";
 import { RecordGridList } from "./RecordGridList";
@@ -10,12 +9,12 @@ import styles from "./RecordGrid.module.css";
 interface RecordGridProps {
   records: Record[];
   isLoading: boolean;
+  search: string;
 }
 
-export function RecordGrid({ records, isLoading }: RecordGridProps) {
+export function RecordGrid({ records, isLoading, search }: RecordGridProps) {
   const [sortField, setSortField] = useState<SortField>("artist");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
-  const [searchQuery, setSearchQuery] = useState("");
   const [selectedFormat, setSelectedFormat] = useState<string>("all");
   const [selectedGenre, setSelectedGenre] = useState<string>("all");
 
@@ -31,18 +30,14 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
   // Sync state with URL on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const query = params.get("search") || "";
     const format = params.get("format") || "all";
     const genre = params.get("genre") || "all";
-    setSearchQuery(query);
     setSelectedFormat(format);
     setSelectedGenre(genre);
   }, []);
 
-  const updateURL = (search: string, format: string, genre: string) => {
+  const updateURL = (format: string, genre: string) => {
     const params = new URLSearchParams(window.location.search);
-    if (search) params.set("search", search);
-    else params.delete("search");
     if (format && format !== "all") params.set("format", format);
     else params.delete("format");
     if (genre && genre !== "all") params.set("genre", genre);
@@ -50,14 +45,9 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
     window.history.replaceState(null, "", "?" + params.toString());
   };
 
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-    updateURL(value, selectedFormat, selectedGenre);
-  };
-
   const handleGenreChange = (value: string) => {
     setSelectedGenre(value);
-    updateURL(searchQuery, selectedFormat, value);
+    updateURL(selectedFormat, value);
   };
 
   if (isLoading) {
@@ -80,9 +70,9 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
   // Filter records
   const filteredRecords = records.filter((record) => {
     const matchesSearch =
-      !searchQuery ||
-      record.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      record.artist.toLowerCase().includes(searchQuery.toLowerCase());
+      !search ||
+      record.title.toLowerCase().includes(search.toLowerCase()) ||
+      record.artist.toLowerCase().includes(search.toLowerCase());
 
     const matchesFormat =
       selectedFormat === "all" || record.format_name === selectedFormat;
@@ -123,12 +113,6 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
           onSortOrderToggle={() =>
             setSortOrder(sortOrder === "asc" ? "desc" : "asc")
           }
-        />
-
-        <Search
-          value={searchQuery}
-          onChange={handleSearchChange}
-          placeholder="Search by title or artist..."
         />
 
         <select

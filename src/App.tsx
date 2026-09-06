@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, useSearchParams, useNavigate } from "react-router-dom";
 import * as Sentry from "@sentry/react";
 import { RecordGrid } from "./components/RecordGrid/RecordGrid";
@@ -13,6 +13,7 @@ import { ArtistProgressList } from "./components/ArtistProgress/ArtistProgressLi
 import { ArtistProgressDetail } from "./components/ArtistProgress/ArtistProgressDetail";
 import { ThemeToggle } from "./components/ThemeToggle/ThemeToggle";
 import { AlphabetIndicator } from "./components/AlphabetIndicator/AlphabetIndicator";
+import { AppBar } from "./components/AppBar/AppBar";
 import { Tabs, type TabValue } from "./components/Tabs/Tabs";
 import { WishlistList } from "./components/WishlistList/WishlistList";
 import { useRecords } from "./hooks/useRecords";
@@ -28,6 +29,7 @@ function RecordList() {
   const navigate = useNavigate();
   const activeTab = (searchParams.get("tab") as TabValue) || "collection";
   const artistSlug = searchParams.get("artist");
+  const [search, setSearch] = useState("");
 
   const { records, isLoading: isLoadingRecords, error: recordsError } = useRecords();
   const { records: wishlistRecords, isLoading: isLoadingWishlist, error: wishlistError } = useWishlist();
@@ -66,14 +68,15 @@ function RecordList() {
 
   return (
     <div className="app">
+      <AppBar search={search} onSearchChange={setSearch} />
       {isCollection && <AlphabetIndicator records={records || []} />}
       <div className="container">
         <Tabs activeTab={activeTab} onTabChange={handleTabChange} />
         <main className="main">
           {activeTab === "collection" ? (
-            <RecordGrid records={records || []} isLoading={isLoadingRecords} />
+            <RecordGrid records={records || []} isLoading={isLoadingRecords} search={search} />
           ) : activeTab === "wishlist" ? (
-            <WishlistList records={wishlistRecords || []} isLoading={isLoadingWishlist} />
+            <WishlistList records={wishlistRecords || []} isLoading={isLoadingWishlist} search={search} />
           ) : artistSlug ? (
             <ArtistProgressDetail artistSlug={artistSlug} onBack={handleArtistBack} />
           ) : (
