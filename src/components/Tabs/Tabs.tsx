@@ -28,12 +28,6 @@ export function Tabs({ activeTab, onTabChange }: TabsProps) {
       >
         Wishlist
       </button>
-      <button
-        className={`${styles.tab} ${activeTab === "collecting" ? styles.active : ""}`}
-        onClick={() => onTabChange("collecting")}
-      >
-        Collecting
-      </button>
     </div>
   );
 }
