@@ -20,7 +20,6 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
   const [selectedFormat, setSelectedFormat] = useState<string>("all");
   const [selectedGenre, setSelectedGenre] = useState<string>("all");
   const [selectedNfc, setSelectedNfc] = useState<string>("all");
-  const [selectedPlays, setSelectedPlays] = useState<string>("all");
   const { hasNfcTag } = useNfcTags();
 
   const { listens } = useListens();
@@ -39,21 +38,13 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
     const format = params.get("format") || "all";
     const genre = params.get("genre") || "all";
     const nfc = params.get("nfc") || "all";
-    const plays = params.get("plays") || "all";
     setSearchQuery(query);
     setSelectedFormat(format);
     setSelectedGenre(genre);
     setSelectedNfc(nfc);
-    setSelectedPlays(plays);
   }, []);
 
-  const updateURL = (
-    search: string,
-    format: string,
-    genre: string,
-    nfc: string,
-    plays: string
-  ) => {
+  const updateURL = (search: string, format: string, genre: string, nfc: string) => {
     const params = new URLSearchParams(window.location.search);
     if (search) params.set("search", search);
     else params.delete("search");
@@ -63,29 +54,22 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
     else params.delete("genre");
     if (nfc && nfc !== "all") params.set("nfc", nfc);
     else params.delete("nfc");
-    if (plays && plays !== "all") params.set("plays", plays);
-    else params.delete("plays");
     window.history.replaceState(null, "", "?" + params.toString());
   };
 
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
-    updateURL(value, selectedFormat, selectedGenre, selectedNfc, selectedPlays);
+    updateURL(value, selectedFormat, selectedGenre, selectedNfc);
   };
 
   const handleGenreChange = (value: string) => {
     setSelectedGenre(value);
-    updateURL(searchQuery, selectedFormat, value, selectedNfc, selectedPlays);
+    updateURL(searchQuery, selectedFormat, value, selectedNfc);
   };
 
   const handleNfcChange = (value: string) => {
     setSelectedNfc(value);
-    updateURL(searchQuery, selectedFormat, selectedGenre, value, selectedPlays);
-  };
-
-  const handlePlaysChange = (value: string) => {
-    setSelectedPlays(value);
-    updateURL(searchQuery, selectedFormat, selectedGenre, selectedNfc, value);
+    updateURL(searchQuery, selectedFormat, selectedGenre, value);
   };
 
   if (isLoading) {
@@ -123,28 +107,23 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
       (selectedNfc === "linked" && hasNfcTag(record.release_id)) ||
       (selectedNfc === "not-linked" && !hasNfcTag(record.release_id));
 
-    const plays = playsByReleaseId.get(record.id) ?? 0;
-    const matchesPlays =
-      selectedPlays === "all" ||
-      (selectedPlays === "unplayed" && plays === 0) ||
-      (selectedPlays === "played" && plays >= 1) ||
-      (selectedPlays === "3" && plays >= 3) ||
-      (selectedPlays === "5" && plays >= 5);
-
-    return (
-      matchesSearch && matchesFormat && matchesGenre && matchesNfc && matchesPlays
-    );
+    return matchesSearch && matchesFormat && matchesGenre && matchesNfc;
   });
 
   // Sort the filtered records
   const sortedRecords = [...filteredRecords].sort((a, b) => {
-    const aValue = a[sortField];
-    const bValue = b[sortField];
     const modifier = sortOrder === "asc" ? 1 : -1;
 
+    if (sortField === "plays") {
+      const aPlays = playsByReleaseId.get(a.id) ?? 0;
+      const bPlays = playsByReleaseId.get(b.id) ?? 0;
+      return (aPlays - bPlays) * modifier;
+    }
+
+    const aValue = a[sortField];
+    const bValue = b[sortField];
     if (aValue === undefined) return 1;
     if (bValue === undefined) return -1;
-
     return aValue < bValue ? -1 * modifier : aValue > bValue ? 1 * modifier : 0;
   });
 
@@ -154,7 +133,10 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
         <SortControls
           sortField={sortField}
           sortOrder={sortOrder}
-          onSortFieldChange={(field) => setSortField(field as SortField)}
+          onSortFieldChange={(field) => {
+            setSortField(field as SortField);
+            setSortOrder(field === "plays" ? "desc" : "asc");
+          }}
           onSortOrderToggle={() =>
             setSortOrder(sortOrder === "asc" ? "desc" : "asc")
           }
@@ -194,18 +176,6 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
           <option value="all">All NFC</option>
           <option value="linked">NFC Linked</option>
           <option value="not-linked">Not Linked</option>
-        </select>
-
-        <select
-          className={styles.filterSelect}
-          value={selectedPlays}
-          onChange={(e) => handlePlaysChange(e.target.value)}
-        >
-          <option value="all">All plays</option>
-          <option value="unplayed">Unplayed</option>
-          <option value="played">Played</option>
-          <option value="3">3+ plays</option>
-          <option value="5">5+ plays</option>
         </select>
       </div>
 

@@ -31,5 +31,5 @@ export type WishlistRecord = Pick<
   "id" | "title" | "artist" | "coverImage" | "supabase_image_url" | "format_name" | "genres" | "styles" | "year" | "duration_seconds"
 >;
 
-export type SortField = "dateAdded" | "artist" | "title" | "year";
+export type SortField = "dateAdded" | "artist" | "title" | "year" | "plays";
 export type SortOrder = "asc" | "desc";
