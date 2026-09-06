@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { BookOpen, Nfc } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import { type Record } from "../../types/Record";
 import { slugify } from "../../utils/slugify";
 import styles from "./RecordCard.module.css";
@@ -8,10 +8,10 @@ import styles from "./RecordCard.module.css";
 interface RecordCardProps {
   record: Record;
   hasArticle?: boolean;
-  hasNfc?: boolean;
+  plays?: number;
 }
 
-export const RecordCard = ({ record, hasArticle, hasNfc }: RecordCardProps) => {
+export const RecordCard = ({ record, hasArticle, plays }: RecordCardProps) => {
   const [imageError, setImageError] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
 
@@ -34,9 +34,9 @@ export const RecordCard = ({ record, hasArticle, hasNfc }: RecordCardProps) => {
               <BookOpen size={14} />
             </span>
           )}
-          {hasNfc && (
-            <span className={styles.nfcBadge}>
-              <Nfc size={14} />
+          {plays != null && plays > 0 && (
+            <span className={styles.playsBadge} title={`${plays} ${plays === 1 ? "play" : "plays"}`}>
+              {plays}
             </span>
           )}
           {record.supabase_image_url && !imageError ? (

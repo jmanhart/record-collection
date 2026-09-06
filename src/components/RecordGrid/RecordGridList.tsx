@@ -1,7 +1,7 @@
-import React from "react";
+import { useMemo } from "react";
 import { RecordCard } from "../RecordCard/RecordCard";
 import { hasArticle } from "../../content/articles/articleIds";
-import { useNfcTags } from "../../hooks/useNfcTags";
+import { useListens } from "../../hooks/useListens";
 import type { Record } from "../../types/Record";
 
 interface RecordGridListProps {
@@ -9,7 +9,15 @@ interface RecordGridListProps {
 }
 
 export function RecordGridList({ records }: RecordGridListProps) {
-  const { hasNfcTag } = useNfcTags();
+  const { listens } = useListens();
+
+  const playsByReleaseId = useMemo(() => {
+    const counts = new Map<number, number>();
+    for (const listen of listens) {
+      counts.set(listen.release_id, (counts.get(listen.release_id) ?? 0) + 1);
+    }
+    return counts;
+  }, [listens]);
 
   return (
     <>
@@ -18,7 +26,7 @@ export function RecordGridList({ records }: RecordGridListProps) {
           key={record.id}
           record={record}
           hasArticle={hasArticle(record.id)}
-          hasNfc={hasNfcTag(record.id)}
+          plays={playsByReleaseId.get(record.id) ?? 0}
         />
       ))}
     </>

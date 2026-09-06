@@ -31,6 +31,7 @@
   --red100: #c60202;
   --red200: #ff8484;
   --red300: #ffb3b3;
+  --blue200: #3b82f6;
 
   /* Legacy variable mappings for compatibility */
   --bg-color: var(--surface200);
@@ -73,6 +74,7 @@
   --red100: #c60202;
   --red200: #ff8484;
   --red300: #ffb3b3;
+  --blue200: #3b82f6;
 }
 
 /* ===========================================
