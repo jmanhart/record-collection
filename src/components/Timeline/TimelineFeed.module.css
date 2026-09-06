@@ -1,0 +1,150 @@
+.feed {
+  max-width: 720px;
+  padding: 0.5rem 0 3rem;
+}
+
+.status {
+  color: var(--text-secondary);
+  padding: 2rem 0;
+}
+
+/* Spine column carries the continuous vertical line; the card sits beside it.
+   Row padding-bottom is the gap between entries, and the line spans it so
+   consecutive nodes stay connected. */
+.row {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr;
+  padding-bottom: 1.75rem;
+}
+
+.spine {
+  position: relative;
+}
+
+.spine::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--divider);
+  transform: translateX(-50%);
+}
+
+/* Filled dot, centered on the album art, ringed in the page background so it
+   reads as sitting on top of the line. */
+.node {
+  position: absolute;
+  left: 50%;
+  top: 54px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  border: 3px solid var(--surface000);
+  transform: translateX(-50%);
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.thumb {
+  position: relative;
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--surface100);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.playsBadge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--blue200);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.when {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+}
+
+.title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text-primary);
+}
+
+.artist {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+}
+
+.card:hover .title {
+  color: var(--link-hover);
+}
+
+@media (max-width: 600px) {
+  .row {
+    grid-template-columns: 1.75rem 1fr;
+    padding-bottom: 1.25rem;
+  }
+
+  .thumb {
+    width: 84px;
+    height: 84px;
+  }
+
+  .node {
+    top: 36px;
+  }
+
+  .title {
+    font-size: 1.0625rem;
+  }
+}
