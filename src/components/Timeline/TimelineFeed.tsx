@@ -126,6 +126,9 @@ function TimelineRow({
               <span>{record.title[0]}</span>
             </div>
           )}
+          {ordinal === 1 && (
+            <span className={styles.firstPlayBadge}>1st Play</span>
+          )}
         </div>
         <div className={styles.meta}>
           {playing ? (
