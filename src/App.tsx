@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from "react";
-import { BrowserRouter as Router, Routes, Route, useSearchParams, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useSearchParams } from "react-router-dom";
 import * as Sentry from "@sentry/react";
 import { RecordGrid } from "./components/RecordGrid/RecordGrid";
 import { RecordDetail } from "./components/RecordDetail/RecordDetail";
@@ -16,7 +16,7 @@ import { AlphabetIndicator } from "./components/AlphabetIndicator/AlphabetIndica
 import { AppBar } from "./components/AppBar/AppBar";
 import { SortControls } from "./components/RecordGrid/SortControls";
 import { GenreSelect } from "./components/RecordGrid/GenreSelect";
-import { Tabs, type TabValue } from "./components/Tabs/Tabs";
+import type { TabValue } from "./components/Tabs/Tabs";
 import { WishlistList } from "./components/WishlistList/WishlistList";
 import { useRecords } from "./hooks/useRecords";
 import { useWishlist } from "./hooks/useWishlist";
@@ -29,7 +29,6 @@ const TimelinePage = lazy(() => import("./components/Timeline/TimelinePage"));
 
 function RecordList() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
   const activeTab = (searchParams.get("tab") as TabValue) || "collection";
   const artistSlug = searchParams.get("artist");
   const [search, setSearch] = useState("");
@@ -39,19 +38,6 @@ function RecordList() {
 
   const { records, isLoading: isLoadingRecords, error: recordsError } = useRecords();
   const { records: wishlistRecords, isLoading: isLoadingWishlist, error: wishlistError } = useWishlist();
-
-  const handleTabChange = (tab: TabValue) => {
-    // Timeline is its own page now; the rest stay as tabs on this route
-    if (tab === "timeline") {
-      navigate("/timeline");
-      return;
-    }
-    const params = new URLSearchParams();
-    if (tab !== "collection") {
-      params.set("tab", tab);
-    }
-    setSearchParams(params);
-  };
 
   const handleArtistSelect = (slug: string) => {
     const params = new URLSearchParams(searchParams);
@@ -100,7 +86,6 @@ function RecordList() {
       />
       {isCollection && <AlphabetIndicator records={records || []} />}
       <div className="container">
-        <Tabs activeTab={activeTab} onTabChange={handleTabChange} />
         <main className="main">
           {activeTab === "collection" ? (
             <RecordGrid
