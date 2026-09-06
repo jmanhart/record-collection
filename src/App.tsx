@@ -14,10 +14,13 @@ import { ArtistProgressDetail } from "./components/ArtistProgress/ArtistProgress
 import { ThemeToggle } from "./components/ThemeToggle/ThemeToggle";
 import { AlphabetIndicator } from "./components/AlphabetIndicator/AlphabetIndicator";
 import { AppBar } from "./components/AppBar/AppBar";
+import { SortControls } from "./components/RecordGrid/SortControls";
+import { GenreSelect } from "./components/RecordGrid/GenreSelect";
 import { Tabs, type TabValue } from "./components/Tabs/Tabs";
 import { WishlistList } from "./components/WishlistList/WishlistList";
 import { useRecords } from "./hooks/useRecords";
 import { useWishlist } from "./hooks/useWishlist";
+import type { SortField, SortOrder } from "./types/Record";
 import "./App.css";
 
 // Lazy so the collection bundle doesn't pay for the charting library
@@ -30,6 +33,9 @@ function RecordList() {
   const activeTab = (searchParams.get("tab") as TabValue) || "collection";
   const artistSlug = searchParams.get("artist");
   const [search, setSearch] = useState("");
+  const [sortField, setSortField] = useState<SortField>("artist");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+  const [genre, setGenre] = useState("all");
 
   const { records, isLoading: isLoadingRecords, error: recordsError } = useRecords();
   const { records: wishlistRecords, isLoading: isLoadingWishlist, error: wishlistError } = useWishlist();
@@ -68,13 +74,43 @@ function RecordList() {
 
   return (
     <div className="app">
-      <AppBar search={search} onSearchChange={setSearch} />
+      <AppBar
+        search={search}
+        onSearchChange={setSearch}
+        left={
+          isCollection ? (
+            <SortControls
+              sortField={sortField}
+              sortOrder={sortOrder}
+              onSortFieldChange={(field) => {
+                setSortField(field as SortField);
+                setSortOrder(field === "plays" ? "desc" : "asc");
+              }}
+              onSortOrderToggle={() =>
+                setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+              }
+            />
+          ) : undefined
+        }
+        right={
+          isCollection ? (
+            <GenreSelect records={records || []} value={genre} onChange={setGenre} />
+          ) : undefined
+        }
+      />
       {isCollection && <AlphabetIndicator records={records || []} />}
       <div className="container">
         <Tabs activeTab={activeTab} onTabChange={handleTabChange} />
         <main className="main">
           {activeTab === "collection" ? (
-            <RecordGrid records={records || []} isLoading={isLoadingRecords} search={search} />
+            <RecordGrid
+              records={records || []}
+              isLoading={isLoadingRecords}
+              search={search}
+              sortField={sortField}
+              sortOrder={sortOrder}
+              genre={genre}
+            />
           ) : activeTab === "wishlist" ? (
             <WishlistList records={wishlistRecords || []} isLoading={isLoadingWishlist} search={search} />
           ) : artistSlug ? (

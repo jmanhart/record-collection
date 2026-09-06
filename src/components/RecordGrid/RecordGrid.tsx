@@ -1,23 +1,26 @@
-import { useState, useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import type { Record, SortField, SortOrder } from "../../types/Record";
-import { SortControls } from "./SortControls";
 import { RecordGridList } from "./RecordGridList";
 import { useListens } from "../../hooks/useListens";
-import filterConfig from "../../data/filter-config.json";
 import styles from "./RecordGrid.module.css";
 
 interface RecordGridProps {
   records: Record[];
   isLoading: boolean;
   search: string;
+  sortField: SortField;
+  sortOrder: SortOrder;
+  genre: string;
 }
 
-export function RecordGrid({ records, isLoading, search }: RecordGridProps) {
-  const [sortField, setSortField] = useState<SortField>("artist");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
-  const [selectedFormat, setSelectedFormat] = useState<string>("all");
-  const [selectedGenre, setSelectedGenre] = useState<string>("all");
-
+export function RecordGrid({
+  records,
+  isLoading,
+  search,
+  sortField,
+  sortOrder,
+  genre,
+}: RecordGridProps) {
   const { listens } = useListens();
   const playsByReleaseId = useMemo(() => {
     const counts = new Map<number, number>();
@@ -27,63 +30,22 @@ export function RecordGrid({ records, isLoading, search }: RecordGridProps) {
     return counts;
   }, [listens]);
 
-  // Sync state with URL on mount
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const format = params.get("format") || "all";
-    const genre = params.get("genre") || "all";
-    setSelectedFormat(format);
-    setSelectedGenre(genre);
-  }, []);
-
-  const updateURL = (format: string, genre: string) => {
-    const params = new URLSearchParams(window.location.search);
-    if (format && format !== "all") params.set("format", format);
-    else params.delete("format");
-    if (genre && genre !== "all") params.set("genre", genre);
-    else params.delete("genre");
-    window.history.replaceState(null, "", "?" + params.toString());
-  };
-
-  const handleGenreChange = (value: string) => {
-    setSelectedGenre(value);
-    updateURL(selectedFormat, value);
-  };
-
   if (isLoading) {
     return <div className={styles.loading}>Loading records...</div>;
   }
 
-  // Get unique genres with counts
-  const genres = Array.from(
-    new Set(records.flatMap((r) => r.genres || []))
-  ).sort();
-
-  const genreCounts: Record<string, number> = {};
-
-  records.forEach((record) => {
-    (record.genres || []).forEach((genre) => {
-      genreCounts[genre] = (genreCounts[genre] || 0) + 1;
-    });
-  });
-
-  // Filter records
   const filteredRecords = records.filter((record) => {
     const matchesSearch =
       !search ||
       record.title.toLowerCase().includes(search.toLowerCase()) ||
       record.artist.toLowerCase().includes(search.toLowerCase());
 
-    const matchesFormat =
-      selectedFormat === "all" || record.format_name === selectedFormat;
-
     const matchesGenre =
-      selectedGenre === "all" || (record.genres || []).includes(selectedGenre);
+      genre === "all" || (record.genres || []).includes(genre);
 
-    return matchesSearch && matchesFormat && matchesGenre;
+    return matchesSearch && matchesGenre;
   });
 
-  // Sort the filtered records
   const sortedRecords = [...filteredRecords].sort((a, b) => {
     const modifier = sortOrder === "asc" ? 1 : -1;
 
@@ -101,44 +63,8 @@ export function RecordGrid({ records, isLoading, search }: RecordGridProps) {
   });
 
   return (
-    <>
-      <div className={styles.controls}>
-        <SortControls
-          sortField={sortField}
-          sortOrder={sortOrder}
-          onSortFieldChange={(field) => {
-            setSortField(field as SortField);
-            setSortOrder(field === "plays" ? "desc" : "asc");
-          }}
-          onSortOrderToggle={() =>
-            setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-          }
-        />
-
-        <select
-          className={styles.filterSelect}
-          value={selectedGenre}
-          onChange={(e) => handleGenreChange(e.target.value)}
-        >
-          <option value="all">All Genres</option>
-          {genres
-            .filter(
-              (g) =>
-                !filterConfig.excludeGenres.includes(g) &&
-                (genreCounts[g] || 0) >= filterConfig.minCount
-            )
-            .sort((a, b) => (genreCounts[b] || 0) - (genreCounts[a] || 0))
-            .map((genre) => (
-              <option key={genre} value={genre}>
-                {genre} ({genreCounts[genre]})
-              </option>
-            ))}
-        </select>
-      </div>
-
-      <div className={styles.grid}>
-        <RecordGridList records={sortedRecords} playsByReleaseId={playsByReleaseId} />
-      </div>
-    </>
+    <div className={styles.grid}>
+      <RecordGridList records={sortedRecords} playsByReleaseId={playsByReleaseId} />
+    </div>
   );
 }
