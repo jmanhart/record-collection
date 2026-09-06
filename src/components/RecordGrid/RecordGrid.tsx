@@ -3,7 +3,6 @@ import { Search } from "../Search/Search";
 import type { Record, SortField, SortOrder } from "../../types/Record";
 import { SortControls } from "./SortControls";
 import { RecordGridList } from "./RecordGridList";
-import { useNfcTags } from "../../hooks/useNfcTags";
 import { useListens } from "../../hooks/useListens";
 import filterConfig from "../../data/filter-config.json";
 import styles from "./RecordGrid.module.css";
@@ -19,8 +18,6 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFormat, setSelectedFormat] = useState<string>("all");
   const [selectedGenre, setSelectedGenre] = useState<string>("all");
-  const [selectedNfc, setSelectedNfc] = useState<string>("all");
-  const { hasNfcTag } = useNfcTags();
 
   const { listens } = useListens();
   const playsByReleaseId = useMemo(() => {
@@ -37,14 +34,12 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
     const query = params.get("search") || "";
     const format = params.get("format") || "all";
     const genre = params.get("genre") || "all";
-    const nfc = params.get("nfc") || "all";
     setSearchQuery(query);
     setSelectedFormat(format);
     setSelectedGenre(genre);
-    setSelectedNfc(nfc);
   }, []);
 
-  const updateURL = (search: string, format: string, genre: string, nfc: string) => {
+  const updateURL = (search: string, format: string, genre: string) => {
     const params = new URLSearchParams(window.location.search);
     if (search) params.set("search", search);
     else params.delete("search");
@@ -52,24 +47,17 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
     else params.delete("format");
     if (genre && genre !== "all") params.set("genre", genre);
     else params.delete("genre");
-    if (nfc && nfc !== "all") params.set("nfc", nfc);
-    else params.delete("nfc");
     window.history.replaceState(null, "", "?" + params.toString());
   };
 
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
-    updateURL(value, selectedFormat, selectedGenre, selectedNfc);
+    updateURL(value, selectedFormat, selectedGenre);
   };
 
   const handleGenreChange = (value: string) => {
     setSelectedGenre(value);
-    updateURL(searchQuery, selectedFormat, value, selectedNfc);
-  };
-
-  const handleNfcChange = (value: string) => {
-    setSelectedNfc(value);
-    updateURL(searchQuery, selectedFormat, selectedGenre, value);
+    updateURL(searchQuery, selectedFormat, value);
   };
 
   if (isLoading) {
@@ -102,12 +90,7 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
     const matchesGenre =
       selectedGenre === "all" || (record.genres || []).includes(selectedGenre);
 
-    const matchesNfc =
-      selectedNfc === "all" ||
-      (selectedNfc === "linked" && hasNfcTag(record.release_id)) ||
-      (selectedNfc === "not-linked" && !hasNfcTag(record.release_id));
-
-    return matchesSearch && matchesFormat && matchesGenre && matchesNfc;
+    return matchesSearch && matchesFormat && matchesGenre;
   });
 
   // Sort the filtered records
@@ -166,16 +149,6 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
                 {genre} ({genreCounts[genre]})
               </option>
             ))}
-        </select>
-
-        <select
-          className={styles.filterSelect}
-          value={selectedNfc}
-          onChange={(e) => handleNfcChange(e.target.value)}
-        >
-          <option value="all">All NFC</option>
-          <option value="linked">NFC Linked</option>
-          <option value="not-linked">Not Linked</option>
         </select>
       </div>
 

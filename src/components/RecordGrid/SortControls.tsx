@@ -8,8 +8,7 @@ interface SortControlsProps {
 }
 
 const SORT_PILLS: { field: string; label: string }[] = [
-  { field: "artist", label: "Artist" },
-  { field: "plays", label: "Top plays" },
+  { field: "plays", label: "Top Spins" },
 ];
 
 export function SortControls({
