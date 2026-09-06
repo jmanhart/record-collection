@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useActivity, toDateKey } from "../../hooks/useActivity";
 import { useListens } from "../../hooks/useListens";
 import type { ActivityEvent } from "../../hooks/useActivity";
@@ -73,6 +73,16 @@ function timeRange(event: ActivityEvent): string {
   return end ? `${start} – ${end}` : start;
 }
 
+// "Currently spinning": the freshest listen that hasn't been stopped and
+// whose full-album runtime still reaches past now.
+function playingNow(event: ActivityEvent, nowMs: number): boolean {
+  if (event.type !== "listen" || event.endedAt) return false;
+  const duration = event.record?.duration_seconds;
+  if (!duration) return false;
+  const startMs = new Date(event.timestamp).getTime();
+  return startMs <= nowMs && startMs + duration * 1000 > nowMs;
+}
+
 function TimelineRow({
   event,
   plays,
@@ -126,7 +136,14 @@ function TimelineRow({
           )}
         </div>
         <div className={styles.meta}>
-          <span className={styles.when}>{timeRange(event)}</span>
+          {playing ? (
+            <span className={styles.when}>
+              <span className={styles.liveTag}>Now Playing</span>
+              <span className={styles.since}>since {timeOf(event.timestamp)}</span>
+            </span>
+          ) : (
+            <span className={styles.when}>{timeRange(event)}</span>
+          )}
           <h3 className={styles.title}>{record.title}</h3>
           <p className={styles.artist}>{record.artist}</p>
         </div>
@@ -140,6 +157,11 @@ export function TimelineFeed({ search }: TimelineFeedProps) {
   const { listens } = useListens();
   const todayKey = toDateKey(new Date().toISOString());
   const [selected, setSelected] = useState<ActivityEvent | null>(null);
+  const [nowMs, setNowMs] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNowMs(Date.now()), 30000);
+    return () => clearInterval(id);
+  }, []);
 
   const playsByReleaseId = useMemo(() => {
     const counts = new Map<number, number>();
@@ -160,6 +182,10 @@ export function TimelineFeed({ search }: TimelineFeedProps) {
       );
     });
   }, [events, search]);
+
+  // Only the newest spin can still be on the platter.
+  const playingId =
+    filtered.length > 0 && playingNow(filtered[0], nowMs) ? filtered[0].id : null;
 
   // Group by day, preserving the newest-first order of `filtered`.
   const days = useMemo(() => {
@@ -226,7 +252,7 @@ export function TimelineFeed({ search }: TimelineFeedProps) {
                   key={event.id}
                   event={event}
                   plays={playsByReleaseId.get(event.releaseId) ?? 0}
-                  playing={false}
+                  playing={event.id === playingId}
                   selected={selected?.id === event.id}
                   onSelect={setSelected}
                 />
