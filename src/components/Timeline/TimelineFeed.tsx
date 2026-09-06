@@ -85,13 +85,13 @@ function playingNow(event: ActivityEvent, nowMs: number): boolean {
 
 function TimelineRow({
   event,
-  plays,
+  ordinal,
   playing,
   selected,
   onSelect,
 }: {
   event: ActivityEvent;
-  plays: number;
+  ordinal: number;
   playing: boolean;
   selected: boolean;
   onSelect: (event: ActivityEvent) => void;
@@ -126,14 +126,6 @@ function TimelineRow({
               <span>{record.title[0]}</span>
             </div>
           )}
-          {plays > 0 && (
-            <span
-              className={styles.playsBadge}
-              title={`${plays} ${plays === 1 ? "play" : "plays"}`}
-            >
-              {plays}
-            </span>
-          )}
         </div>
         <div className={styles.meta}>
           {playing ? (
@@ -146,6 +138,9 @@ function TimelineRow({
           )}
           <h3 className={styles.title}>{record.title}</h3>
           <p className={styles.artist}>{record.artist}</p>
+          <span className={styles.playCount}>
+            {ordinal === 1 ? "First time played" : `Played ${ordinal} times`}
+          </span>
         </div>
       </button>
     </div>
@@ -170,6 +165,26 @@ export function TimelineFeed({ search }: TimelineFeedProps) {
     }
     return counts;
   }, [listens]);
+
+  // How many times each record had been played through a given spin
+  // (chronological), so the first-ever listen reads "First time played".
+  const playOrdinalByEventId = useMemo(() => {
+    const byRelease = new Map<number, ActivityEvent[]>();
+    for (const e of events) {
+      if (e.type !== "listen") continue;
+      const arr = byRelease.get(e.releaseId);
+      if (arr) arr.push(e);
+      else byRelease.set(e.releaseId, [e]);
+    }
+    const ordinals = new Map<string, number>();
+    for (const list of byRelease.values()) {
+      list
+        .slice()
+        .sort((a, b) => a.timestamp.localeCompare(b.timestamp))
+        .forEach((e, i) => ordinals.set(e.id, i + 1));
+    }
+    return ordinals;
+  }, [events]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -251,7 +266,7 @@ export function TimelineFeed({ search }: TimelineFeedProps) {
                 <TimelineRow
                   key={event.id}
                   event={event}
-                  plays={playsByReleaseId.get(event.releaseId) ?? 0}
+                  ordinal={playOrdinalByEventId.get(event.id) ?? 1}
                   playing={event.id === playingId}
                   selected={selected?.id === event.id}
                   onSelect={setSelected}
