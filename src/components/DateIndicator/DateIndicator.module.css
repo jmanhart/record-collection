@@ -1,0 +1,98 @@
+/* Mirrors AlphabetIndicator: fixed left rail, hash marks that reveal a label
+   on the active/hovered month. Kept as its own component because the marker
+   set is data-driven (months present) rather than a fixed A–Z. */
+.container {
+  position: fixed;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  user-select: none;
+}
+
+.months {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: flex-start;
+}
+
+.monthItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 1rem;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.hash {
+  font-size: 0.75rem;
+  color: var(--divider);
+  font-weight: 300;
+  width: 0.5rem;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.monthItem.active .hash {
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 1rem;
+  width: 1rem;
+}
+
+.monthItem:hover .hash {
+  color: var(--text-primary);
+}
+
+.monthItem.scrubbing {
+  cursor: grabbing;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 1024px) {
+  .container {
+    display: none;
+  }
+}
+
+@media (max-width: 1400px) {
+  .container {
+    left: 0.5rem;
+  }
+
+  .months {
+    gap: 0.2rem;
+  }
+
+  .monthItem {
+    height: 0.875rem;
+  }
+
+  .hash {
+    font-size: 0.625rem;
+  }
+
+  .label {
+    font-size: 0.75rem;
+  }
+}

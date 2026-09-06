@@ -1,0 +1,238 @@
+/* One continuous spine line for the whole feed; day markers and record dots
+   are absolutely positioned onto it so the line never breaks between rows. */
+.feed {
+  position: relative;
+  max-width: 860px;
+  padding: 0.5rem 0 3rem;
+}
+
+.feed::before {
+  content: "";
+  position: absolute;
+  left: 1.25rem;
+  top: 0.5rem;
+  bottom: 1.5rem;
+  width: 2px;
+  background: var(--divider);
+}
+
+.status {
+  color: var(--text-secondary);
+  padding: 2rem 0;
+}
+
+/* Day grouping — the date lives here once, so rows below only show time. */
+.dayHeader {
+  position: relative;
+  padding-left: 2.75rem;
+  margin: 2.5rem 0 1.5rem;
+}
+
+.dayGroup:first-child .dayHeader {
+  margin-top: 0;
+}
+
+.dayMarker {
+  position: absolute;
+  left: 1.25rem;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--surface000);
+  border: 3px solid var(--text-secondary);
+  box-sizing: border-box;
+}
+
+/* The date anchors each day; stats ride alongside it on the same baseline. */
+.dayHeading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.dayLabel {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.dayStats {
+  font-size: 0.95rem;
+  color: var(--text-tertiary);
+}
+
+.row {
+  position: relative;
+  padding-left: 2.75rem;
+  margin-bottom: 2.5rem;
+}
+
+/* Sits on the spine, level with the top corner of the album art. */
+.node {
+  position: absolute;
+  left: 1.25rem;
+  top: 0.3rem;
+  transform: translateX(-50%);
+}
+
+/* Now a <button>; reset the global button chrome and let it size to its
+   content instead of the default 2rem height. */
+.card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.75rem;
+  width: 100%;
+  height: auto;
+  padding: 0.5rem;
+  margin: -0.5rem;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.card:hover {
+  background: var(--surface100);
+}
+
+.cardActive,
+.cardActive:hover {
+  background: var(--surface200);
+}
+
+.thumb {
+  position: relative;
+  flex-shrink: 0;
+  width: 180px;
+  height: 180px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface100);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* Small sticker on the art marking a record's first-ever spin. Hardcoded
+   white-on-black so it reads on any cover in either theme. */
+.firstPlayBadge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  background: #fff;
+  color: #000;
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-top: 0.35rem;
+  min-width: 0;
+}
+
+.when {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.95rem;
+  color: var(--text-tertiary);
+}
+
+.liveTag {
+  color: var(--red200);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.since {
+  color: var(--text-tertiary);
+}
+
+.title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text-primary);
+}
+
+.artist {
+  margin: 0;
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+}
+
+.playCount {
+  margin-top: 0.35rem;
+  font-size: 0.9rem;
+  color: var(--text-tertiary);
+}
+
+.card:hover .title {
+  color: var(--link-hover);
+}
+
+@media (max-width: 600px) {
+  .feed::before {
+    left: 1rem;
+  }
+
+  .dayHeader,
+  .row {
+    padding-left: 2.25rem;
+  }
+
+  .dayMarker,
+  .node {
+    left: 1rem;
+  }
+
+  .card {
+    gap: 1rem;
+  }
+
+  .thumb {
+    width: 120px;
+    height: 120px;
+  }
+
+  .title {
+    font-size: 1.375rem;
+  }
+
+  .artist {
+    font-size: 1rem;
+  }
+}

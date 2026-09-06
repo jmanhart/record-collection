@@ -16,6 +16,8 @@ import { AlphabetIndicator } from "./components/AlphabetIndicator/AlphabetIndica
 import { AppBar } from "./components/AppBar/AppBar";
 import { SortControls } from "./components/RecordGrid/SortControls";
 import { GenreSelect } from "./components/RecordGrid/GenreSelect";
+import { TimelineFeed } from "./components/Timeline/TimelineFeed";
+import { ViewToggle } from "./components/Timeline/ViewToggle";
 import type { TabValue } from "./components/Tabs/Tabs";
 import { WishlistList } from "./components/WishlistList/WishlistList";
 import { useRecords } from "./hooks/useRecords";
@@ -35,6 +37,13 @@ function RecordList() {
   const [sortField, setSortField] = useState<SortField>("artist");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [genre, setGenre] = useState("all");
+  const view = searchParams.get("view") === "timeline" ? "timeline" : "grid";
+  const setView = (next: "grid" | "timeline") => {
+    const params = new URLSearchParams(searchParams);
+    if (next === "timeline") params.set("view", "timeline");
+    else params.delete("view");
+    setSearchParams(params, { replace: true });
+  };
 
   const { records, isLoading: isLoadingRecords, error: recordsError } = useRecords();
   const { records: wishlistRecords, isLoading: isLoadingWishlist, error: wishlistError } = useWishlist();
@@ -65,37 +74,55 @@ function RecordList() {
         onSearchChange={setSearch}
         left={
           isCollection ? (
-            <SortControls
-              sortField={sortField}
-              sortOrder={sortOrder}
-              onSortFieldChange={(field) => {
-                setSortField(field as SortField);
-                setSortOrder(field === "plays" ? "desc" : "asc");
-              }}
-              onSortOrderToggle={() =>
-                setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-              }
-            />
+            <>
+              <ViewToggle
+                label="Collection"
+                active={view === "grid"}
+                onClick={() => setView("grid")}
+              />
+              <ViewToggle
+                label="Timeline"
+                active={view === "timeline"}
+                onClick={() => setView("timeline")}
+              />
+              {view === "grid" && (
+                <SortControls
+                  sortField={sortField}
+                  sortOrder={sortOrder}
+                  onSortFieldChange={(field) => {
+                    setSortField(field as SortField);
+                    setSortOrder(field === "plays" ? "desc" : "asc");
+                  }}
+                  onSortOrderToggle={() =>
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                  }
+                />
+              )}
+            </>
           ) : undefined
         }
         right={
-          isCollection ? (
+          isCollection && view === "grid" ? (
             <GenreSelect records={records || []} value={genre} onChange={setGenre} />
           ) : undefined
         }
       />
-      {isCollection && <AlphabetIndicator records={records || []} />}
+      {isCollection && view === "grid" && <AlphabetIndicator records={records || []} />}
       <div className="container">
         <main className="main">
           {activeTab === "collection" ? (
-            <RecordGrid
-              records={records || []}
-              isLoading={isLoadingRecords}
-              search={search}
-              sortField={sortField}
-              sortOrder={sortOrder}
-              genre={genre}
-            />
+            view === "timeline" ? (
+              <TimelineFeed search={search} />
+            ) : (
+              <RecordGrid
+                records={records || []}
+                isLoading={isLoadingRecords}
+                search={search}
+                sortField={sortField}
+                sortOrder={sortOrder}
+                genre={genre}
+              />
+            )
           ) : activeTab === "wishlist" ? (
             <WishlistList records={wishlistRecords || []} isLoading={isLoadingWishlist} search={search} />
           ) : artistSlug ? (
@@ -127,7 +154,7 @@ export default function App() {
               }
             />
             <Route
-              path="/timeline"
+              path="/timeline-2"
               element={
                 <Suspense fallback={null}>
                   <TimelinePage />
