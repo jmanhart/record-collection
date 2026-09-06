@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Search } from "../Search/Search";
 import type { Record, SortField, SortOrder } from "../../types/Record";
 import { SortControls } from "./SortControls";
 import { RecordGridList } from "./RecordGridList";
 import { useNfcTags } from "../../hooks/useNfcTags";
+import { useListens } from "../../hooks/useListens";
 import filterConfig from "../../data/filter-config.json";
 import styles from "./RecordGrid.module.css";
 
@@ -19,7 +20,17 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
   const [selectedFormat, setSelectedFormat] = useState<string>("all");
   const [selectedGenre, setSelectedGenre] = useState<string>("all");
   const [selectedNfc, setSelectedNfc] = useState<string>("all");
+  const [selectedPlays, setSelectedPlays] = useState<string>("all");
   const { hasNfcTag } = useNfcTags();
+
+  const { listens } = useListens();
+  const playsByReleaseId = useMemo(() => {
+    const counts = new Map<number, number>();
+    for (const listen of listens) {
+      counts.set(listen.release_id, (counts.get(listen.release_id) ?? 0) + 1);
+    }
+    return counts;
+  }, [listens]);
 
   // Sync state with URL on mount
   useEffect(() => {
@@ -28,13 +39,21 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
     const format = params.get("format") || "all";
     const genre = params.get("genre") || "all";
     const nfc = params.get("nfc") || "all";
+    const plays = params.get("plays") || "all";
     setSearchQuery(query);
     setSelectedFormat(format);
     setSelectedGenre(genre);
     setSelectedNfc(nfc);
+    setSelectedPlays(plays);
   }, []);
 
-  const updateURL = (search: string, format: string, genre: string, nfc: string) => {
+  const updateURL = (
+    search: string,
+    format: string,
+    genre: string,
+    nfc: string,
+    plays: string
+  ) => {
     const params = new URLSearchParams(window.location.search);
     if (search) params.set("search", search);
     else params.delete("search");
@@ -44,22 +63,29 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
     else params.delete("genre");
     if (nfc && nfc !== "all") params.set("nfc", nfc);
     else params.delete("nfc");
+    if (plays && plays !== "all") params.set("plays", plays);
+    else params.delete("plays");
     window.history.replaceState(null, "", "?" + params.toString());
   };
 
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
-    updateURL(value, selectedFormat, selectedGenre, selectedNfc);
+    updateURL(value, selectedFormat, selectedGenre, selectedNfc, selectedPlays);
   };
 
   const handleGenreChange = (value: string) => {
     setSelectedGenre(value);
-    updateURL(searchQuery, selectedFormat, value, selectedNfc);
+    updateURL(searchQuery, selectedFormat, value, selectedNfc, selectedPlays);
   };
 
   const handleNfcChange = (value: string) => {
     setSelectedNfc(value);
-    updateURL(searchQuery, selectedFormat, selectedGenre, value);
+    updateURL(searchQuery, selectedFormat, selectedGenre, value, selectedPlays);
+  };
+
+  const handlePlaysChange = (value: string) => {
+    setSelectedPlays(value);
+    updateURL(searchQuery, selectedFormat, selectedGenre, selectedNfc, value);
   };
 
   if (isLoading) {
@@ -97,7 +123,17 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
       (selectedNfc === "linked" && hasNfcTag(record.release_id)) ||
       (selectedNfc === "not-linked" && !hasNfcTag(record.release_id));
 
-    return matchesSearch && matchesFormat && matchesGenre && matchesNfc;
+    const plays = playsByReleaseId.get(record.id) ?? 0;
+    const matchesPlays =
+      selectedPlays === "all" ||
+      (selectedPlays === "unplayed" && plays === 0) ||
+      (selectedPlays === "played" && plays >= 1) ||
+      (selectedPlays === "3" && plays >= 3) ||
+      (selectedPlays === "5" && plays >= 5);
+
+    return (
+      matchesSearch && matchesFormat && matchesGenre && matchesNfc && matchesPlays
+    );
   });
 
   // Sort the filtered records
@@ -159,10 +195,22 @@ export function RecordGrid({ records, isLoading }: RecordGridProps) {
           <option value="linked">NFC Linked</option>
           <option value="not-linked">Not Linked</option>
         </select>
+
+        <select
+          className={styles.filterSelect}
+          value={selectedPlays}
+          onChange={(e) => handlePlaysChange(e.target.value)}
+        >
+          <option value="all">All plays</option>
+          <option value="unplayed">Unplayed</option>
+          <option value="played">Played</option>
+          <option value="3">3+ plays</option>
+          <option value="5">5+ plays</option>
+        </select>
       </div>
 
       <div className={styles.grid}>
-        <RecordGridList records={sortedRecords} />
+        <RecordGridList records={sortedRecords} playsByReleaseId={playsByReleaseId} />
       </div>
     </>
   );
