@@ -17,7 +17,6 @@ import { Tabs, type TabValue } from "./components/Tabs/Tabs";
 import { WishlistList } from "./components/WishlistList/WishlistList";
 import { useRecords } from "./hooks/useRecords";
 import { useWishlist } from "./hooks/useWishlist";
-import { formatRuntime } from "./utils/formatDuration";
 import "./App.css";
 
 // Lazy so the collection bundle doesn't pay for the charting library
@@ -65,26 +64,10 @@ function RecordList() {
 
   const isCollection = activeTab === "collection";
 
-  const totalDuration = isCollection
-    ? (records?.reduce((sum, r) => sum + (r.duration_seconds || 0), 0) || 0)
-    : 0;
-  const runtime = formatRuntime(totalDuration);
-  const runtimeSuffix = runtime ? `${runtime} of music` : "";
-
-  const subtitle = isCollection
-    ? `${records?.length || 0} records in collection${runtimeSuffix ? ` · ${runtimeSuffix}` : ""}`
-    : activeTab === "wishlist"
-    ? `${wishlistRecords?.length || 0} records on wishlist`
-    : "Tracking progress on artist discographies";
-
   return (
     <div className="app">
       {isCollection && <AlphabetIndicator records={records || []} />}
       <div className="container">
-        <header className="page-header">
-          <h2>My Record Collection</h2>
-          <h3 className="record-count">{subtitle}</h3>
-        </header>
         <Tabs activeTab={activeTab} onTabChange={handleTabChange} />
         <main className="main">
           {activeTab === "collection" ? (
