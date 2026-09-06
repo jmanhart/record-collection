@@ -17,7 +17,7 @@ import { AppBar } from "./components/AppBar/AppBar";
 import { SortControls } from "./components/RecordGrid/SortControls";
 import { GenreSelect } from "./components/RecordGrid/GenreSelect";
 import { TimelineFeed } from "./components/Timeline/TimelineFeed";
-import { TimelineToggle } from "./components/Timeline/TimelineToggle";
+import { ViewToggle } from "./components/Timeline/ViewToggle";
 import type { TabValue } from "./components/Tabs/Tabs";
 import { WishlistList } from "./components/WishlistList/WishlistList";
 import { useRecords } from "./hooks/useRecords";
@@ -74,10 +74,18 @@ function RecordList() {
         onSearchChange={setSearch}
         left={
           isCollection ? (
-            view === "timeline" ? (
-              <TimelineToggle active onClick={() => setView("grid")} />
-            ) : (
-              <>
+            <>
+              <ViewToggle
+                label="Collection"
+                active={view === "grid"}
+                onClick={() => setView("grid")}
+              />
+              <ViewToggle
+                label="Timeline"
+                active={view === "timeline"}
+                onClick={() => setView("timeline")}
+              />
+              {view === "grid" && (
                 <SortControls
                   sortField={sortField}
                   sortOrder={sortOrder}
@@ -89,9 +97,8 @@ function RecordList() {
                     setSortOrder(sortOrder === "asc" ? "desc" : "asc")
                   }
                 />
-                <TimelineToggle active={false} onClick={() => setView("timeline")} />
-              </>
-            )
+              )}
+            </>
           ) : undefined
         }
         right={

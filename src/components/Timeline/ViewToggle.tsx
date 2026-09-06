@@ -1,13 +1,14 @@
 import styles from "../RecordGrid/RecordGrid.module.css";
 
-interface TimelineToggleProps {
+interface ViewToggleProps {
+  label: string;
   active: boolean;
   onClick: () => void;
 }
 
-/** Pill that switches the collection between the grid and the spins timeline.
+/** Pill switching the collection between its views (grid / timeline).
  *  Reuses the sort-pill styling so it sits beside Top Spins seamlessly. */
-export function TimelineToggle({ active, onClick }: TimelineToggleProps) {
+export function ViewToggle({ label, active, onClick }: ViewToggleProps) {
   return (
     <button
       className={`${styles.filterPill} ${styles.sortPill} ${active ? styles.active : ""}`}
@@ -15,7 +16,7 @@ export function TimelineToggle({ active, onClick }: TimelineToggleProps) {
       type="button"
       aria-pressed={active}
     >
-      Timeline
+      {label}
     </button>
   );
 }
