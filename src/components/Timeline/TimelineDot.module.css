@@ -1,0 +1,35 @@
+/* Filled node, ringed in the page background so it reads as sitting on top
+   of the spine line. */
+.dot {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  border: 3px solid var(--surface000);
+  box-sizing: content-box;
+}
+
+/* Expanding ring for the currently-playing record. */
+.pulsing {
+  background: var(--red200);
+  animation: pulse 1.6s ease-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 132, 132, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(255, 132, 132, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 132, 132, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulsing {
+    animation: none;
+  }
+}

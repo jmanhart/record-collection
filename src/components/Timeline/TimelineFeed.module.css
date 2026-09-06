@@ -1,6 +1,19 @@
+/* One continuous spine line for the whole feed; day markers and record dots
+   are absolutely positioned onto it so the line never breaks between rows. */
 .feed {
-  max-width: 720px;
+  position: relative;
+  max-width: 860px;
   padding: 0.5rem 0 3rem;
+}
+
+.feed::before {
+  content: "";
+  position: absolute;
+  left: 1.25rem;
+  top: 0.5rem;
+  bottom: 1.5rem;
+  width: 2px;
+  background: var(--divider);
 }
 
 .status {
@@ -8,48 +21,54 @@
   padding: 2rem 0;
 }
 
-/* Spine column carries the continuous vertical line; the card sits beside it.
-   Row padding-bottom is the gap between entries, and the line spans it so
-   consecutive nodes stay connected. */
-.row {
-  display: grid;
-  grid-template-columns: 2.5rem 1fr;
-  padding-bottom: 1.75rem;
-}
-
-.spine {
+/* Day grouping — the date lives here once, so rows below only show time. */
+.dayHeader {
   position: relative;
+  padding-left: 2.75rem;
+  margin: 2.5rem 0 1.5rem;
 }
 
-.spine::before {
-  content: "";
+.dayGroup:first-child .dayHeader {
+  margin-top: 0;
+}
+
+.dayMarker {
   position: absolute;
-  left: 50%;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: var(--divider);
-  transform: translateX(-50%);
+  left: 1.25rem;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--surface000);
+  border: 2px solid var(--text-tertiary);
+  box-sizing: border-box;
 }
 
-/* Filled dot, centered on the album art, ringed in the page background so it
-   reads as sitting on top of the line. */
+.dayLabel {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.row {
+  position: relative;
+  padding-left: 2.75rem;
+  margin-bottom: 2.5rem;
+}
+
+/* Sits on the spine, level with the top corner of the album art. */
 .node {
   position: absolute;
-  left: 50%;
-  top: 54px;
-  width: 13px;
-  height: 13px;
-  border-radius: 50%;
-  background: var(--text-primary);
-  border: 3px solid var(--surface000);
+  left: 1.25rem;
+  top: 0.15rem;
   transform: translateX(-50%);
 }
 
 .card {
   display: flex;
-  align-items: center;
-  gap: 1.25rem;
+  align-items: flex-start;
+  gap: 1.75rem;
   text-decoration: none;
   color: inherit;
 }
@@ -57,9 +76,9 @@
 .thumb {
   position: relative;
   flex-shrink: 0;
-  width: 120px;
-  height: 120px;
-  border-radius: 6px;
+  width: 180px;
+  height: 180px;
+  border-radius: 8px;
   overflow: hidden;
   background: var(--surface100);
 }
@@ -77,24 +96,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
+  font-size: 3rem;
   font-weight: 600;
   color: var(--text-secondary);
 }
 
 .playsBadge {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
+  top: 0.6rem;
+  right: 0.6rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: var(--blue200);
   color: #fff;
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   font-weight: 700;
   line-height: 1;
 }
@@ -102,26 +121,27 @@
 .meta {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.4rem;
+  padding-top: 0.35rem;
   min-width: 0;
 }
 
 .when {
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   color: var(--text-tertiary);
 }
 
 .title {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.75rem;
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 1.25;
   color: var(--text-primary);
 }
 
 .artist {
   margin: 0;
-  font-size: 0.9375rem;
+  font-size: 1.125rem;
   color: var(--text-secondary);
 }
 
@@ -130,21 +150,34 @@
 }
 
 @media (max-width: 600px) {
+  .feed::before {
+    left: 1rem;
+  }
+
+  .dayHeader,
   .row {
-    grid-template-columns: 1.75rem 1fr;
-    padding-bottom: 1.25rem;
+    padding-left: 2.25rem;
+  }
+
+  .dayMarker,
+  .node {
+    left: 1rem;
+  }
+
+  .card {
+    gap: 1rem;
   }
 
   .thumb {
-    width: 84px;
-    height: 84px;
-  }
-
-  .node {
-    top: 36px;
+    width: 120px;
+    height: 120px;
   }
 
   .title {
-    font-size: 1.0625rem;
+    font-size: 1.375rem;
+  }
+
+  .artist {
+    font-size: 1rem;
   }
 }

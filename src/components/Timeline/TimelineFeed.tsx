@@ -1,11 +1,12 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { useActivity } from "../../hooks/useActivity";
+import { useActivity, toDateKey } from "../../hooks/useActivity";
 import { useListens } from "../../hooks/useListens";
 import type { ActivityEvent } from "../../hooks/useActivity";
 import { slugify } from "../../utils/slugify";
 import { TIMEZONE } from "../../utils/timezone";
 import { DateIndicator, type MonthMarker } from "../DateIndicator/DateIndicator";
+import { TimelineDot } from "./TimelineDot";
 import styles from "./TimelineFeed.module.css";
 
 interface TimelineFeedProps {
@@ -26,23 +27,50 @@ function monthLabel(key: string): string {
   return `${MONTHS_SHORT[month - 1]} '${String(year).slice(2)}`;
 }
 
-function formatWhen(timestamp: string): string {
-  const d = new Date(timestamp);
-  const date = d.toLocaleDateString("en-US", {
-    timeZone: TIMEZONE,
-    month: "short",
+function pad(n: number): string {
+  return String(n).padStart(2, "0");
+}
+
+function formatDay(dateKey: string, todayKey: string): string {
+  if (dateKey === todayKey) return "Today";
+
+  const [ty, tm, td] = todayKey.split("-").map(Number);
+  const yesterday = new Date(ty, tm - 1, td - 1, 12);
+  const yesterdayKey = `${yesterday.getFullYear()}-${pad(yesterday.getMonth() + 1)}-${pad(
+    yesterday.getDate()
+  )}`;
+  if (dateKey === yesterdayKey) return "Yesterday";
+
+  const [year, month, day] = dateKey.split("-").map(Number);
+  return new Date(year, month - 1, day, 12).toLocaleDateString("en-US", {
+    month: "long",
     day: "numeric",
     year: "numeric",
   });
-  const time = d.toLocaleTimeString("en-US", {
+}
+
+function timeOf(timestamp: string): string {
+  return new Date(timestamp).toLocaleTimeString("en-US", {
     timeZone: TIMEZONE,
     hour: "numeric",
     minute: "2-digit",
   });
-  return `${date} · ${time}`;
 }
 
-function TimelineRow({ event, plays }: { event: ActivityEvent; plays: number }) {
+function timeRange(event: ActivityEvent): string {
+  const start = timeOf(event.timestamp);
+  return event.endedAt ? `${start} – ${timeOf(event.endedAt)}` : start;
+}
+
+function TimelineRow({
+  event,
+  plays,
+  playing,
+}: {
+  event: ActivityEvent;
+  plays: number;
+  playing: boolean;
+}) {
   const [imageError, setImageError] = useState(false);
   const record = event.record;
   if (!record) return null;
@@ -51,10 +79,10 @@ function TimelineRow({ event, plays }: { event: ActivityEvent; plays: number }) 
   const showImage = record.supabase_image_url && !imageError;
 
   return (
-    <div className={styles.row} data-month={monthKey(event.dateKey)}>
-      <div className={styles.spine}>
-        <span className={styles.node} />
-      </div>
+    <div className={styles.row}>
+      <span className={styles.node}>
+        <TimelineDot pulsing={playing} />
+      </span>
       <Link to={to} className={styles.card}>
         <div className={styles.thumb}>
           {showImage ? (
@@ -80,7 +108,7 @@ function TimelineRow({ event, plays }: { event: ActivityEvent; plays: number }) 
           )}
         </div>
         <div className={styles.meta}>
-          <span className={styles.when}>{formatWhen(event.timestamp)}</span>
+          <span className={styles.when}>{timeRange(event)}</span>
           <h3 className={styles.title}>{record.title}</h3>
           <p className={styles.artist}>{record.artist}</p>
         </div>
@@ -92,6 +120,7 @@ function TimelineRow({ event, plays }: { event: ActivityEvent; plays: number }) 
 export function TimelineFeed({ search }: TimelineFeedProps) {
   const { events, isLoading } = useActivity();
   const { listens } = useListens();
+  const todayKey = toDateKey(new Date().toISOString());
 
   const playsByReleaseId = useMemo(() => {
     const counts = new Map<number, number>();
@@ -113,18 +142,29 @@ export function TimelineFeed({ search }: TimelineFeedProps) {
     });
   }, [events, search]);
 
+  // Group by day, preserving the newest-first order of `filtered`.
+  const days = useMemo(() => {
+    const map = new Map<string, ActivityEvent[]>();
+    for (const e of filtered) {
+      const arr = map.get(e.dateKey);
+      if (arr) arr.push(e);
+      else map.set(e.dateKey, [e]);
+    }
+    return Array.from(map.entries());
+  }, [filtered]);
+
   const months = useMemo<MonthMarker[]>(() => {
     const seen = new Set<string>();
     const markers: MonthMarker[] = [];
-    for (const e of filtered) {
-      const key = monthKey(e.dateKey);
+    for (const [dateKey] of days) {
+      const key = monthKey(dateKey);
       if (!seen.has(key)) {
         seen.add(key);
         markers.push({ key, label: monthLabel(key) });
       }
     }
     return markers;
-  }, [filtered]);
+  }, [days]);
 
   if (isLoading) {
     return <p className={styles.status}>Loading...</p>;
@@ -138,12 +178,25 @@ export function TimelineFeed({ search }: TimelineFeedProps) {
     <>
       <DateIndicator months={months} />
       <div className={styles.feed}>
-        {filtered.map((event) => (
-          <TimelineRow
-            key={event.id}
-            event={event}
-            plays={playsByReleaseId.get(event.releaseId) ?? 0}
-          />
+        {days.map(([dateKey, dayEvents]) => (
+          <section
+            key={dateKey}
+            className={styles.dayGroup}
+            data-month={monthKey(dateKey)}
+          >
+            <div className={styles.dayHeader}>
+              <span className={styles.dayMarker} />
+              <span className={styles.dayLabel}>{formatDay(dateKey, todayKey)}</span>
+            </div>
+            {dayEvents.map((event) => (
+              <TimelineRow
+                key={event.id}
+                event={event}
+                plays={playsByReleaseId.get(event.releaseId) ?? 0}
+                playing={false}
+              />
+            ))}
+          </section>
         ))}
       </div>
     </>
