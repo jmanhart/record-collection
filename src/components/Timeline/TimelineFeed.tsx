@@ -127,7 +127,7 @@ function TimelineRow({
             </div>
           )}
           {ordinal === 1 && (
-            <span className={styles.firstPlayBadge}>1st Play</span>
+            <span className={styles.firstPlayBadge}>1st Spin</span>
           )}
         </div>
         <div className={styles.meta}>
