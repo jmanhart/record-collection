@@ -63,6 +63,49 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
+/* Prev/next frame controls, centered under the toggles. Fixed-shrink so the
+   chart below never reclaims its height when the label wraps. */
+.periodNav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.navButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: var(--surface100);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.navButton:hover:not(:disabled) {
+  background: var(--surface300);
+  color: var(--text-primary);
+}
+
+.navButton:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.periodLabel {
+  min-width: 9rem;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
 /* Both the chart and its empty state take every pixel the fixed rows above
    and below leave behind, down to a floor that keeps the bars readable */
 .empty,

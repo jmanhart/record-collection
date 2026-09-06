@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Bar, BarChart, LabelList, ResponsiveContainer, XAxis } from "recharts";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { ActivityEvent } from "../../hooks/useActivity";
 import { StatCard, StatCardRow } from "../StatCard/StatCard";
 import { formatRuntimeCompact } from "../../utils/formatDuration";
@@ -148,6 +149,43 @@ function periodBounds(range: Range, todayKey: string): PeriodBounds {
   };
 }
 
+// Anchor date for the viewed period. offset 0 = current; each step walks one
+// whole period back. Month/year rebuild from day 1 to dodge month-length
+// rollover (e.g. Mar 31 → Feb).
+function anchorKey(range: Range, todayKey: string, offset: number): string {
+  const today = parseKey(todayKey);
+  if (range === "week") {
+    const d = new Date(today);
+    d.setDate(today.getDate() - offset * 7);
+    return keyOf(d);
+  }
+  if (range === "month") {
+    return keyOf(new Date(today.getFullYear(), today.getMonth() - offset, 1, 12));
+  }
+  return keyOf(new Date(today.getFullYear() - offset, today.getMonth(), 1, 12));
+}
+
+// Human label for the viewed frame, shown between the nav arrows.
+function periodLabel(range: Range, anchor: string): string {
+  const d = parseKey(anchor);
+  if (range === "week") {
+    const start = new Date(d);
+    start.setDate(d.getDate() - d.getDay());
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+    const startStr = `${monthShort(start)} ${start.getDate()}`;
+    const endStr =
+      start.getMonth() === end.getMonth()
+        ? String(end.getDate())
+        : `${monthShort(end)} ${end.getDate()}`;
+    return `${startStr} – ${endStr}`;
+  }
+  if (range === "month") {
+    return d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  }
+  return String(d.getFullYear());
+}
+
 function toBuckets(spans: Span[], events: ActivityEvent[]): ChartBucket[] {
   return spans.map(({ label, startKey, endKey }) => {
     const listens = events.filter(
@@ -171,14 +209,22 @@ const RANGE_OPTIONS: { value: Range; label: string }[] = [
 export function ListeningChart({ events, todayKey }: ListeningChartProps) {
   const [range, setRange] = useState<Range>("month");
   const [measure, setMeasure] = useState<Measure>("time");
+  // 0 = current period; each increment walks one whole period into the past.
+  const [offset, setOffset] = useState(0);
+
+  const anchor = useMemo(
+    () => anchorKey(range, todayKey, offset),
+    [range, todayKey, offset]
+  );
+  const periodTitle = periodLabel(range, anchor);
 
   const buckets = useMemo(
-    () => toBuckets(SPAN_BUILDERS[range](todayKey), events),
-    [range, todayKey, events]
+    () => toBuckets(SPAN_BUILDERS[range](anchor), events),
+    [range, anchor, events]
   );
 
   const stats = useMemo(() => {
-    const bounds = periodBounds(range, todayKey);
+    const bounds = periodBounds(range, anchor);
     const inPeriod = (e: ActivityEvent, startKey: string, endKey: string) =>
       e.type === "listen" && e.dateKey >= startKey && e.dateKey <= endKey;
 
@@ -203,7 +249,7 @@ export function ListeningChart({ events, todayKey }: ListeningChartProps) {
       .map(([artist, count]) => ({ artist, count }));
 
     return { listens: listens.length, albums, seconds, prevSeconds, topArtists };
-  }, [range, todayKey, events]);
+  }, [range, anchor, events]);
 
   const isEmpty = buckets.every((b) => b.albums === 0 && b.minutes === 0);
 
@@ -221,7 +267,10 @@ export function ListeningChart({ events, todayKey }: ListeningChartProps) {
             <button
               key={value}
               className={`${styles.toggleButton} ${range === value ? styles.toggleActive : ""}`}
-              onClick={() => setRange(value)}
+              onClick={() => {
+                setRange(value);
+                setOffset(0);
+              }}
               aria-pressed={range === value}
             >
               {label}
@@ -246,6 +295,25 @@ export function ListeningChart({ events, todayKey }: ListeningChartProps) {
         </div>
       </div>
 
+      <div className={styles.periodNav}>
+        <button
+          className={styles.navButton}
+          onClick={() => setOffset((o) => o + 1)}
+          aria-label={`Previous ${range}`}
+        >
+          <ChevronLeft size={18} aria-hidden />
+        </button>
+        <span className={styles.periodLabel}>{periodTitle}</span>
+        <button
+          className={styles.navButton}
+          onClick={() => setOffset((o) => Math.max(0, o - 1))}
+          disabled={offset === 0}
+          aria-label={`Next ${range}`}
+        >
+          <ChevronRight size={18} aria-hidden />
+        </button>
+      </div>
+
       <div className={styles.stats}>
         <StatCardRow>
           <StatCard
@@ -258,7 +326,7 @@ export function ListeningChart({ events, todayKey }: ListeningChartProps) {
             size="sm"
             label="Time listened"
             value={formatRuntimeCompact(stats.seconds)}
-            sub={`this ${range}`}
+            sub={offset === 0 ? `this ${range}` : periodTitle}
           />
           <StatCard
             size="sm"
@@ -270,7 +338,7 @@ export function ListeningChart({ events, todayKey }: ListeningChartProps) {
       </div>
 
       {isEmpty ? (
-        <p className={styles.empty}>No listens this {range}.</p>
+        <p className={styles.empty}>No listens in {periodTitle}.</p>
       ) : (
         <div className={styles.chart}>
           <ResponsiveContainer width="100%" height="100%">
@@ -289,7 +357,7 @@ export function ListeningChart({ events, todayKey }: ListeningChartProps) {
                   snapping to the new values. Animation is left at its 'auto'
                   default, which sits out when prefers-reduced-motion is set. */}
               <Bar
-                key={`${range}-${measure}`}
+                key={`${range}-${measure}-${offset}`}
                 dataKey={measure === "time" ? "minutes" : "albums"}
                 radius={[4, 4, 0, 0]}
                 maxBarSize={48}
@@ -309,7 +377,9 @@ export function ListeningChart({ events, todayKey }: ListeningChartProps) {
 
       {stats.topArtists.length > 0 && (
         <div className={styles.topArtists}>
-          <span className={styles.topArtistsLabel}>Top artists this {range}</span>
+          <span className={styles.topArtistsLabel}>
+            {offset === 0 ? `Top artists this ${range}` : `Top artists · ${periodTitle}`}
+          </span>
           <div className={styles.topArtistsList}>
             {stats.topArtists.map(({ artist, count }, index) => (
               <div key={artist} className={styles.topArtistRow}>
