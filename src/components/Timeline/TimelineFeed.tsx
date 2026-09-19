@@ -1,12 +1,14 @@
 import { useMemo, useState, useEffect } from "react";
 import { useActivity, toDateKey } from "../../hooks/useActivity";
 import { useListens } from "../../hooks/useListens";
+import { useRecords } from "../../hooks/useRecords";
 import type { ActivityEvent } from "../../hooks/useActivity";
 import { RecordPanel } from "./RecordPanel";
 import { TIMEZONE } from "../../utils/timezone";
 import { formatRuntimeCompact } from "../../utils/formatDuration";
 import { DateIndicator, type MonthMarker } from "../DateIndicator/DateIndicator";
 import { TimelineDot } from "./TimelineDot";
+import { ShoppingBag } from "lucide-react";
 import styles from "./TimelineFeed.module.css";
 
 interface TimelineFeedProps {
@@ -17,6 +19,10 @@ const MONTHS_SHORT = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
+
+// Records acquired on/after this date surface as "bought" events; earlier
+// acquisitions predate active cataloging and are just Discogs import noise.
+const PURCHASE_CUTOFF = "2026-07-01";
 
 function monthKey(dateKey: string): string {
   return dateKey.slice(0, 7);
@@ -150,9 +156,63 @@ function TimelineRow({
   );
 }
 
+function PurchaseRow({
+  event,
+  selected,
+  onSelect,
+}: {
+  event: ActivityEvent;
+  selected: boolean;
+  onSelect: (event: ActivityEvent) => void;
+}) {
+  const [imageError, setImageError] = useState(false);
+  const record = event.record;
+  if (!record) return null;
+
+  const showImage = record.supabase_image_url && !imageError;
+
+  return (
+    <div className={`${styles.row} ${styles.purchaseRow}`}>
+      <span className={styles.node}>
+        <TimelineDot variant="purchase" />
+      </span>
+      <button
+        type="button"
+        className={`${styles.card} ${selected ? styles.cardActive : ""}`}
+        onClick={() => onSelect(event)}
+      >
+        <div className={styles.thumb}>
+          {showImage ? (
+            <img
+              src={record.supabase_image_url}
+              alt={`${record.title} by ${record.artist}`}
+              className={styles.image}
+              loading="lazy"
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <div className={styles.placeholder}>
+              <span>{record.title[0]}</span>
+            </div>
+          )}
+        </div>
+        <div className={styles.meta}>
+          <span className={styles.boughtTag}>
+            <ShoppingBag size={14} />
+            Bought this record
+          </span>
+          <h3 className={styles.title}>{record.title}</h3>
+          <p className={styles.artist}>{record.artist}</p>
+        </div>
+      </button>
+    </div>
+  );
+}
+
 export function TimelineFeed({ search }: TimelineFeedProps) {
   const { events, isLoading } = useActivity();
   const { listens } = useListens();
+  const { records } = useRecords();
   const todayKey = toDateKey(new Date().toISOString());
   const [selected, setSelected] = useState<ActivityEvent | null>(null);
   const [nowMs, setNowMs] = useState(() => Date.now());
@@ -191,19 +251,42 @@ export function TimelineFeed({ search }: TimelineFeedProps) {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return events.filter((e) => {
-      if (e.type !== "listen" || !e.record) return false;
-      if (!q) return true;
-      return (
-        e.record.title.toLowerCase().includes(q) ||
-        e.record.artist.toLowerCase().includes(q)
-      );
-    });
-  }, [events, search]);
+    const matches = (title: string, artist: string) =>
+      !q || title.toLowerCase().includes(q) || artist.toLowerCase().includes(q);
 
-  // Only the newest spin can still be on the platter.
+    const listenEvents = events.filter(
+      (e) => e.type === "listen" && e.record && matches(e.record.title, e.record.artist)
+    );
+
+    const purchaseEvents = records
+      .filter(
+        (r) =>
+          r.acquired_at &&
+          r.acquired_at >= PURCHASE_CUTOFF &&
+          matches(r.title, r.artist)
+      )
+      .map(
+        (r): ActivityEvent => ({
+          id: `purchase-${r.id}`,
+          type: "purchase",
+          releaseId: r.id,
+          dateKey: toDateKey(r.acquired_at as string),
+          timestamp: r.acquired_at as string,
+          record: r,
+        })
+      );
+
+    return [...listenEvents, ...purchaseEvents].sort((a, b) =>
+      a.dateKey === b.dateKey
+        ? b.timestamp.localeCompare(a.timestamp)
+        : b.dateKey.localeCompare(a.dateKey)
+    );
+  }, [events, records, search]);
+
+  // Only the newest *listen* can still be on the platter.
+  const newestListen = filtered.find((e) => e.type === "listen");
   const playingId =
-    filtered.length > 0 && playingNow(filtered[0], nowMs) ? filtered[0].id : null;
+    newestListen && playingNow(newestListen, nowMs) ? newestListen.id : null;
 
   // Group by day, preserving the newest-first order of `filtered`.
   const days = useMemo(() => {
@@ -242,11 +325,22 @@ export function TimelineFeed({ search }: TimelineFeedProps) {
       <DateIndicator months={months} />
       <div className={styles.feed}>
         {days.map(([dateKey, dayEvents]) => {
-          const albumCount = new Set(dayEvents.map((e) => e.releaseId)).size;
-          const seconds = dayEvents.reduce(
+          const listenEvents = dayEvents.filter((e) => e.type === "listen");
+          const purchaseCount = dayEvents.length - listenEvents.length;
+          const albumCount = new Set(listenEvents.map((e) => e.releaseId)).size;
+          const seconds = listenEvents.reduce(
             (sum, e) => sum + (e.record?.duration_seconds || 0),
             0
           );
+          const statBits: string[] = [];
+          if (listenEvents.length > 0) {
+            statBits.push(
+              `${albumCount} ${albumCount === 1 ? "album" : "albums"} · ${formatRuntimeCompact(seconds)}`
+            );
+          }
+          if (purchaseCount > 0) {
+            statBits.push(`${purchaseCount} added`);
+          }
           return (
             <section
               key={dateKey}
@@ -259,22 +353,30 @@ export function TimelineFeed({ search }: TimelineFeedProps) {
                   <span className={styles.dayLabel}>
                     {formatDay(dateKey, todayKey)}
                   </span>
-                  <span className={styles.dayStats}>
-                    {albumCount} {albumCount === 1 ? "album" : "albums"} ·{" "}
-                    {formatRuntimeCompact(seconds)}
-                  </span>
+                  {statBits.length > 0 && (
+                    <span className={styles.dayStats}>{statBits.join(" · ")}</span>
+                  )}
                 </div>
               </div>
-              {dayEvents.map((event) => (
-                <TimelineRow
-                  key={event.id}
-                  event={event}
-                  ordinal={playOrdinalByEventId.get(event.id) ?? 1}
-                  playing={event.id === playingId}
-                  selected={selected?.id === event.id}
-                  onSelect={setSelected}
-                />
-              ))}
+              {dayEvents.map((event) =>
+                event.type === "purchase" ? (
+                  <PurchaseRow
+                    key={event.id}
+                    event={event}
+                    selected={selected?.id === event.id}
+                    onSelect={setSelected}
+                  />
+                ) : (
+                  <TimelineRow
+                    key={event.id}
+                    event={event}
+                    ordinal={playOrdinalByEventId.get(event.id) ?? 1}
+                    playing={event.id === playingId}
+                    selected={selected?.id === event.id}
+                    onSelect={setSelected}
+                  />
+                )
+              )}
             </section>
           );
         })}
@@ -284,7 +386,7 @@ export function TimelineFeed({ search }: TimelineFeedProps) {
           event={selected}
           plays={playsByReleaseId.get(selected.releaseId) ?? 0}
           dayLabel={formatDay(selected.dateKey, todayKey)}
-          timeRange={timeRange(selected)}
+          timeRange={selected.type === "listen" ? timeRange(selected) : ""}
           onClose={() => setSelected(null)}
         />
       )}

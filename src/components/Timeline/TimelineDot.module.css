@@ -10,6 +10,11 @@
   box-sizing: content-box;
 }
 
+/* Acquisition marker — tinted so it reads apart from listen nodes. */
+.purchase {
+  background: var(--blue200);
+}
+
 /* Expanding ring for the currently-playing record. */
 .pulsing {
   background: var(--red200);

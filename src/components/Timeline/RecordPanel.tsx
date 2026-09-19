@@ -70,11 +70,18 @@ export function RecordPanel({
         {meta.length > 0 && <p className={styles.meta}>{meta.join(" · ")}</p>}
 
         <dl className={styles.stats}>
-          <div className={`${styles.stat} ${styles.statWide}`}>
-            <dt className={styles.statLabel}>Played</dt>
-            <dd className={styles.statValue}>{timeRange}</dd>
-            <dd className={styles.statSub}>{dayLabel}</dd>
-          </div>
+          {event.type === "purchase" ? (
+            <div className={`${styles.stat} ${styles.statWide}`}>
+              <dt className={styles.statLabel}>Added</dt>
+              <dd className={styles.statValue}>{dayLabel}</dd>
+            </div>
+          ) : (
+            <div className={`${styles.stat} ${styles.statWide}`}>
+              <dt className={styles.statLabel}>Played</dt>
+              <dd className={styles.statValue}>{timeRange}</dd>
+              <dd className={styles.statSub}>{dayLabel}</dd>
+            </div>
+          )}
           <div className={styles.stat}>
             <dt className={styles.statLabel}>Plays</dt>
             <dd className={styles.statValue}>{plays}</dd>

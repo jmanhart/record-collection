@@ -180,6 +180,17 @@
   color: var(--text-tertiary);
 }
 
+.boughtTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--blue200);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 .title {
   margin: 0;
   font-size: 1.75rem;
@@ -202,6 +213,21 @@
 
 .card:hover .title {
   color: var(--link-hover);
+}
+
+/* Acquisitions read as a lighter note beneath the full-size listen card:
+   same building blocks, smaller cover + type so scale sets them apart. */
+.purchaseRow .thumb {
+  width: 112px;
+  height: 112px;
+}
+
+.purchaseRow .title {
+  font-size: 1.3rem;
+}
+
+.purchaseRow .artist {
+  font-size: 1rem;
 }
 
 @media (max-width: 600px) {
