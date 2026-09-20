@@ -49,10 +49,11 @@ export function AppBar({
         ? document.querySelector<HTMLElement>("[data-timeline-hero]")
         : null;
       if (hero) {
-        // Transparent + hero-tinted while the hero still covers the bar.
-        const over = hero.getBoundingClientRect().bottom > navHeight + 4;
-        setOverHero(over);
-        setSolid(!over);
+        // On the timeline the bar carries no controls, so it never becomes a
+        // solid backdrop — it stays transparent and the corner buttons float
+        // on their own (hero-tinted over the hero, solid chips once past it).
+        setOverHero(hero.getBoundingClientRect().bottom > navHeight + 4);
+        setSolid(false);
       } else {
         setOverHero(false);
         setSolid(window.scrollY > 8);
