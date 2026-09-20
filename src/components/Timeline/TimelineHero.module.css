@@ -2,17 +2,18 @@
    background is the cover's dominant color + a blurred copy of the art, with a
    scrim and luminance-picked text color so it reads in either app theme.
    Full-bleed: breaks out of the .container to span the viewport edge-to-edge,
-   while content stays padded to the page grid so the cover lines up with the
-   feed below. */
+   while content stays padded to the page grid (--grid-left) so it lines up with
+   the feed, and the timeline spine runs through it for scroll continuity. */
 .hero {
+  --grid-left: max(2rem, calc((100vw - 1280px) / 2 + 2rem));
   position: relative;
   display: flex;
-  align-items: center;
-  gap: clamp(1.5rem, 4vw, 3.5rem);
+  flex-direction: column;
+  justify-content: center;
   width: 100vw;
   min-height: 80vh;
-  margin: -2rem calc(50% - 50vw) 3rem;
-  padding: clamp(1.75rem, 5vh, 4rem) max(2rem, calc((100vw - 1280px) / 2 + 2rem));
+  margin: -2rem calc(50% - 50vw) 0;
+  padding: clamp(1.75rem, 5vh, 3.5rem) var(--grid-left);
   border: none;
   border-radius: 0;
   overflow: hidden;
@@ -36,7 +37,7 @@
   transform: scale(1.15);
 }
 
-/* Even contrast lift for text + a soft bottom settle into the feed below. */
+/* Even contrast lift for text over the ambient. */
 .scrim {
   position: absolute;
   inset: 0;
@@ -44,46 +45,29 @@
   background: var(--hero-scrim, transparent);
 }
 
-.cover {
-  flex-shrink: 0;
-  width: clamp(220px, 42vw, 460px);
-  aspect-ratio: 1;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
-  background: rgba(0, 0, 0, 0.2);
+/* Aligned to the feed spine: grid edge + the feed's own 1.25rem offset. */
+.spine {
+  position: absolute;
+  left: calc(var(--grid-left) + 1.25rem);
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--hero-text, var(--divider));
+  opacity: 0.22;
 }
 
-.image {
+.content {
+  position: relative;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 5rem;
-  font-weight: 700;
-  color: var(--hero-text, var(--text-secondary));
-  opacity: 0.7;
-}
-
-.info {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
+  /* Gutter matching the feed's rows so the spine + dot sit to the left. */
+  padding-left: 2.75rem;
 }
 
 .status {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.9rem;
+  margin-bottom: clamp(0.9rem, 2.5vh, 1.6rem);
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -111,10 +95,75 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation: none;
+  }
+}
+
+.body {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 3rem);
+}
+
+.cover {
+  position: relative;
+  flex-shrink: 0;
+  /* Shrunk so the header + cover fit within the 80vh spotlight. */
+  width: min(clamp(180px, 26vw, 320px), 48vh);
+  aspect-ratio: 1;
+}
+
+/* Dot on the spine at the top corner of the cover, mirroring a feed row. */
+.node {
+  position: absolute;
+  left: -1.5rem;
+  top: 0.5rem;
+  z-index: 2;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--hero-text, var(--text-primary));
+  border: 3px solid var(--hero-color, var(--surface000));
+  box-sizing: content-box;
+}
+
+.image,
+.placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+}
+
+.image {
+  object-fit: cover;
+  display: block;
+}
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4.5rem;
+  font-weight: 700;
+  color: var(--hero-text, var(--text-secondary));
+  opacity: 0.7;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
 .title {
   margin: 0;
   color: var(--hero-text, var(--text-primary));
-  font-size: clamp(2rem, 4.5vw, 3.6rem);
+  font-size: clamp(1.8rem, 4vw, 3.1rem);
   font-weight: 800;
   line-height: 1.05;
   letter-spacing: -0.02em;
@@ -122,7 +171,7 @@
 
 .artist {
   margin: 0.6rem 0 0;
-  font-size: clamp(1.1rem, 2vw, 1.6rem);
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
   color: var(--hero-subtext, var(--text-secondary));
 }
 
@@ -130,7 +179,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin: 1.5rem 0 0;
+  margin: 1.35rem 0 0;
   padding: 0;
   list-style: none;
 }
@@ -149,7 +198,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.6rem 1.25rem;
-  margin-top: 1.75rem;
+  margin-top: 1.6rem;
   font-size: 0.95rem;
   color: var(--hero-subtext, var(--text-secondary));
 }
@@ -171,17 +220,19 @@
 
 @media (max-width: 768px) {
   .hero {
+    --grid-left: 1rem;
+    min-height: 70vh;
+    margin: -1.5rem calc(50% - 50vw) 0;
+    padding: 1.75rem var(--grid-left);
+  }
+
+  .body {
     flex-direction: column;
     align-items: flex-start;
-    justify-content: center;
-    min-height: 70vh;
-    gap: 1.5rem;
-    margin: -1.5rem calc(50% - 50vw) 3rem;
-    padding: 1.75rem 1rem;
+    gap: 1.25rem;
   }
 
   .cover {
-    width: min(70vw, 320px);
-    align-self: center;
+    width: min(60vw, 260px);
   }
 }

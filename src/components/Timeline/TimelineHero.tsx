@@ -95,27 +95,15 @@ export function TimelineHero({
         />
       )}
       <div className={styles.scrim} aria-hidden />
+      {/* Timeline spine continuing up from the feed, so the hero reads as the
+          newest entry rather than a detached banner. */}
+      <span className={styles.spine} aria-hidden />
 
-      <div className={styles.cover}>
-        {showImage ? (
-          <img
-            src={cover}
-            alt={`${record.title} by ${record.artist}`}
-            className={styles.image}
-            onError={() => setImageError(true)}
-          />
-        ) : (
-          <div className={styles.placeholder}>
-            <span>{record.title[0]}</span>
-          </div>
-        )}
-      </div>
-
-      <div className={styles.info}>
+      <div className={styles.content}>
         <span className={styles.status}>
           {playing ? (
             <>
-              <Disc3 size={16} className={styles.spin} />
+              <Disc3 size={15} className={styles.spin} />
               <span className={styles.statusLabel}>Now Playing</span>
               <span className={styles.statusDetail}>since {since}</span>
             </>
@@ -130,32 +118,52 @@ export function TimelineHero({
           )}
         </span>
 
-        <h2 className={styles.title}>{record.title}</h2>
-        <p className={styles.artist}>{record.artist}</p>
+        <div className={styles.body}>
+          <div className={styles.cover}>
+            <span className={styles.node} aria-hidden />
+            {showImage ? (
+              <img
+                src={cover}
+                alt={`${record.title} by ${record.artist}`}
+                className={styles.image}
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <div className={styles.placeholder}>
+                <span>{record.title[0]}</span>
+              </div>
+            )}
+          </div>
 
-        {meta.length > 0 && (
-          <ul className={styles.chips}>
-            {meta.map((m) => (
-              <li key={String(m)} className={styles.chip}>
-                {m}
-              </li>
-            ))}
-          </ul>
-        )}
+          <div className={styles.info}>
+            <h2 className={styles.title}>{record.title}</h2>
+            <p className={styles.artist}>{record.artist}</p>
 
-        <div className={styles.footer}>
-          <span className={styles.footItem}>
-            {ordinal === 1 ? "First time played" : `Played ${plays} times`}
-          </span>
-          {trackCount > 0 && (
-            <span className={styles.footItem}>
-              {trackCount} {trackCount === 1 ? "track" : "tracks"}
-              {record.duration_seconds
-                ? ` · ${formatRuntimeCompact(record.duration_seconds)}`
-                : ""}
-            </span>
-          )}
-          {ordinal === 1 && <span className={styles.badge}>1st Spin</span>}
+            {meta.length > 0 && (
+              <ul className={styles.chips}>
+                {meta.map((m) => (
+                  <li key={String(m)} className={styles.chip}>
+                    {m}
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <div className={styles.footer}>
+              <span className={styles.footItem}>
+                {ordinal === 1 ? "First time played" : `Played ${plays} times`}
+              </span>
+              {trackCount > 0 && (
+                <span className={styles.footItem}>
+                  {trackCount} {trackCount === 1 ? "track" : "tracks"}
+                  {record.duration_seconds
+                    ? ` · ${formatRuntimeCompact(record.duration_seconds)}`
+                    : ""}
+                </span>
+              )}
+              {ordinal === 1 && <span className={styles.badge}>1st Spin</span>}
+            </div>
+          </div>
         </div>
       </div>
     </button>
