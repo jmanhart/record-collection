@@ -45,13 +45,16 @@
   background: var(--hero-scrim, transparent);
 }
 
-/* Aligned to the feed spine: grid edge + the feed's own 1.25rem offset. */
+/* Starts at the dot (cover's top corner) and drops down; the hero's
+   overflow:hidden clips it at the bottom edge, where the feed spine takes
+   over. No segment travels above the dot. */
 .spine {
   position: absolute;
-  left: calc(var(--grid-left) + 1.25rem);
-  top: 0;
-  bottom: 0;
+  left: -1.5rem;
+  top: 0.9rem;
+  transform: translateX(-50%);
   width: 2px;
+  height: 200vh;
   background: var(--hero-text, var(--divider));
   opacity: 0.22;
 }

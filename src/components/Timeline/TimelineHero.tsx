@@ -95,9 +95,6 @@ export function TimelineHero({
         />
       )}
       <div className={styles.scrim} aria-hidden />
-      {/* Timeline spine continuing up from the feed, so the hero reads as the
-          newest entry rather than a detached banner. */}
-      <span className={styles.spine} aria-hidden />
 
       <div className={styles.content}>
         <span className={styles.status}>
@@ -120,6 +117,10 @@ export function TimelineHero({
 
         <div className={styles.body}>
           <div className={styles.cover}>
+            {/* Spine drops from the dot down into the feed (clipped at the
+                hero's bottom), so the timeline reads as continuous below the
+                status header without a stub above the dot. */}
+            <span className={styles.spine} aria-hidden />
             <span className={styles.node} aria-hidden />
             {showImage ? (
               <img
