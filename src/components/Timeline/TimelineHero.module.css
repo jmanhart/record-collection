@@ -1,17 +1,20 @@
 /* Oversized spotlight for the freshest listen. Self-contained color world:
    background is the cover's dominant color + a blurred copy of the art, with a
-   scrim and luminance-picked text color so it reads in either app theme. */
+   scrim and luminance-picked text color so it reads in either app theme.
+   Full-bleed: breaks out of the .container to span the viewport edge-to-edge,
+   while content stays padded to the page grid so the cover lines up with the
+   feed below. */
 .hero {
   position: relative;
   display: flex;
   align-items: center;
   gap: clamp(1.5rem, 4vw, 3.5rem);
-  width: 100%;
+  width: 100vw;
   min-height: 80vh;
-  margin: 0 0 3rem;
-  padding: clamp(1.75rem, 5vh, 4rem) clamp(1.5rem, 4vw, 3.5rem);
+  margin: -2rem calc(50% - 50vw) 3rem;
+  padding: clamp(1.75rem, 5vh, 4rem) max(2rem, calc((100vw - 1280px) / 2 + 2rem));
   border: none;
-  border-radius: 20px;
+  border-radius: 0;
   overflow: hidden;
   isolation: isolate;
   text-align: left;
@@ -173,7 +176,8 @@
     justify-content: center;
     min-height: 70vh;
     gap: 1.5rem;
-    padding: 1.75rem 1.5rem;
+    margin: -1.5rem calc(50% - 50vw) 3rem;
+    padding: 1.75rem 1rem;
   }
 
   .cover {
