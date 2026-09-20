@@ -1,17 +1,23 @@
 import fetch from "node-fetch";
 import { logError } from "./log.js";
 import { supabaseAdmin, STORAGE_BUCKET } from "./supabase.js";
+import { extractDominantColor } from "./extractDominantColor.js";
+
+export interface UploadedImage {
+  url: string;
+  /** Dominant cover color as hex, or null if extraction failed. */
+  dominantColor: string | null;
+}
 
 /**
- * Upload an image to Supabase Storage and return the new URL.
- * @param {string} imageUrl - The URL of the image to download.
- * @param {number} releaseId - The ID of the release.
- * @returns {Promise<string | null>} The new URL of the uploaded image, or null if failed.
+ * Download a cover, upload it to Supabase Storage, and extract its dominant
+ * color from the same buffer. Returns the public URL + color, or null if the
+ * download/upload failed.
  */
 export async function uploadImageToSupabase(
   imageUrl: string,
   releaseId: number
-): Promise<string | null> {
+): Promise<UploadedImage | null> {
   try {
     // Download the image
     const response = await fetch(imageUrl);
@@ -33,12 +39,14 @@ export async function uploadImageToSupabase(
       throw error;
     }
 
-    // Return the public URL
+    // Extract the dominant color from the same buffer we just uploaded.
+    const dominantColor = await extractDominantColor(imageBuffer);
+
     const { data: publicUrl } = supabaseAdmin.storage
       .from(STORAGE_BUCKET)
       .getPublicUrl(`covers/${releaseId}.jpeg`);
 
-    return publicUrl.publicUrl;
+    return { url: publicUrl.publicUrl, dominantColor };
   } catch (error) {
     logError(`❌ Image upload failed for ${releaseId}:`, error);
     return null;

@@ -1,0 +1,43 @@
+/* Matched pair with the theme toggle: fixed to the top-right, just left of it,
+   sharing the adaptive control skin (--control-*) so both go transparent and
+   hero-tinted while the bar overlays the timeline hero. */
+.viewSwitch {
+  position: fixed;
+  top: 1rem;
+  right: 3.5rem;
+  z-index: 10000;
+
+  width: 2.25rem;
+  height: 2.25rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: var(--control-bg);
+  color: var(--control-text);
+  border: 1px solid var(--control-border);
+  border-radius: 50%;
+
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease,
+    border-color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+}
+
+.viewSwitch:hover {
+  opacity: 0.7;
+  transform: scale(1.1);
+}
+
+.viewSwitch:active {
+  transform: scale(0.95);
+}
+
+@media (max-width: 768px) {
+  .viewSwitch {
+    width: 2rem;
+    height: 2rem;
+    top: 0.75rem;
+    right: 3rem;
+  }
+}

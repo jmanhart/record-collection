@@ -108,12 +108,12 @@ export async function updateSupabaseRecords(records: DiscogsRecord[]) {
         }
 
         try {
-          const uploadedUrl = await uploadImageToSupabase(
+          const uploaded = await uploadImageToSupabase(
             record.image_url,
             record.id
           );
 
-          if (!uploadedUrl) {
+          if (!uploaded) {
             logWarn(
               `⚠️ Failed to upload image for "${record.title}" (ID: ${record.id})`
             );
@@ -122,7 +122,10 @@ export async function updateSupabaseRecords(records: DiscogsRecord[]) {
 
           const { error: updateError } = await supabase
             .from(TABLE_NAME)
-            .update({ supabase_image_url: uploadedUrl })
+            .update({
+              supabase_image_url: uploaded.url,
+              dominant_color: uploaded.dominantColor,
+            })
             .eq("id", record.id);
 
           if (updateError) {

@@ -9,7 +9,7 @@
 .searchIcon {
   position: absolute;
   left: 12px;
-  color: var(--text-secondary);
+  color: var(--control-text);
   opacity: 0.7;
   pointer-events: none;
 }
@@ -19,10 +19,10 @@
   height: 40px;
   padding: 0.625rem 1rem;
   font-size: 14px;
-  border: 2px solid var(--divider);
+  border: 2px solid var(--control-border);
   border-radius: 8px;
-  background-color: var(--surface000);
-  color: var(--text-primary);
+  background-color: var(--control-bg);
+  color: var(--control-text);
  
   box-sizing: border-box;
   font-family: inherit;
@@ -39,19 +39,10 @@
 }
 
 .searchInput::placeholder {
-  color: var(--text-secondary);
+  color: var(--control-text);
   opacity: 0.7;
 }
 
-/* Dark mode adjustments */
-:global(.dark-theme) .searchInput {
-  background-color: var(--surface100);
-  border-color: var(--divider);
-}
-
-:global(.dark-theme) .searchInput:hover {
-  border-color: var(--surface400);
-}
 
 @media (max-width: 768px) {
   .searchInput {

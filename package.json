@@ -13,6 +13,7 @@
     "sync:readme": "pnpm run generate-readme",
     "sync:discography": "pnpm --filter discogs-supabase-sync run sync:discography",
     "sync:track-durations": "pnpm --filter discogs-supabase-sync run track-durations",
+    "backfill:colors": "pnpm --filter discogs-supabase-sync run backfill:colors",
     "report:track-durations": "pnpm --filter discogs-supabase-sync run report:track-durations",
     "sync:all": "pnpm run sync:discogs && pnpm run sync:readme",
     "tools:dev": "pnpm --filter discogs-supabase-sync run dev",

@@ -12,7 +12,9 @@
 .container {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  /* Fixed AppBar overlays the page; push content clear of it. The timeline
+     hero cancels this top offset so it sits behind the bar. */
+  padding: calc(var(--nav-height) + 2rem) 2rem 2rem;
   box-sizing: border-box;
 }
 
@@ -43,7 +45,7 @@
 
 @media (max-width: 768px) {
   .container {
-    padding: 1.5rem 1rem;
+    padding: calc(var(--nav-height) + 1.5rem) 1rem 1.5rem;
   }
   
   .page-header h1 {

@@ -1,0 +1,246 @@
+/* Oversized spotlight for the freshest listen. Self-contained color world:
+   background is the cover's dominant color + a blurred copy of the art, with a
+   scrim and luminance-picked text color so it reads in either app theme.
+   Full-bleed: breaks out of the .container to span the viewport edge-to-edge,
+   while content stays padded to the page grid (--grid-left) so it lines up with
+   the feed, and the timeline spine runs through it for scroll continuity. */
+.hero {
+  --grid-left: max(2rem, calc((100vw - 1280px) / 2 + 2rem));
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100vw;
+  min-height: 80vh;
+  margin: calc(-1 * (var(--nav-height) + 2rem)) calc(50% - 50vw) 0;
+  padding: clamp(1.75rem, 5vh, 3.5rem) var(--grid-left);
+  border: none;
+  border-radius: 0;
+  overflow: hidden;
+  isolation: isolate;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  background: var(--hero-color, var(--surface100));
+  color: var(--hero-text, var(--text-primary));
+}
+
+/* Blurred, enlarged cover for ambient richness over the flat color base. */
+.ambient {
+  position: absolute;
+  inset: -25%;
+  z-index: -2;
+  background-size: cover;
+  background-position: center;
+  filter: blur(64px) saturate(1.4);
+  opacity: 0.55;
+  transform: scale(1.15);
+}
+
+/* Even contrast lift for text over the ambient. */
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--hero-scrim, transparent);
+}
+
+/* Dot + spine live on the status line now. The spine starts at the dot
+   (status center) and drops down; the hero's overflow:hidden clips it at the
+   bottom edge, where the feed spine takes over. */
+.spine {
+  position: absolute;
+  left: -1.5rem;
+  top: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 200vh;
+  background: var(--hero-text, var(--divider));
+  opacity: 0.22;
+}
+
+.content {
+  position: relative;
+  width: 100%;
+  /* Gutter matching the feed's rows so the spine + dot sit to the left. */
+  padding-left: 2.75rem;
+}
+
+.status {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  margin-bottom: clamp(1rem, 2.5vh, 1.75rem);
+}
+
+/* Matches the feed's day-header date tag: big label + smaller meta beside. */
+.statusLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: clamp(1.4rem, 2.6vw, 1.75rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--hero-text, var(--text-primary));
+}
+
+.statusDetail {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--hero-subtext, var(--text-secondary));
+}
+
+.spin {
+  animation: heroSpin 3s linear infinite;
+}
+
+@keyframes heroSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation: none;
+  }
+}
+
+.body {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 3rem);
+}
+
+.cover {
+  position: relative;
+  flex-shrink: 0;
+  /* Shrunk so the header + cover fit within the 80vh spotlight. */
+  width: min(clamp(180px, 26vw, 320px), 48vh);
+  aspect-ratio: 1;
+}
+
+/* Marker on the spine, level with the status line — mirrors the feed's
+   day-header dot. */
+.node {
+  position: absolute;
+  left: -1.5rem;
+  top: 50%;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--hero-color, var(--surface000));
+  border: 3px solid var(--hero-text, var(--text-primary));
+  box-sizing: content-box;
+}
+
+.image,
+.placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+}
+
+.image {
+  object-fit: cover;
+  display: block;
+}
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4.5rem;
+  font-weight: 700;
+  color: var(--hero-text, var(--text-secondary));
+  opacity: 0.7;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  color: var(--hero-text, var(--text-primary));
+  font-size: clamp(1.8rem, 4vw, 3.1rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.artist {
+  margin: 0.6rem 0 0;
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  color: var(--hero-subtext, var(--text-secondary));
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1.35rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: var(--hero-chip, var(--surface200));
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--hero-text, var(--text-primary));
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1.25rem;
+  margin-top: 1.6rem;
+  font-size: 0.95rem;
+  color: var(--hero-subtext, var(--text-secondary));
+}
+
+.footItem {
+  font-weight: 500;
+}
+
+.badge {
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  background: var(--hero-text, #000);
+  color: var(--hero-color, #fff);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    --grid-left: 1rem;
+    min-height: 70vh;
+    margin: calc(-1 * (var(--nav-height) + 1.5rem)) calc(50% - 50vw) 0;
+    padding: 1.75rem var(--grid-left);
+  }
+
+  .body {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+
+  .cover {
+    width: min(60vw, 260px);
+  }
+}

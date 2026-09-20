@@ -8,6 +8,7 @@ import { TIMEZONE } from "../../utils/timezone";
 import { formatRuntimeCompact } from "../../utils/formatDuration";
 import { DateIndicator, type MonthMarker } from "../DateIndicator/DateIndicator";
 import { TimelineDot } from "./TimelineDot";
+import { TimelineHero } from "./TimelineHero";
 import { ShoppingBag } from "lucide-react";
 import styles from "./TimelineFeed.module.css";
 
@@ -283,21 +284,23 @@ export function TimelineFeed({ search }: TimelineFeedProps) {
     );
   }, [events, records, search]);
 
-  // Only the newest *listen* can still be on the platter.
-  const newestListen = filtered.find((e) => e.type === "listen");
+  // The freshest listen is promoted into the hero; only it can still be on
+  // the platter, and it's excluded from the day groups so it isn't duplicated.
+  const heroEvent = filtered.find((e) => e.type === "listen") ?? null;
   const playingId =
-    newestListen && playingNow(newestListen, nowMs) ? newestListen.id : null;
+    heroEvent && playingNow(heroEvent, nowMs) ? heroEvent.id : null;
 
   // Group by day, preserving the newest-first order of `filtered`.
   const days = useMemo(() => {
     const map = new Map<string, ActivityEvent[]>();
     for (const e of filtered) {
+      if (e.id === heroEvent?.id) continue;
       const arr = map.get(e.dateKey);
       if (arr) arr.push(e);
       else map.set(e.dateKey, [e]);
     }
     return Array.from(map.entries());
-  }, [filtered]);
+  }, [filtered, heroEvent]);
 
   const months = useMemo<MonthMarker[]>(() => {
     const seen = new Set<string>();
@@ -323,6 +326,18 @@ export function TimelineFeed({ search }: TimelineFeedProps) {
   return (
     <>
       <DateIndicator months={months} />
+      {heroEvent && (
+        <TimelineHero
+          event={heroEvent}
+          playing={heroEvent.id === playingId}
+          ordinal={playOrdinalByEventId.get(heroEvent.id) ?? 1}
+          plays={playsByReleaseId.get(heroEvent.releaseId) ?? 0}
+          dayLabel={formatDay(heroEvent.dateKey, todayKey)}
+          timeRange={timeRange(heroEvent)}
+          since={timeOf(heroEvent.timestamp)}
+          onSelect={setSelected}
+        />
+      )}
       <div className={styles.feed}>
         {days.map(([dateKey, dayEvents]) => {
           const listenEvents = dayEvents.filter((e) => e.type === "listen");

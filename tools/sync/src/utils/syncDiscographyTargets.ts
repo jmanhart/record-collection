@@ -101,7 +101,8 @@ export async function syncDiscographyTargets(): Promise<void> {
       let supabaseImageUrl: string | null = null;
 
       if (imageUrl) {
-        supabaseImageUrl = await uploadImageToSupabase(imageUrl, releaseId);
+        const uploaded = await uploadImageToSupabase(imageUrl, releaseId);
+        supabaseImageUrl = uploaded?.url ?? null;
       }
 
       // Upsert into discography_targets table
