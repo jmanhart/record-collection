@@ -1,0 +1,183 @@
+/* Oversized spotlight for the freshest listen. Self-contained color world:
+   background is the cover's dominant color + a blurred copy of the art, with a
+   scrim and luminance-picked text color so it reads in either app theme. */
+.hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  width: 100%;
+  min-height: 80vh;
+  margin: 0 0 3rem;
+  padding: clamp(1.75rem, 5vh, 4rem) clamp(1.5rem, 4vw, 3.5rem);
+  border: none;
+  border-radius: 20px;
+  overflow: hidden;
+  isolation: isolate;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  background: var(--hero-color, var(--surface100));
+  color: var(--hero-text, var(--text-primary));
+}
+
+/* Blurred, enlarged cover for ambient richness over the flat color base. */
+.ambient {
+  position: absolute;
+  inset: -25%;
+  z-index: -2;
+  background-size: cover;
+  background-position: center;
+  filter: blur(64px) saturate(1.4);
+  opacity: 0.55;
+  transform: scale(1.15);
+}
+
+/* Even contrast lift for text + a soft bottom settle into the feed below. */
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--hero-scrim, transparent);
+}
+
+.cover {
+  flex-shrink: 0;
+  width: clamp(220px, 42vw, 460px);
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 5rem;
+  font-weight: 700;
+  color: var(--hero-text, var(--text-secondary));
+  opacity: 0.7;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.statusLabel {
+  color: var(--hero-text, var(--text-primary));
+}
+
+.statusDetail {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--hero-subtext, var(--text-secondary));
+}
+
+.spin {
+  animation: heroSpin 3s linear infinite;
+}
+
+@keyframes heroSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.title {
+  margin: 0;
+  color: var(--hero-text, var(--text-primary));
+  font-size: clamp(2rem, 4.5vw, 3.6rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.artist {
+  margin: 0.6rem 0 0;
+  font-size: clamp(1.1rem, 2vw, 1.6rem);
+  color: var(--hero-subtext, var(--text-secondary));
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: var(--hero-chip, var(--surface200));
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--hero-text, var(--text-primary));
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1.25rem;
+  margin-top: 1.75rem;
+  font-size: 0.95rem;
+  color: var(--hero-subtext, var(--text-secondary));
+}
+
+.footItem {
+  font-weight: 500;
+}
+
+.badge {
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  background: var(--hero-text, #000);
+  color: var(--hero-color, #fff);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    min-height: 70vh;
+    gap: 1.5rem;
+    padding: 1.75rem 1.5rem;
+  }
+
+  .cover {
+    width: min(70vw, 320px);
+    align-self: center;
+  }
+}

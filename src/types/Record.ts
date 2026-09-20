@@ -11,6 +11,8 @@ export interface Record {
   artist: string;
   coverImage?: string;
   supabase_image_url?: string;
+  /** Precomputed hex of the cover's dominant color (e.g. "#1a2b3c"). */
+  dominant_color?: string | null;
   dateAdded: string;
   format_name?: string;
   format_descriptions?: string[];
