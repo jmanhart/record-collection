@@ -7,7 +7,7 @@
     "fetch": "tsx src/run.ts",
     "sync:discography": "tsx src/syncDiscography.ts",
     "track-durations": "tsx src/fetchMusicBrainzDurations.ts",
-    "report:track-durations": "tsx src/reportMissingDurations.ts",
+    "backfill:colors": "tsx src/backfillColors.ts",
     "start": "node src/server.js"
   },
   "dependencies": {
@@ -15,7 +15,8 @@
     "@supabase/supabase-js": "^2.48.1",
     "dotenv": "^16.4.7",
     "express": "^4.18.2",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^3.3.2",
+    "sharp": "^0.35.4"
   },
   "devDependencies": {
     "@types/express": "^4.17.17",
