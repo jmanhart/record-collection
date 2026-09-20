@@ -3,6 +3,7 @@
  * =========================================== */
 
 :root {
+  --nav-height: 64px;
   /* Light Mode Colors */
   --surface000: #ffffff; /* Background */
   --surface100: #ededed; /* Background */
@@ -42,6 +43,12 @@
   --border-hover-color: var(--text-secondary);
   --error-color: var(--red100);
   --accent-color: var(--red200);
+}
+
+@media (max-width: 768px) {
+  :root {
+    --nav-height: 60px;
+  }
 }
 
 /* ===========================================

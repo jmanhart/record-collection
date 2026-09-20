@@ -12,7 +12,7 @@
   justify-content: center;
   width: 100vw;
   min-height: 80vh;
-  margin: -2rem calc(50% - 50vw) 0;
+  margin: calc(-1 * (var(--nav-height) + 2rem)) calc(50% - 50vw) 0;
   padding: clamp(1.75rem, 5vh, 3.5rem) var(--grid-left);
   border: none;
   border-radius: 0;
@@ -225,7 +225,7 @@
   .hero {
     --grid-left: 1rem;
     min-height: 70vh;
-    margin: -1.5rem calc(50% - 50vw) 0;
+    margin: calc(-1 * (var(--nav-height) + 1.5rem)) calc(50% - 50vw) 0;
     padding: 1.75rem var(--grid-left);
   }
 

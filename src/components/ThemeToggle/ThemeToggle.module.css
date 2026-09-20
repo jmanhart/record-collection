@@ -11,8 +11,8 @@
   align-items: center;
   justify-content: center;
   
-  background-color: transparent;
-  border: none;
+  background-color: var(--surface000);
+  border: 1px solid var(--divider);
   border-radius: 50%;
   
   cursor: pointer;

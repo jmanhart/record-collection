@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { Search } from "../Search/Search";
 import styles from "./AppBar.module.css";
 
@@ -24,8 +24,28 @@ export function AppBar({
   left,
   right,
 }: AppBarProps) {
+  // Transparent over content at the top (so the timeline hero bleeds up
+  // behind it); solid once scrolled so it doesn't clash with passing content.
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        setScrolled(window.scrollY > 8);
+        raf = 0;
+      });
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   return (
-    <header className={styles.appBar}>
+    <header className={`${styles.appBar} ${scrolled ? styles.scrolled : ""}`}>
       <div className={styles.left}>{left}</div>
       <div className={styles.searchSlot}>
         <Search

@@ -23,7 +23,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
+  /* Solid so the pills stay legible over the transparent AppBar (which, on
+     the timeline, sits over the colored hero). On solid-bg views this reads
+     the same as before. */
+  background: var(--surface000);
   border: 1px solid var(--divider);
   border-radius: 4px;
   padding: 0.375rem 0.75rem;
