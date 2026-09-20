@@ -9,6 +9,8 @@ interface AppBarProps {
   /** Controls flanking the search: sort on the left, filters on the right. */
   left?: ReactNode;
   right?: ReactNode;
+  /** Hidden on views that don't search (e.g. the timeline). */
+  showSearch?: boolean;
   /** True on views with a full-bleed hero the bar should overlay while it's
    *  still on screen (currently the timeline). */
   hasHero?: boolean;
@@ -28,6 +30,7 @@ export function AppBar({
   searchPlaceholder = "Search by title or artist...",
   left,
   right,
+  showSearch = true,
   hasHero = false,
 }: AppBarProps) {
   const [solid, setSolid] = useState(false);
@@ -83,13 +86,15 @@ export function AppBar({
   return (
     <header className={`${styles.appBar} ${solid ? styles.scrolled : ""}`}>
       <div className={styles.left}>{left}</div>
-      <div className={styles.searchSlot}>
-        <Search
-          value={search}
-          onChange={onSearchChange}
-          placeholder={searchPlaceholder}
-        />
-      </div>
+      {showSearch && (
+        <div className={styles.searchSlot}>
+          <Search
+            value={search}
+            onChange={onSearchChange}
+            placeholder={searchPlaceholder}
+          />
+        </div>
+      )}
       <div className={styles.right}>{right}</div>
     </header>
   );

@@ -72,6 +72,7 @@ function RecordList() {
       <AppBar
         search={search}
         onSearchChange={setSearch}
+        showSearch={!(isCollection && view === "timeline")}
         hasHero={isCollection && view === "timeline"}
         left={
           isCollection && view === "grid" ? (
@@ -94,7 +95,15 @@ function RecordList() {
           ) : undefined
         }
       />
-      {isCollection && <ViewSwitch view={view} onToggle={setView} />}
+      {isCollection && (
+        <ViewSwitch
+          view={view}
+          onToggle={(next) => {
+            if (next === "timeline") setSearch("");
+            setView(next);
+          }}
+        />
+      )}
       {isCollection && view === "grid" && <AlphabetIndicator records={records || []} />}
       <div className="container">
         <main className="main">
