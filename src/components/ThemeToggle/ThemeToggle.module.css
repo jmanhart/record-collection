@@ -11,14 +11,14 @@
   align-items: center;
   justify-content: center;
   
-  background-color: var(--surface000);
-  border: 1px solid var(--divider);
+  background-color: var(--control-bg);
+  border: 1px solid var(--control-border);
   border-radius: 50%;
-  
+
   cursor: pointer;
   transition: all 0.2s ease;
-  
-  color: var(--text-primary);
+
+  color: var(--control-text);
 }
 
 .themeToggle:hover {

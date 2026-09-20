@@ -45,13 +45,13 @@
   background: var(--hero-scrim, transparent);
 }
 
-/* Starts at the dot (cover's top corner) and drops down; the hero's
-   overflow:hidden clips it at the bottom edge, where the feed spine takes
-   over. No segment travels above the dot. */
+/* Dot + spine live on the status line now. The spine starts at the dot
+   (status center) and drops down; the hero's overflow:hidden clips it at the
+   bottom edge, where the feed spine takes over. */
 .spine {
   position: absolute;
   left: -1.5rem;
-  top: 0.9rem;
+  top: 50%;
   transform: translateX(-50%);
   width: 2px;
   height: 200vh;
@@ -67,24 +67,28 @@
 }
 
 .status {
+  position: relative;
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: clamp(0.9rem, 2.5vh, 1.6rem);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  margin-bottom: clamp(1rem, 2.5vh, 1.75rem);
 }
 
+/* Matches the feed's day-header date tag: big label + smaller meta beside. */
 .statusLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: clamp(1.4rem, 2.6vw, 1.75rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--hero-text, var(--text-primary));
 }
 
 .statusDetail {
+  font-size: 0.95rem;
   font-weight: 500;
-  letter-spacing: 0.02em;
-  text-transform: none;
   color: var(--hero-subtext, var(--text-secondary));
 }
 
@@ -118,18 +122,19 @@
   aspect-ratio: 1;
 }
 
-/* Dot on the spine at the top corner of the cover, mirroring a feed row. */
+/* Marker on the spine, level with the status line — mirrors the feed's
+   day-header dot. */
 .node {
   position: absolute;
   left: -1.5rem;
-  top: 0.5rem;
+  top: 50%;
   z-index: 2;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: var(--hero-text, var(--text-primary));
-  border: 3px solid var(--hero-color, var(--surface000));
+  background: var(--hero-color, var(--surface000));
+  border: 3px solid var(--hero-text, var(--text-primary));
   box-sizing: content-box;
 }
 

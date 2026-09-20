@@ -17,7 +17,7 @@ import { AppBar } from "./components/AppBar/AppBar";
 import { SortControls } from "./components/RecordGrid/SortControls";
 import { GenreSelect } from "./components/RecordGrid/GenreSelect";
 import { TimelineFeed } from "./components/Timeline/TimelineFeed";
-import { ViewToggle } from "./components/Timeline/ViewToggle";
+import { ViewSwitch } from "./components/Timeline/ViewSwitch";
 import type { TabValue } from "./components/Tabs/Tabs";
 import { WishlistList } from "./components/WishlistList/WishlistList";
 import { useRecords } from "./hooks/useRecords";
@@ -72,33 +72,20 @@ function RecordList() {
       <AppBar
         search={search}
         onSearchChange={setSearch}
+        hasHero={isCollection && view === "timeline"}
         left={
-          isCollection ? (
-            <>
-              <ViewToggle
-                label="Collection"
-                active={view === "grid"}
-                onClick={() => setView("grid")}
-              />
-              <ViewToggle
-                label="Timeline"
-                active={view === "timeline"}
-                onClick={() => setView("timeline")}
-              />
-              {view === "grid" && (
-                <SortControls
-                  sortField={sortField}
-                  sortOrder={sortOrder}
-                  onSortFieldChange={(field) => {
-                    setSortField(field as SortField);
-                    setSortOrder(field === "plays" ? "desc" : "asc");
-                  }}
-                  onSortOrderToggle={() =>
-                    setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-                  }
-                />
-              )}
-            </>
+          isCollection && view === "grid" ? (
+            <SortControls
+              sortField={sortField}
+              sortOrder={sortOrder}
+              onSortFieldChange={(field) => {
+                setSortField(field as SortField);
+                setSortOrder(field === "plays" ? "desc" : "asc");
+              }}
+              onSortOrderToggle={() =>
+                setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+              }
+            />
           ) : undefined
         }
         right={
@@ -107,6 +94,7 @@ function RecordList() {
           ) : undefined
         }
       />
+      {isCollection && <ViewSwitch view={view} onToggle={setView} />}
       {isCollection && view === "grid" && <AlphabetIndicator records={records || []} />}
       <div className="container">
         <main className="main">

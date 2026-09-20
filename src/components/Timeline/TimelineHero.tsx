@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Disc3 } from "lucide-react";
 import type { ActivityEvent } from "../../hooks/useActivity";
 import { formatRuntimeCompact } from "../../utils/formatDuration";
@@ -52,8 +52,30 @@ export function TimelineHero({
       subtext: isLight ? "rgba(20,20,20,0.66)" : "rgba(245,245,245,0.72)",
       scrim: isLight ? "rgba(255,255,255,0.44)" : "rgba(0,0,0,0.4)",
       chip: isLight ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.12)",
+      // Borders / fills for nav controls that adopt the hero's color world.
+      line: isLight ? "rgba(20,20,20,0.28)" : "rgba(245,245,245,0.34)",
+      fill: isLight ? "rgba(20,20,20,0.10)" : "rgba(245,245,245,0.16)",
     };
   }, [record?.dominant_color]);
+
+  // Publish the palette to :root so the fixed AppBar (a DOM sibling) can tint
+  // its controls to the hero while it's transparent over it. Cleared on
+  // unmount / when leaving the timeline.
+  useEffect(() => {
+    if (!palette) return;
+    const root = document.documentElement;
+    const vars: Record<string, string> = {
+      "--hero-color": palette.color,
+      "--hero-text": palette.text,
+      "--hero-subtext": palette.subtext,
+      "--hero-line": palette.line,
+      "--hero-fill": palette.fill,
+    };
+    for (const [k, v] of Object.entries(vars)) root.style.setProperty(k, v);
+    return () => {
+      for (const k of Object.keys(vars)) root.style.removeProperty(k);
+    };
+  }, [palette]);
 
   if (!record) return null;
 
@@ -86,6 +108,7 @@ export function TimelineHero({
       style={cssVars}
       onClick={() => onSelect(event)}
       aria-label={`${record.title} by ${record.artist} — open details`}
+      data-timeline-hero
     >
       {showImage && (
         <div
@@ -98,6 +121,10 @@ export function TimelineHero({
 
       <div className={styles.content}>
         <span className={styles.status}>
+          {/* Dot sits on the spine, level with the status; the spine drops
+              from here down into the feed (clipped at the hero's bottom). */}
+          <span className={styles.spine} aria-hidden />
+          <span className={styles.node} aria-hidden />
           {playing ? (
             <>
               <Disc3 size={15} className={styles.spin} />
@@ -117,11 +144,6 @@ export function TimelineHero({
 
         <div className={styles.body}>
           <div className={styles.cover}>
-            {/* Spine drops from the dot down into the feed (clipped at the
-                hero's bottom), so the timeline reads as continuous below the
-                status header without a stub above the dot. */}
-            <span className={styles.spine} aria-hidden />
-            <span className={styles.node} aria-hidden />
             {showImage ? (
               <img
                 src={cover}
