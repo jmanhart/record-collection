@@ -1,0 +1,27 @@
+/* Pinned to the bottom of the hero, spanning the content width (aligned to the
+   same gutter as the spine/text). Bars scale from their base, so keep them
+   anchored to the bottom. */
+.bars {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 44px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 0 var(--grid-left, 2rem);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bar {
+  flex: 0 0 4px;
+  width: 4px;
+  height: 100%;
+  transform-origin: bottom;
+  border-radius: 2px 2px 0 0;
+  background: var(--hero-text, var(--text-primary));
+  opacity: 0.2;
+}

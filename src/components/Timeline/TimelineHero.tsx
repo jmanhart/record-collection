@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from "react";
 import { Disc3 } from "lucide-react";
 import type { ActivityEvent } from "../../hooks/useActivity";
 import { formatRuntimeCompact } from "../../utils/formatDuration";
+import { EqualizerBars } from "./EqualizerBars";
 import styles from "./TimelineHero.module.css";
 
 interface TimelineHeroProps {
@@ -118,16 +119,23 @@ export function TimelineHero({
         />
       )}
       <div className={styles.scrim} aria-hidden />
+      <EqualizerBars active={playing} />
 
       <div className={styles.content}>
         <span className={styles.status}>
-          {/* Dot sits on the spine, level with the status; the spine drops
-              from here down into the feed (clipped at the hero's bottom). */}
+          {/* Spine drops from the marker down into the feed (clipped at the
+              hero's bottom). When playing, the marker becomes the spinning
+              disc; otherwise it's the timeline dot. */}
           <span className={styles.spine} aria-hidden />
-          <span className={styles.node} aria-hidden />
+          {playing ? (
+            <span className={styles.playingIcon} aria-hidden>
+              <Disc3 size={26} className={styles.spin} />
+            </span>
+          ) : (
+            <span className={styles.node} aria-hidden />
+          )}
           {playing ? (
             <>
-              <Disc3 size={15} className={styles.spin} />
               <span className={styles.statusLabel}>Now Playing</span>
               <span className={styles.statusDetail}>since {since}</span>
             </>
