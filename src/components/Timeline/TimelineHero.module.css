@@ -147,6 +147,12 @@
   z-index: 2;
   transform: translate(-50%, -50%);
   display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Solid seat so the spine reads as stopping at the disc, like a node/dot. */
+  padding: 5px;
+  border-radius: 50%;
+  background: var(--hero-color, var(--surface000));
   color: var(--hero-text, var(--text-primary));
 }
 
@@ -195,22 +201,11 @@
   color: var(--hero-subtext, var(--text-secondary));
 }
 
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+.meta {
   margin: 1.35rem 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.chip {
-  padding: 0.3rem 0.75rem;
-  border-radius: 999px;
-  background: var(--hero-chip, var(--surface200));
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   font-weight: 500;
-  color: var(--hero-text, var(--text-primary));
+  color: var(--hero-subtext, var(--text-secondary));
 }
 
 .footer {

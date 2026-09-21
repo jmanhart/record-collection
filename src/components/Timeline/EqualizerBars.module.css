@@ -1,17 +1,15 @@
-/* Pinned to the bottom of the hero, spanning the content width (aligned to the
-   same gutter as the spine/text). Bars scale from their base, so keep them
-   anchored to the bottom. */
+/* Pinned to the bottom of the hero, starting flush with the album's left edge
+   (content gutter + the cover's own gutter) and running to the right margin.
+   Bars scale from their base, so keep them anchored to the bottom. */
 .bars {
   position: absolute;
-  left: 0;
-  right: 0;
+  left: calc(var(--grid-left, 2rem) + 2.75rem);
+  right: var(--grid-left, 2rem);
   bottom: 0;
   height: 44px;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 4px;
-  padding: 0 var(--grid-left, 2rem);
   pointer-events: none;
   overflow: hidden;
 }

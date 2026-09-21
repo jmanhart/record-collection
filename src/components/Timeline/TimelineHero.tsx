@@ -171,13 +171,7 @@ export function TimelineHero({
             <p className={styles.artist}>{record.artist}</p>
 
             {meta.length > 0 && (
-              <ul className={styles.chips}>
-                {meta.map((m) => (
-                  <li key={String(m)} className={styles.chip}>
-                    {m}
-                  </li>
-                ))}
-              </ul>
+              <p className={styles.meta}>{meta.join(" · ")}</p>
             )}
 
             <div className={styles.footer}>
