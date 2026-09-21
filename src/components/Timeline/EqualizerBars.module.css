@@ -1,0 +1,25 @@
+/* Pinned to the bottom of the hero, starting flush with the album's left edge
+   (content gutter + the cover's own gutter) and running to the right margin.
+   Bars scale from their base, so keep them anchored to the bottom. */
+.bars {
+  position: absolute;
+  left: calc(var(--grid-left, 2rem) + 2.75rem);
+  right: var(--grid-left, 2rem);
+  bottom: 0;
+  height: 44px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bar {
+  flex: 0 0 4px;
+  width: 4px;
+  height: 100%;
+  transform-origin: bottom;
+  border-radius: 2px 2px 0 0;
+  background: var(--hero-text, var(--text-primary));
+  opacity: 0.2;
+}
