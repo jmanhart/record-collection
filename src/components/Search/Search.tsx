@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Search as SearchIcon } from "lucide-react";
 import styles from "./Search.module.css";
 
@@ -18,13 +18,17 @@ export function Search({
   variant = "default",
 }: SearchProps) {
   const compact = variant === "compact";
+  const [focused, setFocused] = useState(false);
 
-  // While the compact search is focused, flag the body so the sibling view-nav
-  // cluster (outside this subtree) can dim. Cleared on unmount for safety.
+  // Dim the album grid (via a body flag) only while the compact search is
+  // focused with no query yet — once results are showing they stay fully
+  // visible. Cleared on unmount for safety.
   useEffect(() => {
     if (!compact) return;
+    const searchMode = focused && value.trim() === "";
+    document.body.classList.toggle("search-focused", searchMode);
     return () => document.body.classList.remove("search-focused");
-  }, [compact]);
+  }, [compact, focused, value]);
   return (
     <div
       className={`${styles.searchContainer} ${compact ? styles.compact : ""}`}
@@ -38,8 +42,8 @@ export function Search({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className={styles.searchInput}
-        onFocus={() => compact && document.body.classList.add("search-focused")}
-        onBlur={() => compact && document.body.classList.remove("search-focused")}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
       />
     </div>
   );
