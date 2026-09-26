@@ -226,7 +226,7 @@
   line-height: 1.05;
   letter-spacing: -0.02em;
   text-wrap: balance;
-  max-width: 18ch;
+  max-width: 32ch;
 }
 
 .artist {
