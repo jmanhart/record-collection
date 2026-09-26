@@ -109,6 +109,9 @@ export function TimelineHero({
       // Borders / fills for nav controls that adopt the hero's color world.
       line: isLight ? "rgba(20,20,20,0.28)" : "rgba(245,245,245,0.34)",
       fill: isLight ? "rgba(20,20,20,0.10)" : "rgba(245,245,245,0.16)",
+      // Cover drop-shadow tinted to the dominant hue (darkened) instead of
+      // flat black, so it grounds the art in the hero's color world.
+      shadow: `rgba(${Math.round(r * 0.38)}, ${Math.round(g * 0.38)}, ${Math.round(b * 0.38)}, 0.32)`,
     };
   }, [record?.dominant_color]);
 
@@ -156,6 +159,7 @@ export function TimelineHero({
         "--hero-subtext": palette.subtext,
         "--hero-scrim": palette.scrim,
         "--hero-chip": palette.chip,
+        "--hero-shadow": palette.shadow,
       } as React.CSSProperties)
     : undefined;
 
