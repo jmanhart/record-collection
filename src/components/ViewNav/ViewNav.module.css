@@ -29,7 +29,10 @@
 }
 
 .button:hover {
-  opacity: 0.7;
+  /* Hold the control text color; the global a:hover would otherwise recolor the
+     icon to --link-hover (black), which vanishes on the dark timeline hero. */
+  color: var(--control-text);
+  background: var(--control-active-bg);
   transform: scale(1.1);
 }
 
@@ -43,6 +46,7 @@
 .buttonActive:hover {
   background: var(--control-active-bg);
   border-color: var(--control-text);
+  color: var(--control-text);
   opacity: 1;
 }
 
