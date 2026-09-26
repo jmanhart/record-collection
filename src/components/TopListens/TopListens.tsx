@@ -100,14 +100,14 @@ export default function TopListens() {
           a.record.title.localeCompare(b.record.title)
       );
 
-    // Standard competition-ranking display: the first album at a given play
-    // count carries its rank number (1 + albums with strictly more plays); the
-    // albums below it that share that same count show a dash, since repeating
-    // the number would imply an order among equals that doesn't exist.
+    // Dense ranking: each distinct play count is one place, so tiers read 1st,
+    // 2nd, 3rd… with no gaps for ties — a 5-play album sitting below a 6-play
+    // tie is 3rd, not 5th. The leader of each tier carries the number; the
+    // albums sharing its count show a dash.
     const rankByPlays = new Map<number, number>();
-    items.forEach((it, i) => {
-      if (!rankByPlays.has(it.plays)) rankByPlays.set(it.plays, i + 1);
-    });
+    for (const it of items) {
+      if (!rankByPlays.has(it.plays)) rankByPlays.set(it.plays, rankByPlays.size + 1);
+    }
 
     const numbered = new Set<number>();
     return items.map((it) => {
