@@ -1,0 +1,36 @@
+/* Sits above the ranked feed; the feed itself reuses the timeline's spine and
+   row styles so Top Listens reads as a sibling of the timeline view. */
+.pageHeader {
+  margin: 0 0 2.5rem;
+}
+
+.pageTitle {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.pageSubtitle {
+  margin: 0.35rem 0 0;
+  font-size: 1rem;
+  color: var(--text-tertiary);
+}
+
+/* Rank numeral seated on the feed spine, in place of the timeline dot. Ringed
+   in the page background so it reads as sitting on top of the line. */
+.rankMarker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--surface000);
+  border: 2px solid var(--text-secondary);
+  box-sizing: border-box;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-primary);
+}
