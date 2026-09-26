@@ -139,13 +139,15 @@ export function TimelineHero({
   const showImage = cover && !imageError;
   const trackCount =
     record.tracklist?.filter((t) => t.type_ !== "heading").length ?? 0;
-  const meta = [
-    record.year,
-    record.format_descriptions?.length
-      ? record.format_descriptions.join(", ")
-      : record.format_name,
-    record.genres?.length ? record.genres.join(", ") : null,
-  ].filter(Boolean) as (string | number)[];
+  const metaTags = [
+    record.year ? String(record.year) : null,
+    ...(record.format_descriptions?.length
+      ? record.format_descriptions
+      : record.format_name
+        ? [record.format_name]
+        : []),
+    ...(record.genres ?? []),
+  ].filter(Boolean) as string[];
 
   const cssVars = palette
     ? ({
@@ -226,8 +228,14 @@ export function TimelineHero({
             <h2 className={styles.title}>{record.title}</h2>
             <p className={styles.artist}>{record.artist}</p>
 
-            {meta.length > 0 && (
-              <p className={styles.meta}>{meta.join(" · ")}</p>
+            {metaTags.length > 0 && (
+              <div className={styles.meta}>
+                {metaTags.map((tag, i) => (
+                  <span key={`${i}-${tag}`} className={styles.metaTag}>
+                    {tag}
+                  </span>
+                ))}
+              </div>
             )}
 
             <div className={styles.footer}>

@@ -211,11 +211,25 @@
   color: var(--hero-subtext, var(--text-secondary));
 }
 
+/* Metadata as tag pills; colors come from the hero palette (--hero-chip /
+   --hero-line / --hero-subtext are luminance-picked) so they read on either a
+   light or dark cover. */
 .meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   margin: 1.35rem 0 0;
-  font-size: 0.95rem;
-  font-weight: 500;
+}
+
+.metaTag {
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  background: var(--hero-chip, var(--surface200));
+  border: 1px solid var(--hero-line, var(--divider));
   color: var(--hero-subtext, var(--text-secondary));
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .footer {
