@@ -232,18 +232,9 @@
   white-space: nowrap;
 }
 
-.footer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.6rem 0.75rem;
-  margin-top: 1.6rem;
-  font-size: 0.95rem;
-  color: var(--hero-subtext, var(--text-secondary));
-}
-
-.footItem {
-  font-weight: 500;
+.sep {
+  margin: 0 0.45rem;
+  opacity: 0.45;
 }
 
 @media (max-width: 768px) {

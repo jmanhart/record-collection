@@ -137,15 +137,16 @@ export function TimelineHero({
   const showImage = cover && !imageError;
   const trackCount =
     record.tracklist?.filter((t) => t.type_ !== "heading").length ?? 0;
-  const metaTags = [
-    record.year ? String(record.year) : null,
-    ...(record.format_descriptions?.length
-      ? record.format_descriptions
-      : record.format_name
-        ? [record.format_name]
-        : []),
-    ...(record.genres ?? []),
-  ].filter(Boolean) as string[];
+  const trackLabel =
+    trackCount > 0
+      ? `${trackCount} ${trackCount === 1 ? "track" : "tracks"}`
+      : null;
+  const runtime = record.duration_seconds
+    ? formatRuntimeCompact(record.duration_seconds)
+    : null;
+  const metaTags = [record.year ? String(record.year) : null].filter(
+    Boolean,
+  ) as string[];
 
   const cssVars = palette
     ? ({
@@ -226,29 +227,25 @@ export function TimelineHero({
             <h2 className={styles.title}>{record.title}</h2>
             <p className={styles.artist}>{record.artist}</p>
 
-            {metaTags.length > 0 && (
+            {(metaTags.length > 0 || trackLabel || runtime || ordinal === 1) && (
               <div className={styles.meta}>
                 {metaTags.map((tag, i) => (
                   <span key={`${i}-${tag}`} className={styles.metaTag}>
                     {tag}
                   </span>
                 ))}
+                {(trackLabel || runtime) && (
+                  <span className={styles.metaTag}>
+                    {trackLabel}
+                    {trackLabel && runtime && (
+                      <span className={styles.sep}>|</span>
+                    )}
+                    {runtime}
+                  </span>
+                )}
+                {ordinal === 1 && <span className={styles.metaTag}>1st Spin</span>}
               </div>
             )}
-
-            <div className={styles.footer}>
-              {trackCount > 0 && (
-                <span className={styles.footItem}>
-                  {trackCount} {trackCount === 1 ? "track" : "tracks"}
-                </span>
-              )}
-              {record.duration_seconds ? (
-                <span className={styles.metaTag}>
-                  {formatRuntimeCompact(record.duration_seconds)}
-                </span>
-              ) : null}
-              {ordinal === 1 && <span className={styles.metaTag}>1st Spin</span>}
-            </div>
           </div>
         </div>
       </div>
