@@ -50,7 +50,6 @@ export function Search({
           type="button"
           className={styles.clearButton}
           aria-label="Clear search"
-          onMouseDown={(e) => e.preventDefault()}
           onClick={() => onChange("")}
         >
           <X size={16} />
