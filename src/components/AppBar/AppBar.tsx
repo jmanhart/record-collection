@@ -1,4 +1,4 @@
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect } from "react";
 import { Search } from "../Search/Search";
 import styles from "./AppBar.module.css";
 
@@ -6,9 +6,6 @@ interface AppBarProps {
   search: string;
   onSearchChange: (value: string) => void;
   searchPlaceholder?: string;
-  /** Controls flanking the search: sort on the left, filters on the right. */
-  left?: ReactNode;
-  right?: ReactNode;
   /** Hidden on views that don't search (e.g. the timeline). */
   showSearch?: boolean;
   /** True on views with a full-bleed hero the bar should overlay while it's
@@ -17,8 +14,8 @@ interface AppBarProps {
 }
 
 /**
- * Top-level app bar: fixed overlay, centered search flanked by an optional
- * left (sort) and right (filter) slot. Transparent at the top; on a hero view
+ * Top-level app bar: fixed overlay holding a compact search aligned to the
+ * page's left gutter. Transparent at the top; on a hero view
  * it stays transparent and tints its controls to the hero (via body class)
  * until the hero scrolls past, then turns solid. On other views it turns solid
  * as soon as the page scrolls. The view switch is a separate globally-fixed
@@ -27,9 +24,7 @@ interface AppBarProps {
 export function AppBar({
   search,
   onSearchChange,
-  searchPlaceholder = "Search by title or artist...",
-  left,
-  right,
+  searchPlaceholder = "Search...",
   showSearch = true,
   hasHero = false,
 }: AppBarProps) {
@@ -86,17 +81,14 @@ export function AppBar({
 
   return (
     <header className={`${styles.appBar} ${solid ? styles.scrolled : ""}`}>
-      <div className={styles.left}>{left}</div>
       {showSearch && (
-        <div className={styles.searchSlot}>
-          <Search
-            value={search}
-            onChange={onSearchChange}
-            placeholder={searchPlaceholder}
-          />
-        </div>
+        <Search
+          value={search}
+          onChange={onSearchChange}
+          placeholder={searchPlaceholder}
+          variant="compact"
+        />
       )}
-      <div className={styles.right}>{right}</div>
     </header>
   );
 }

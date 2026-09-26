@@ -49,3 +49,38 @@
     font-size: 16px; /* Prevent zoom on iOS */
   }
 }
+
+/* Compact variant — pill-shaped and control-skinned to match the view-nav
+   buttons: fixed 180px wide, same height/border, with a leading icon sized like
+   the button icons. */
+.compact {
+  width: 180px;
+  height: 2.25rem;
+}
+
+.compact .searchIcon {
+  left: 0.75rem;
+  opacity: 1;
+}
+
+.compact .searchInput {
+  height: 100%;
+  padding: 0 0.875rem 0 2.5rem;
+  border: 1px solid var(--control-border);
+  border-radius: 999px;
+}
+
+.compact .searchInput:hover {
+  border-color: var(--control-text);
+}
+
+.compact .searchInput:focus {
+  border-color: var(--control-text);
+  box-shadow: none;
+}
+
+@media (max-width: 768px) {
+  .compact {
+    height: 2rem;
+  }
+}

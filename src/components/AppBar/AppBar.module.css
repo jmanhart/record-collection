@@ -1,23 +1,21 @@
-/* Fixed overlay across all views: transparent at the top so the timeline
-   hero's color bleeds up behind it, turning solid (--surface000 + --divider
-   border) once the page scrolls under it. Content is offset by --nav-height
-   in .container; the timeline hero cancels that offset to sit behind the bar.
+/* Fixed overlay across all views: transparent at the top so the timeline hero's
+   color bleeds up behind it, turning solid (--surface000 + --divider border)
+   once the page scrolls under it. Content is offset by --nav-height in
+   .container; the timeline hero cancels that offset to sit behind the bar.
 
-   Three columns with equal 1fr flanks keep the centered search column
-   aligned to the true viewport centre regardless of what the side slots
-   hold. Symmetric side padding both frames the bar and leaves the right
-   corner clear for the globally-fixed view switch. */
+   Holds a single compact search pinned to the left, aligned to the page grid's
+   left gutter (--grid-left mirrors the .container max-width + padding) and on the
+   same line as the fixed view-nav cluster in the right corner. */
 .appBar {
+  --grid-left: max(2rem, calc((100vw - 1280px) / 2 + 2rem));
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 100;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 0.75rem 6.5rem 0.75rem 4rem;
+  padding: 1rem var(--grid-left);
   background: transparent;
   border-bottom: 1px solid transparent;
   transition: background-color 0.2s ease, border-color 0.2s ease;
@@ -29,36 +27,10 @@
   border-bottom-color: var(--divider);
 }
 
-.left {
-  justify-self: start;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  min-width: 0;
-}
-
-.right {
-  justify-self: end;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  min-width: 0;
-}
-
-/* Search sits centered, capped so it reads as a focal element rather
-   than stretching the full width. */
-.searchSlot {
-  width: clamp(16rem, 45vw, 40rem);
-}
-
 @media (max-width: 768px) {
   .appBar {
-    grid-template-columns: 1fr auto 1fr;
-    gap: 0.5rem;
-    padding: 0.625rem 5rem 0.625rem 1rem;
-  }
-
-  .searchSlot {
-    width: clamp(8rem, 40vw, 40rem);
+    --grid-left: 1rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
   }
 }
