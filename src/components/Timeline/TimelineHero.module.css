@@ -25,6 +25,12 @@
   color: var(--hero-text, var(--text-primary));
 }
 
+/* The hero is a <button>, so the global button:hover surface tint would flatten
+   its cover color. Hold the resting background on hover to kill that effect. */
+.hero:hover {
+  background: var(--hero-color, var(--surface100));
+}
+
 /* Blurred, enlarged cover for ambient richness over the flat color base. */
 .ambient {
   position: absolute;
@@ -51,7 +57,7 @@
 .spine {
   position: absolute;
   left: -1.5rem;
-  top: 50%;
+  top: 0.55em;
   transform: translateX(-50%);
   width: 2px;
   height: 200vh;
@@ -69,20 +75,24 @@
 .status {
   position: relative;
   display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 0.5rem 0.75rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
   margin-bottom: clamp(1rem, 2.5vh, 1.75rem);
+  /* Base size = the label; the marker/spine use em off this to sit on the
+     first line. */
+  font-size: clamp(1.4rem, 2.6vw, 1.75rem);
 }
 
-/* Matches the feed's day-header date tag: big label + smaller meta beside. */
+/* Matches the feed's day-header date tag; sits on its own line above the meta. */
 .statusLabel {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: clamp(1.4rem, 2.6vw, 1.75rem);
+  font-size: 1em;
   font-weight: 700;
   letter-spacing: -0.01em;
+  line-height: 1.1;
   color: var(--hero-text, var(--text-primary));
 }
 
@@ -127,7 +137,7 @@
 .node {
   position: absolute;
   left: -1.5rem;
-  top: 50%;
+  top: 0.55em;
   z-index: 2;
   transform: translate(-50%, -50%);
   width: 12px;
@@ -143,7 +153,7 @@
 .playingIcon {
   position: absolute;
   left: -1.5rem;
-  top: 50%;
+  top: 0.55em;
   z-index: 2;
   transform: translate(-50%, -50%);
   display: flex;

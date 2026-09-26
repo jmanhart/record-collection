@@ -8,6 +8,16 @@
   transform: translateY(-50%);
   z-index: 100;
   user-select: none;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* The month rail lives behind the Now Playing hero: while the hero is still
+   on screen (AppBar flags this on <body>) the rail stays hidden, then fades
+   in once the hero scrolls out of view. Position is unchanged either way. */
+:global(body.nav-over-hero) .container {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .months {

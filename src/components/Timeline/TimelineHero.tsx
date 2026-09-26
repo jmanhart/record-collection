@@ -5,6 +5,55 @@ import { formatRuntimeCompact } from "../../utils/formatDuration";
 import { EqualizerBars } from "./EqualizerBars";
 import styles from "./TimelineHero.module.css";
 
+// RGB (0–255) → HSL. Used to derive an analogous-but-darker bar color that
+// stays in the same family as the cover's dominant color.
+function rgbToHsl(r: number, g: number, b: number) {
+  r /= 255;
+  g /= 255;
+  b /= 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  const d = max - min;
+  let h = 0;
+  let s = 0;
+  if (d) {
+    s = d / (1 - Math.abs(2 * l - 1));
+    switch (max) {
+      case r:
+        h = (((g - b) / d) % 6 + 6) % 6;
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      default:
+        h = (r - g) / d + 4;
+    }
+    h *= 60;
+  }
+  return { h, s, l };
+}
+
+function hslToHex(h: number, s: number, l: number) {
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = l - c / 2;
+  let r = 0;
+  let g = 0;
+  let b = 0;
+  if (h < 60) [r, g] = [c, x];
+  else if (h < 120) [r, g] = [x, c];
+  else if (h < 180) [g, b] = [c, x];
+  else if (h < 240) [g, b] = [x, c];
+  else if (h < 300) [r, b] = [x, c];
+  else [r, b] = [c, x];
+  const to = (v: number) =>
+    Math.round((v + m) * 255)
+      .toString(16)
+      .padStart(2, "0");
+  return `#${to(r)}${to(g)}${to(b)}`;
+}
+
 interface TimelineHeroProps {
   event: ActivityEvent;
   playing: boolean;
@@ -47,8 +96,14 @@ export function TimelineHero({
     const b = parseInt(hex.slice(4, 6), 16);
     // Perceived luminance (ITU-R BT.601) → light backgrounds get dark ink.
     const isLight = (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.62;
+    // Equalizer bars: same color family as the hero background, hue nudged for
+    // an analogous relationship and lightness halved so they read as a darker
+    // shade of the backdrop rather than generic ink.
+    const { h, s, l } = rgbToHsl(r, g, b);
+    const bar = hslToHex((h + 340) % 360, s, Math.max(0.08, l * 0.5));
     return {
       color,
+      bar,
       text: isLight ? "#141414" : "#f5f5f5",
       subtext: isLight ? "rgba(20,20,20,0.66)" : "rgba(245,245,245,0.72)",
       scrim: isLight ? "rgba(255,255,255,0.44)" : "rgba(0,0,0,0.4)",
@@ -95,6 +150,7 @@ export function TimelineHero({
   const cssVars = palette
     ? ({
         "--hero-color": palette.color,
+        "--hero-bar": palette.bar,
         "--hero-text": palette.text,
         "--hero-subtext": palette.subtext,
         "--hero-scrim": palette.scrim,
