@@ -65,7 +65,7 @@
 
 .compact .searchInput {
   height: 100%;
-  padding: 0 0.875rem 0 2.5rem;
+  padding: 0 2rem 0 2.5rem;
   border: 1px solid var(--control-border);
   border-radius: 999px;
 }
@@ -77,6 +77,29 @@
 .compact .searchInput:focus {
   border-color: var(--control-text);
   box-shadow: none;
+}
+
+.compact .clearButton {
+  position: absolute;
+  right: 0.5rem;
+  width: auto;
+  height: auto;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--control-text);
+  opacity: 0.55;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.compact .clearButton:hover {
+  background: none;
+  opacity: 1;
 }
 
 @media (max-width: 768px) {

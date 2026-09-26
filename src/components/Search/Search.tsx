@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Search as SearchIcon } from "lucide-react";
+import { Search as SearchIcon, X } from "lucide-react";
 import styles from "./Search.module.css";
 
 interface SearchProps {
@@ -45,6 +45,17 @@ export function Search({
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
       />
+      {compact && value && (
+        <button
+          type="button"
+          className={styles.clearButton}
+          aria-label="Clear search"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => onChange("")}
+        >
+          <X size={16} />
+        </button>
+      )}
     </div>
   );
 }
