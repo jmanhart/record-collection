@@ -1,8 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { LayoutGrid } from "lucide-react";
 import { AppBar } from "../AppBar/AppBar";
-import { CircleLink } from "./CircleLink";
+import { ViewNav } from "../ViewNav/ViewNav";
 import { useListens } from "../../hooks/useListens";
 import { useRecords } from "../../hooks/useRecords";
 import { slugify } from "../../utils/slugify";
@@ -209,9 +208,7 @@ export default function TopListens() {
   return (
     <div className="app">
       <AppBar search="" onSearchChange={() => {}} showSearch={false} />
-      <CircleLink to="/" label="Back to collection" placement="corner">
-        <LayoutGrid size={20} />
-      </CircleLink>
+      <ViewNav />
       <div className="container">
         <main className="main">
           <header className={styles.pageHeader}>

@@ -13,18 +13,13 @@ import { ArtistProgressList } from "./components/ArtistProgress/ArtistProgressLi
 import { ArtistProgressDetail } from "./components/ArtistProgress/ArtistProgressDetail";
 import { AlphabetIndicator } from "./components/AlphabetIndicator/AlphabetIndicator";
 import { AppBar } from "./components/AppBar/AppBar";
-import { SortControls } from "./components/RecordGrid/SortControls";
-import { GenreSelect } from "./components/RecordGrid/GenreSelect";
 import { TimelineFeed } from "./components/Timeline/TimelineFeed";
-import { ViewSwitch } from "./components/Timeline/ViewSwitch";
-import { CircleLink } from "./components/TopListens/CircleLink";
+import { ViewNav } from "./components/ViewNav/ViewNav";
 import TopListens from "./components/TopListens/TopListens";
-import { ListOrdered } from "lucide-react";
 import type { TabValue } from "./components/Tabs/Tabs";
 import { WishlistList } from "./components/WishlistList/WishlistList";
 import { useRecords } from "./hooks/useRecords";
 import { useWishlist } from "./hooks/useWishlist";
-import type { SortField, SortOrder } from "./types/Record";
 import "./App.css";
 
 // Lazy so the collection bundle doesn't pay for the charting library
@@ -36,16 +31,7 @@ function RecordList() {
   const activeTab = (searchParams.get("tab") as TabValue) || "collection";
   const artistSlug = searchParams.get("artist");
   const [search, setSearch] = useState("");
-  const [sortField, setSortField] = useState<SortField>("artist");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
-  const [genre, setGenre] = useState("all");
   const view = searchParams.get("view") === "timeline" ? "timeline" : "grid";
-  const setView = (next: "grid" | "timeline") => {
-    const params = new URLSearchParams(searchParams);
-    if (next === "timeline") params.set("view", "timeline");
-    else params.delete("view");
-    setSearchParams(params, { replace: true });
-  };
 
   const { records, isLoading: isLoadingRecords, error: recordsError } = useRecords();
   const { records: wishlistRecords, isLoading: isLoadingWishlist, error: wishlistError } = useWishlist();
@@ -76,41 +62,8 @@ function RecordList() {
         onSearchChange={setSearch}
         showSearch={!(isCollection && view === "timeline")}
         hasHero={isCollection && view === "timeline"}
-        left={
-          isCollection && view === "grid" ? (
-            <SortControls
-              sortField={sortField}
-              sortOrder={sortOrder}
-              onSortFieldChange={(field) => {
-                setSortField(field as SortField);
-                setSortOrder(field === "plays" ? "desc" : "asc");
-              }}
-              onSortOrderToggle={() =>
-                setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-              }
-            />
-          ) : undefined
-        }
-        right={
-          isCollection && view === "grid" ? (
-            <GenreSelect records={records || []} value={genre} onChange={setGenre} />
-          ) : undefined
-        }
       />
-      {isCollection && (
-        <>
-          <CircleLink to="/top-listens" label="Top listens" placement="beside">
-            <ListOrdered size={20} />
-          </CircleLink>
-          <ViewSwitch
-            view={view}
-            onToggle={(next) => {
-              if (next === "timeline") setSearch("");
-              setView(next);
-            }}
-          />
-        </>
-      )}
+      {isCollection && <ViewNav />}
       {isCollection && view === "grid" && <AlphabetIndicator records={records || []} />}
       <div className="container">
         <main className="main">
@@ -122,9 +75,9 @@ function RecordList() {
                 records={records || []}
                 isLoading={isLoadingRecords}
                 search={search}
-                sortField={sortField}
-                sortOrder={sortOrder}
-                genre={genre}
+                sortField="artist"
+                sortOrder="asc"
+                genre="all"
               />
             )
           ) : activeTab === "wishlist" ? (
