@@ -200,6 +200,13 @@ export function TimelineHero({
         />
       )}
       <div className={styles.scrim} aria-hidden />
+      {showImage && (
+        <div
+          className={styles.edgeArt}
+          style={{ backgroundImage: `url(${cover})` }}
+          aria-hidden
+        />
+      )}
       <EqualizerBars active={playing} />
 
       <div className={styles.content}>

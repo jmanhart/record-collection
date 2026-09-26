@@ -51,6 +51,23 @@
   background: var(--hero-scrim, transparent);
 }
 
+/* A muted copy of the cover bleeding in from the right edge, masked so it
+   dissolves into the hero color toward the center. Sits above the scrim but
+   below content — a quiet backdrop accent, not a focal image. */
+.edgeArt {
+  position: absolute;
+  inset: 0 0 0 auto;
+  z-index: -1;
+  width: min(48%, 620px);
+  background-size: cover;
+  background-position: center;
+  opacity: 0.16;
+  filter: saturate(0.8);
+  -webkit-mask-image: linear-gradient(to left, #000 0%, transparent 82%);
+  mask-image: linear-gradient(to left, #000 0%, transparent 82%);
+  pointer-events: none;
+}
+
 /* Dot + spine live on the status line now. The spine starts at the dot
    (status center) and drops down; the hero's overflow:hidden clips it at the
    bottom edge, where the feed spine takes over. */
