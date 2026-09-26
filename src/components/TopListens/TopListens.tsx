@@ -20,36 +20,24 @@ interface Rankable {
 }
 
 /**
- * Dense ranking: sort by plays (ties broken by recency, then sortKey), then give
- * each distinct play count one place — so tiers read 1st, 2nd, 3rd with no gaps.
- * The first item at a count carries its number; the rest sharing that count get
- * a dash, since a distinct number there would imply an order among equals.
+ * Order by plays (ties broken by most-recent listen, then sortKey) and label
+ * each entry with its raw play count. Showing the count sidesteps rank ties —
+ * equal counts simply share the same number.
  */
-function assignRanks<T extends Rankable>(items: T[]): (T & { marker: string; shared: boolean })[] {
-  const sorted = [...items].sort(
-    (a, b) =>
-      b.plays - a.plays ||
-      b.last.localeCompare(a.last) ||
-      a.sortKey.localeCompare(b.sortKey)
-  );
-
-  const rankByPlays = new Map<number, number>();
-  for (const it of sorted) {
-    if (!rankByPlays.has(it.plays)) rankByPlays.set(it.plays, rankByPlays.size + 1);
-  }
-
-  const numbered = new Set<number>();
-  return sorted.map((it) => {
-    const shared = numbered.has(it.plays);
-    numbered.add(it.plays);
-    return { ...it, shared, marker: shared ? "\u2013" : String(rankByPlays.get(it.plays)) };
-  });
+function orderByPlays<T extends Rankable>(items: T[]): (T & { marker: string })[] {
+  return [...items]
+    .sort(
+      (a, b) =>
+        b.plays - a.plays ||
+        b.last.localeCompare(a.last) ||
+        a.sortKey.localeCompare(b.sortKey)
+    )
+    .map((it) => ({ ...it, marker: String(it.plays) }));
 }
 
 interface RowData {
   id: string | number;
   marker: string;
-  shared: boolean;
   cover?: string;
   fallback: string;
   when: string;
@@ -59,8 +47,8 @@ interface RowData {
   to?: string;
 }
 
-/** A ranked row styled as a timeline row: rank numeral (or dash) on the spine,
- *  cover, and metadata. Links to the album detail when `to` is set. */
+/** A row styled as a timeline row: play-count marker on the spine, cover, and
+ *  metadata. Links to the album detail when `to` is set. */
 function TopRow({ data }: { data: RowData }) {
   const [imageError, setImageError] = useState(false);
   const showImage = data.cover && !imageError;
@@ -93,9 +81,7 @@ function TopRow({ data }: { data: RowData }) {
   return (
     <div className={feed.row}>
       <span className={feed.node}>
-        <span className={styles.rankMarker} aria-hidden={data.shared}>
-          {data.marker}
-        </span>
+        <span className={styles.rankMarker}>{data.marker}</span>
       </span>
       {data.to ? (
         <Link to={data.to} className={feed.card}>
@@ -115,7 +101,7 @@ function plural(n: number, word: string): string {
 /**
  * Top Listens: records — or artists — ranked by all-time spin count. Shares the
  * timeline's react-query data (so the route loads instantly) and its spine + row
- * look; the marker carries each entry's dense rank, or a dash when tied.
+ * look; the marker shows each entry's play count.
  */
 export default function TopListens() {
   const { listens, isLoading: listensLoading } = useListens();
@@ -145,10 +131,9 @@ export default function TopListens() {
         last: perRecord.lastListened.get(record.id) ?? "",
         sortKey: record.title,
       }));
-    return assignRanks(items).map(({ record, plays, marker, shared }) => ({
+    return orderByPlays(items).map(({ record, plays, marker }) => ({
       id: record.id,
       marker,
-      shared,
       cover: record.supabase_image_url,
       fallback: record.title[0] ?? "?",
       when: `Played ${plural(plays, "time")}`,
@@ -190,10 +175,9 @@ export default function TopListens() {
     }
 
     const items = [...byArtist.values()].map((e) => ({ ...e, sortKey: e.artist }));
-    return assignRanks(items).map((e) => ({
+    return orderByPlays(items).map((e) => ({
       id: e.artist,
       marker: e.marker,
-      shared: e.shared,
       cover: e.cover,
       fallback: e.artist[0] ?? "?",
       when: `Played ${plural(e.plays, "time")}`,
