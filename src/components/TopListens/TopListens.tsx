@@ -10,14 +10,17 @@ import type { Record } from "../../types/Record";
 import feed from "../Timeline/TimelineFeed.module.css";
 import styles from "./TopListens.module.css";
 
-/** A single ranked album, styled as a timeline row with a rank numeral on the
- *  spine in place of the listen dot. */
+/** A single ranked album, styled as a timeline row. The spine marker carries
+ *  the album's rank, or a dash when its play count is tied with others (a
+ *  distinct rank number there would imply an order that doesn't exist). */
 function TopRow({
-  rank,
+  marker,
+  tied,
   record,
   plays,
 }: {
-  rank: number;
+  marker: string;
+  tied: boolean;
   record: Record;
   plays: number;
 }) {
@@ -27,7 +30,7 @@ function TopRow({
   return (
     <div className={feed.row}>
       <span className={feed.node}>
-        <span className={styles.rankMarker}>{rank}</span>
+        <span className={styles.rankMarker} aria-hidden={tied}>{marker}</span>
       </span>
       <Link
         to={`/${slugify(record.artist)}/${slugify(record.title)}`}
@@ -63,8 +66,8 @@ function TopRow({
 /**
  * Top Listens: every played record ranked by all-time spin count, newest listen
  * data shared with the timeline via react-query so the route loads instantly.
- * Deliberately mirrors the timeline's spine + row look; the marker carries the
- * rank number instead of a dot.
+ * Deliberately mirrors the timeline's spine + row look; the marker carries each
+ * album's rank, or a dash when its play count is tied.
  */
 export default function TopListens() {
   const { listens, isLoading: listensLoading } = useListens();
@@ -72,16 +75,50 @@ export default function TopListens() {
 
   const ranked = useMemo(() => {
     const counts = new Map<number, number>();
+    const lastListened = new Map<number, string>();
     for (const listen of listens) {
       counts.set(listen.release_id, (counts.get(listen.release_id) ?? 0) + 1);
+      const prev = lastListened.get(listen.release_id);
+      if (!prev || listen.listened_at > prev) {
+        lastListened.set(listen.release_id, listen.listened_at);
+      }
     }
-    return (records ?? [])
+
+    const items = (records ?? [])
       .filter((r) => counts.has(r.id))
-      .map((record) => ({ record, plays: counts.get(record.id) as number }))
+      .map((record) => ({
+        record,
+        plays: counts.get(record.id) as number,
+        last: lastListened.get(record.id) ?? "",
+      }))
+      // Most plays first; ties ordered by most-recent listen, then title so the
+      // order is stable even when recency also ties.
       .sort(
         (a, b) =>
-          b.plays - a.plays || a.record.title.localeCompare(b.record.title)
+          b.plays - a.plays ||
+          b.last.localeCompare(a.last) ||
+          a.record.title.localeCompare(b.record.title)
       );
+
+    // Competition ranking: an album's rank is 1 + however many albums have
+    // strictly more plays, so a tied cluster all shares one rank and the next
+    // distinct count resumes past it. Tied albums render a dash instead of that
+    // shared number, which would otherwise imply a false ordering.
+    const rankByPlays = new Map<number, number>();
+    const sizeByPlays = new Map<number, number>();
+    items.forEach((it, i) => {
+      if (!rankByPlays.has(it.plays)) rankByPlays.set(it.plays, i + 1);
+      sizeByPlays.set(it.plays, (sizeByPlays.get(it.plays) ?? 0) + 1);
+    });
+
+    return items.map((it) => {
+      const tied = (sizeByPlays.get(it.plays) as number) > 1;
+      return {
+        ...it,
+        tied,
+        marker: tied ? "\u2013" : String(rankByPlays.get(it.plays)),
+      };
+    });
   }, [listens, records]);
 
   const isLoading = listensLoading || recordsLoading;
@@ -105,8 +142,14 @@ export default function TopListens() {
             <p className={feed.status}>No spins yet.</p>
           ) : (
             <div className={feed.feed}>
-              {ranked.map(({ record, plays }, i) => (
-                <TopRow key={record.id} rank={i + 1} record={record} plays={plays} />
+              {ranked.map(({ record, plays, marker, tied }) => (
+                <TopRow
+                  key={record.id}
+                  marker={marker}
+                  tied={tied}
+                  record={record}
+                  plays={plays}
+                />
               ))}
             </div>
           )}
