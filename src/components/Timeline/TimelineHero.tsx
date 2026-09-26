@@ -167,7 +167,7 @@ export function TimelineHero({
     const r = el.getBoundingClientRect();
     const nx = ((e.clientX - r.left) / r.width - 0.5) * 2;
     const ny = ((e.clientY - r.top) / r.height - 0.5) * 2;
-    const MAX = 7;
+    const MAX = 4;
     el.style.setProperty("--ry", `${nx * MAX}deg`);
     el.style.setProperty("--rx", `${-ny * MAX}deg`);
   };
