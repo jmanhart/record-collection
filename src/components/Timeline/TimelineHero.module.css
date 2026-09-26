@@ -236,7 +236,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.6rem 1.25rem;
+  gap: 0.6rem 0.75rem;
   margin-top: 1.6rem;
   font-size: 0.95rem;
   color: var(--hero-subtext, var(--text-secondary));
@@ -244,17 +244,6 @@
 
 .footItem {
   font-weight: 500;
-}
-
-.badge {
-  padding: 0.25rem 0.6rem;
-  border-radius: 6px;
-  background: var(--hero-text, #000);
-  color: var(--hero-color, #fff);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 
 @media (max-width: 768px) {

@@ -331,7 +331,6 @@ export function TimelineFeed({ search }: TimelineFeedProps) {
           event={heroEvent}
           playing={heroEvent.id === playingId}
           ordinal={playOrdinalByEventId.get(heroEvent.id) ?? 1}
-          plays={playsByReleaseId.get(heroEvent.releaseId) ?? 0}
           dayLabel={formatDay(heroEvent.dateKey, todayKey)}
           timeRange={timeRange(heroEvent)}
           since={timeOf(heroEvent.timestamp)}

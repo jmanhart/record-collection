@@ -58,7 +58,6 @@ interface TimelineHeroProps {
   event: ActivityEvent;
   playing: boolean;
   ordinal: number;
-  plays: number;
   /** Pre-formatted in the feed, which owns the time helpers. */
   dayLabel: string;
   timeRange: string;
@@ -75,7 +74,6 @@ export function TimelineHero({
   event,
   playing,
   ordinal,
-  plays,
   dayLabel,
   timeRange,
   since,
@@ -239,18 +237,17 @@ export function TimelineHero({
             )}
 
             <div className={styles.footer}>
-              <span className={styles.footItem}>
-                {ordinal === 1 ? "First time played" : `Played ${plays} times`}
-              </span>
               {trackCount > 0 && (
                 <span className={styles.footItem}>
                   {trackCount} {trackCount === 1 ? "track" : "tracks"}
-                  {record.duration_seconds
-                    ? ` · ${formatRuntimeCompact(record.duration_seconds)}`
-                    : ""}
                 </span>
               )}
-              {ordinal === 1 && <span className={styles.badge}>1st Spin</span>}
+              {record.duration_seconds ? (
+                <span className={styles.metaTag}>
+                  {formatRuntimeCompact(record.duration_seconds)}
+                </span>
+              ) : null}
+              {ordinal === 1 && <span className={styles.metaTag}>1st Spin</span>}
             </div>
           </div>
         </div>
