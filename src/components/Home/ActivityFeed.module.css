@@ -134,9 +134,3 @@
   padding: 0.2rem 0.55rem;
   white-space: nowrap;
 }
-
-/* The red ramp doesn't flip per theme; the dark red is illegible on dark */
-:global(body.dark-theme) .purchaseBadge {
-  color: var(--red200);
-  background: color-mix(in srgb, var(--red100) 25%, transparent);
-}

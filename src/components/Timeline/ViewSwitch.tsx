@@ -7,8 +7,8 @@ interface ViewSwitchProps {
 }
 
 /**
- * Fixed icon toggle between the collection grid and the timeline, sitting
- * beside the theme toggle and sharing its look. Shows the view it switches to.
+ * Fixed icon toggle between the collection grid and the timeline, pinned to the
+ * top-right corner. Shows the view it switches to.
  */
 export function ViewSwitch({ view, onToggle }: ViewSwitchProps) {
   const toTimeline = view === "grid";

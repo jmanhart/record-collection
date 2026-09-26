@@ -1,12 +1,12 @@
 /* ===========================================
- *  GLOBAL THEME SETUP (Light Mode by Default)
+ *  GLOBAL COLOR TOKENS (Light Mode)
  * =========================================== */
 
 :root {
   --nav-height: 64px;
 
   /* Nav control skin — solid by default; overridden per-state (see
-     body.nav-over-hero) so the pills, search, and theme toggle can adopt the
+     body.nav-over-hero) so the pills, search, and view switch can adopt the
      timeline hero's color world while the bar overlays it. */
   --control-bg: var(--surface000);
   --control-text: var(--text-primary);
@@ -68,45 +68,6 @@ body.nav-over-hero {
   --control-text: var(--hero-text, var(--text-primary));
   --control-border: var(--hero-line, var(--divider));
   --control-active-bg: var(--hero-fill, var(--surface200));
-}
-
-/* ===========================================
- *  DARK MODE SETUP
- *  Applied when `.dark-theme` is on <body>
- * =========================================== */
-
-.dark-theme {
-  --surface000: #000000;
-  /* Re-resolve the control skin against the dark palette (a var() indirection
-     declared on :root would otherwise keep the light values). */
-  --control-bg: #171717;
-  --control-text: var(--text-primary);
-  --control-border: #444444;
-  --control-active-bg: #221b28;
-  --surface100: #171717;
-  --surface200: #221b28;
-  --surface300: #29232f;
-  --surface400: #4e3f58;
-
-  --text-primary: #ededed;
-  --text-secondary: #b3b3b3;
-  --text-tertiary: #747474;
-
-  --inverse: #ffffff;
-  --divider: #444444;
-  --link: #d1d1d1;
-  --link-hover: #ffffff;
-
-  --card-bg: #23272f;
-  --card-bg-hover: #2c313a;
-  --card-text: #f3f3f3;
-  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-  --card-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.6);
-
-  --red100: #c60202;
-  --red200: #ff8484;
-  --red300: #ffb3b3;
-  --blue200: #3b82f6;
 }
 
 /* ===========================================

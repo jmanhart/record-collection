@@ -258,7 +258,7 @@
     padding: 0 1.25rem;
   }
 
-  /* Keep the back button clear of the fixed theme toggle in the corner */
+  /* Keep the back button off the right edge in the corner */
   .topBar {
     padding-right: 2.25rem;
   }
