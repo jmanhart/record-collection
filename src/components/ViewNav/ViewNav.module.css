@@ -10,14 +10,6 @@
   z-index: 10000;
   display: flex;
   gap: 0.5rem;
-  transition: opacity 0.2s ease;
-}
-
-/* Focused compact search dims the cluster so attention goes to the query; the
-   record grid keeps populating underneath. Still clickable — a click blurs the
-   search (restoring full opacity) and navigates. */
-:global(body.search-focused) .nav {
-  opacity: 0.35;
 }
 
 .button {

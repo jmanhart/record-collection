@@ -102,6 +102,13 @@
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   grid-auto-rows: 1fr;
   gap: 2rem;
+  transition: opacity 0.2s ease;
+}
+
+/* Focusing the search dims the album grid to spotlight the query; the grid
+   keeps filtering/populating underneath. */
+:global(body.search-focused) .grid {
+  opacity: 0.35;
 }
 
 .loading {
