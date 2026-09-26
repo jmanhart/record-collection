@@ -159,6 +159,23 @@ export function TimelineHero({
       } as React.CSSProperties)
     : undefined;
 
+  // Subtle 3D tilt: the cover leans away from the cursor so the corner you
+  // hover pushes "back". Written straight to CSS vars on the element (no state)
+  // to avoid re-rendering the hero on every pointer move.
+  const handleTilt = (e: React.PointerEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    const r = el.getBoundingClientRect();
+    const nx = ((e.clientX - r.left) / r.width - 0.5) * 2;
+    const ny = ((e.clientY - r.top) / r.height - 0.5) * 2;
+    const MAX = 7;
+    el.style.setProperty("--ry", `${nx * MAX}deg`);
+    el.style.setProperty("--rx", `${-ny * MAX}deg`);
+  };
+  const resetTilt = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.currentTarget.style.setProperty("--rx", "0deg");
+    e.currentTarget.style.setProperty("--ry", "0deg");
+  };
+
   return (
     <button
       type="button"
@@ -208,7 +225,11 @@ export function TimelineHero({
         </span>
 
         <div className={styles.body}>
-          <div className={styles.cover}>
+          <div
+            className={styles.cover}
+            onPointerMove={handleTilt}
+            onPointerLeave={resetTilt}
+          >
             {showImage ? (
               <img
                 src={cover}
