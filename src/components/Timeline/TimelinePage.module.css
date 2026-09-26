@@ -19,7 +19,7 @@
   box-sizing: border-box;
 }
 
-/* App bar: full-bleed, fixed height, its own rule. The theme toggle is fixed
+/* App bar: full-bleed, fixed height, its own rule. The view switch is fixed
    at top:1rem and lands inside this bar, so the right side keeps clear of it. */
 .appBar {
   flex-shrink: 0;

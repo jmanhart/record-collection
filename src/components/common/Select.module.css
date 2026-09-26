@@ -56,17 +56,6 @@
   color: var(--text-primary);
 }
 
-/* Dark mode adjustments */
-:global(.dark-theme) .select {
-  background-color: var(--surface100);
-  border-color: var(--divider);
-}
-
-:global(.dark-theme) .select:hover {
-  background-color: var(--surface200);
-  border-color: var(--surface400);
-}
-
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .selectWrapper {

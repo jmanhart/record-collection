@@ -1,5 +1,5 @@
 /* Fixed drawer pinned to the right; the timeline scrolls behind it. Close
-   button sits top-left so it never collides with the fixed theme toggle. */
+   button sits top-left so it stays clear of the corner view switch. */
 .panel {
   position: fixed;
   top: 0;

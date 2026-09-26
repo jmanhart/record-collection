@@ -11,7 +11,6 @@ import { AdminAuthProvider } from "./contexts/AdminAuthContext";
 import { AdminFab } from "./components/AdminFab/AdminFab";
 import { ArtistProgressList } from "./components/ArtistProgress/ArtistProgressList";
 import { ArtistProgressDetail } from "./components/ArtistProgress/ArtistProgressDetail";
-import { ThemeToggle } from "./components/ThemeToggle/ThemeToggle";
 import { AlphabetIndicator } from "./components/AlphabetIndicator/AlphabetIndicator";
 import { AppBar } from "./components/AppBar/AppBar";
 import { SortControls } from "./components/RecordGrid/SortControls";
@@ -138,7 +137,6 @@ export default function App() {
     <Sentry.ErrorBoundary fallback={<div>Something went wrong. Please refresh the page.</div>}>
       <AdminAuthProvider>
         <Router>
-          <ThemeToggle />
           <AdminFab />
           <Routes>
             <Route path="/" element={<RecordList />} />

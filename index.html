@@ -10,16 +10,6 @@
     <title>Record Collection</title>
   </head>
   <body>
-    <script>
-      // Prevent flash of light theme - apply dark mode immediately
-      (function() {
-        const savedTheme = localStorage.getItem('theme');
-        // Default to dark if no preference saved
-        if (savedTheme === null || savedTheme === 'dark') {
-          document.body.classList.add('dark-theme');
-        }
-      })();
-    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

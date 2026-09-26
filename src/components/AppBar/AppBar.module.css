@@ -6,7 +6,7 @@
    Three columns with equal 1fr flanks keep the centered search column
    aligned to the true viewport centre regardless of what the side slots
    hold. Symmetric side padding both frames the bar and leaves the right
-   corner clear for the globally-fixed theme toggle. */
+   corner clear for the globally-fixed view switch. */
 .appBar {
   position: fixed;
   top: 0;

@@ -69,12 +69,3 @@
 .filterPill.active .filterPillCount {
   color: var(--text-secondary);
 }
-
-/* Dark mode adjustments */
-:global(.dark-theme) .filterPill:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-:global(.dark-theme) .filterPill.active {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
-}

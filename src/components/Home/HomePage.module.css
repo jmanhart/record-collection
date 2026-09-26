@@ -1,5 +1,5 @@
 /* App-shell layout: the page itself never scrolls; the feed pane does.
-   Extra right padding keeps content clear of the fixed theme toggle.
+   Extra right padding keeps the top-right content off the viewport edge.
    Vertical padding sits on the panes rather than the shell so the rule
    between them can run the full height of the viewport. */
 .shell {

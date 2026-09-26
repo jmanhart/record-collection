@@ -21,7 +21,7 @@ interface AppBarProps {
  * left (sort) and right (filter) slot. Transparent at the top; on a hero view
  * it stays transparent and tints its controls to the hero (via body class)
  * until the hero scrolls past, then turns solid. On other views it turns solid
- * as soon as the page scrolls. The theme toggle is a separate globally-fixed
+ * as soon as the page scrolls. The view switch is a separate globally-fixed
  * control that floats over the right corner.
  */
 export function AppBar({
@@ -77,7 +77,7 @@ export function AppBar({
     };
   }, [hasHero]);
 
-  // Let global controls (theme toggle, pills) adopt the hero palette while the
+  // Let global controls (view switch, pills) adopt the hero palette while the
   // bar overlays it.
   useEffect(() => {
     document.body.classList.toggle("nav-over-hero", overHero);
