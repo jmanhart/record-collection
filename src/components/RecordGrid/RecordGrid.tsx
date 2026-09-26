@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { SearchX } from "lucide-react";
 import type { Record, SortField, SortOrder } from "../../types/Record";
 import { RecordGridList } from "./RecordGridList";
 import { useListens } from "../../hooks/useListens";
@@ -61,6 +62,20 @@ export function RecordGrid({
     if (bValue === undefined) return -1;
     return aValue < bValue ? -1 * modifier : aValue > bValue ? 1 * modifier : 0;
   });
+
+  if (sortedRecords.length === 0) {
+    return (
+      <div className={styles.empty}>
+        <SearchX size={40} className={styles.emptyIcon} aria-hidden />
+        <p className={styles.emptyTitle}>
+          {search ? `No results for “${search}”` : "No records to show"}
+        </p>
+        {search && (
+          <p className={styles.emptyHint}>Try a different title or artist.</p>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className={styles.grid}>
