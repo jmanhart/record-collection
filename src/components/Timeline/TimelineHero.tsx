@@ -58,6 +58,8 @@ interface TimelineHeroProps {
   event: ActivityEvent;
   playing: boolean;
   ordinal: number;
+  /** Total lifetime listen count for this release. */
+  plays: number;
   /** Pre-formatted in the feed, which owns the time helpers. */
   dayLabel: string;
   timeRange: string;
@@ -74,6 +76,7 @@ export function TimelineHero({
   event,
   playing,
   ordinal,
+  plays,
   dayLabel,
   timeRange,
   since,
@@ -252,7 +255,11 @@ export function TimelineHero({
             <h2 className={styles.title}>{record.title}</h2>
             <p className={styles.artist}>{record.artist}</p>
 
-            {(metaTags.length > 0 || trackLabel || runtime || ordinal === 1) && (
+            {(metaTags.length > 0 ||
+              trackLabel ||
+              runtime ||
+              plays > 0 ||
+              ordinal === 1) && (
               <div className={styles.meta}>
                 {metaTags.map((tag, i) => (
                   <span key={`${i}-${tag}`} className={styles.metaTag}>
@@ -266,6 +273,11 @@ export function TimelineHero({
                       <span className={styles.sep}>|</span>
                     )}
                     {runtime}
+                  </span>
+                )}
+                {plays > 0 && (
+                  <span className={styles.metaTag}>
+                    {plays} {plays === 1 ? "listen" : "listens"}
                   </span>
                 )}
                 {ordinal === 1 && <span className={styles.metaTag}>1st Spin</span>}
