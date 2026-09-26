@@ -11,16 +11,16 @@ import feed from "../Timeline/TimelineFeed.module.css";
 import styles from "./TopListens.module.css";
 
 /** A single ranked album, styled as a timeline row. The spine marker carries
- *  the album's rank, or a dash when its play count is tied with others (a
- *  distinct rank number there would imply an order that doesn't exist). */
+ *  the album's rank number, or a dash when it shares its play count with the
+ *  album ranked directly above it. */
 function TopRow({
   marker,
-  tied,
+  shared,
   record,
   plays,
 }: {
   marker: string;
-  tied: boolean;
+  shared: boolean;
   record: Record;
   plays: number;
 }) {
@@ -30,7 +30,7 @@ function TopRow({
   return (
     <div className={feed.row}>
       <span className={feed.node}>
-        <span className={styles.rankMarker} aria-hidden={tied}>{marker}</span>
+        <span className={styles.rankMarker} aria-hidden={shared}>{marker}</span>
       </span>
       <Link
         to={`/${slugify(record.artist)}/${slugify(record.title)}`}
@@ -100,23 +100,23 @@ export default function TopListens() {
           a.record.title.localeCompare(b.record.title)
       );
 
-    // Competition ranking: an album's rank is 1 + however many albums have
-    // strictly more plays, so a tied cluster all shares one rank and the next
-    // distinct count resumes past it. Tied albums render a dash instead of that
-    // shared number, which would otherwise imply a false ordering.
+    // Standard competition-ranking display: the first album at a given play
+    // count carries its rank number (1 + albums with strictly more plays); the
+    // albums below it that share that same count show a dash, since repeating
+    // the number would imply an order among equals that doesn't exist.
     const rankByPlays = new Map<number, number>();
-    const sizeByPlays = new Map<number, number>();
     items.forEach((it, i) => {
       if (!rankByPlays.has(it.plays)) rankByPlays.set(it.plays, i + 1);
-      sizeByPlays.set(it.plays, (sizeByPlays.get(it.plays) ?? 0) + 1);
     });
 
+    const numbered = new Set<number>();
     return items.map((it) => {
-      const tied = (sizeByPlays.get(it.plays) as number) > 1;
+      const shared = numbered.has(it.plays);
+      numbered.add(it.plays);
       return {
         ...it,
-        tied,
-        marker: tied ? "\u2013" : String(rankByPlays.get(it.plays)),
+        shared,
+        marker: shared ? "\u2013" : String(rankByPlays.get(it.plays)),
       };
     });
   }, [listens, records]);
@@ -142,11 +142,11 @@ export default function TopListens() {
             <p className={feed.status}>No spins yet.</p>
           ) : (
             <div className={feed.feed}>
-              {ranked.map(({ record, plays, marker, tied }) => (
+              {ranked.map(({ record, plays, marker, shared }) => (
                 <TopRow
                   key={record.id}
                   marker={marker}
-                  tied={tied}
+                  shared={shared}
                   record={record}
                   plays={plays}
                 />
