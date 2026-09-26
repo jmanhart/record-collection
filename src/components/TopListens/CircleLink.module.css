@@ -1,0 +1,59 @@
+/* Circular fixed nav button sharing the ViewSwitch control skin (--control-*),
+   so it goes transparent + hero-tinted while a bar overlays a hero and reads
+   solid otherwise. `corner` takes the far-right slot; `beside` sits one button
+   to its left, alongside the collection controls. */
+.button {
+  position: fixed;
+  top: 1rem;
+  z-index: 10000;
+
+  width: 2.25rem;
+  height: 2.25rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: var(--control-bg);
+  color: var(--control-text);
+  border: 1px solid var(--control-border);
+  border-radius: 50%;
+  text-decoration: none;
+
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease,
+    transform 0.2s ease, opacity 0.2s ease;
+}
+
+.button:hover {
+  opacity: 0.7;
+  transform: scale(1.1);
+}
+
+.button:active {
+  transform: scale(0.95);
+}
+
+.corner {
+  right: 1rem;
+}
+
+.beside {
+  right: 3.5rem;
+}
+
+@media (max-width: 768px) {
+  .button {
+    width: 2rem;
+    height: 2rem;
+    top: 0.75rem;
+  }
+
+  .corner {
+    right: 0.75rem;
+  }
+
+  .beside {
+    right: 3rem;
+  }
+}

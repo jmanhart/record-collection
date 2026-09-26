@@ -17,6 +17,9 @@ import { SortControls } from "./components/RecordGrid/SortControls";
 import { GenreSelect } from "./components/RecordGrid/GenreSelect";
 import { TimelineFeed } from "./components/Timeline/TimelineFeed";
 import { ViewSwitch } from "./components/Timeline/ViewSwitch";
+import { CircleLink } from "./components/TopListens/CircleLink";
+import TopListens from "./components/TopListens/TopListens";
+import { ListOrdered } from "lucide-react";
 import type { TabValue } from "./components/Tabs/Tabs";
 import { WishlistList } from "./components/WishlistList/WishlistList";
 import { useRecords } from "./hooks/useRecords";
@@ -95,13 +98,18 @@ function RecordList() {
         }
       />
       {isCollection && (
-        <ViewSwitch
-          view={view}
-          onToggle={(next) => {
-            if (next === "timeline") setSearch("");
-            setView(next);
-          }}
-        />
+        <>
+          <CircleLink to="/top-listens" label="Top listens" placement="beside">
+            <ListOrdered size={20} />
+          </CircleLink>
+          <ViewSwitch
+            view={view}
+            onToggle={(next) => {
+              if (next === "timeline") setSearch("");
+              setView(next);
+            }}
+          />
+        </>
       )}
       {isCollection && view === "grid" && <AlphabetIndicator records={records || []} />}
       <div className="container">
@@ -156,6 +164,7 @@ export default function App() {
                 </Suspense>
               }
             />
+            <Route path="/top-listens" element={<TopListens />} />
             <Route path="/listen/:uid" element={<ListenRedirect />} />
             <Route path="/:artist/:album" element={<RecordDetail />} />
             <Route
