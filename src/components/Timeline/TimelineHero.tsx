@@ -97,11 +97,14 @@ export function TimelineHero({
     const b = parseInt(hex.slice(4, 6), 16);
     // Perceived luminance (ITU-R BT.601) → light backgrounds get dark ink.
     const isLight = (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.62;
-    // Equalizer bars: same color family as the hero background, hue nudged for
-    // an analogous relationship and lightness halved so they read as a darker
-    // shade of the backdrop rather than generic ink.
+    // Equalizer bars: analogous hue to the cover, but lightness is pushed to
+    // CONTRAST the hero background (darker on light covers, lighter on dark
+    // ones) so the bars read on either, and saturation is lifted so they show
+    // as color rather than muddy ink.
     const { h, s, l } = rgbToHsl(r, g, b);
-    const bar = hslToHex((h + 340) % 360, s, Math.max(0.08, l * 0.5));
+    const barSat = Math.min(1, s * 1.15 + 0.08);
+    const barLight = isLight ? Math.max(0.24, l * 0.5) : Math.min(0.82, l + 0.4);
+    const bar = hslToHex((h + 340) % 360, barSat, barLight);
     return {
       color,
       bar,
