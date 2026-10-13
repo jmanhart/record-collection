@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Search } from "../Search/Search";
+import { formatRuntime } from "../../utils/formatDuration";
 import styles from "./AppBar.module.css";
 
 interface AppBarProps {
@@ -11,6 +12,9 @@ interface AppBarProps {
   /** True on views with a full-bleed hero the bar should overlay while it's
    *  still on screen (currently the timeline). */
   hasHero?: boolean;
+  /** Collection summary shown inline beside the search bar. Omitted on views
+   *  without a flat record list (e.g. the artists tab). */
+  stats?: { count: number; durationSeconds: number };
 }
 
 /**
@@ -27,6 +31,7 @@ export function AppBar({
   searchPlaceholder = "Search...",
   showSearch = true,
   hasHero = false,
+  stats,
 }: AppBarProps) {
   const [solid, setSolid] = useState(false);
   const [overHero, setOverHero] = useState(false);
@@ -82,12 +87,24 @@ export function AppBar({
   return (
     <header className={`${styles.appBar} ${solid ? styles.scrolled : ""}`}>
       {showSearch && (
-        <Search
-          value={search}
-          onChange={onSearchChange}
-          placeholder={searchPlaceholder}
-          variant="compact"
-        />
+        <div className={styles.row}>
+          <Search
+            value={search}
+            onChange={onSearchChange}
+            placeholder={searchPlaceholder}
+            variant="compact"
+          />
+          {stats && (
+            <span className={styles.stats}>
+              {[
+                `${stats.count} ${stats.count === 1 ? "album" : "albums"}`,
+                formatRuntime(stats.durationSeconds),
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </span>
+          )}
+        </div>
       )}
     </header>
   );

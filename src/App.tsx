@@ -55,6 +55,14 @@ function RecordList() {
 
   const isCollection = activeTab === "collection";
 
+  const statsList = isCollection ? records : activeTab === "wishlist" ? wishlistRecords : null;
+  const stats = statsList && statsList.length
+    ? {
+        count: statsList.length,
+        durationSeconds: statsList.reduce((s, r) => s + (r.duration_seconds || 0), 0),
+      }
+    : undefined;
+
   return (
     <div className="app">
       <AppBar
@@ -62,6 +70,7 @@ function RecordList() {
         onSearchChange={setSearch}
         showSearch={!(isCollection && view === "timeline")}
         hasHero={isCollection && view === "timeline"}
+        stats={stats}
       />
       {isCollection && <ViewNav />}
       {isCollection && view === "grid" && <AlphabetIndicator records={records || []} />}
