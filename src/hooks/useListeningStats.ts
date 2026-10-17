@@ -8,6 +8,8 @@ export interface ChartBucket {
   label: string;
   albums: number;
   minutes: number;
+  /** The span lies entirely after today — render no empty-state stub for it. */
+  future: boolean;
 }
 
 interface Span {
@@ -212,7 +214,11 @@ function periodLabel(range: Range, anchor: string): string {
   return String(d.getFullYear());
 }
 
-function toBuckets(spans: Span[], events: ActivityEvent[]): ChartBucket[] {
+function toBuckets(
+  spans: Span[],
+  events: ActivityEvent[],
+  todayKey: string
+): ChartBucket[] {
   return spans.map(({ label, startKey, endKey }) => {
     const listens = events.filter(
       (e) => e.type === "listen" && e.dateKey >= startKey && e.dateKey <= endKey
@@ -222,7 +228,12 @@ function toBuckets(spans: Span[], events: ActivityEvent[]): ChartBucket[] {
       (sum, e) => sum + (e.record?.duration_seconds || 0),
       0
     );
-    return { label, albums, minutes: Math.round(seconds / 60) };
+    return {
+      label,
+      albums,
+      minutes: Math.round(seconds / 60),
+      future: startKey > todayKey,
+    };
   });
 }
 
@@ -244,8 +255,8 @@ export function useListeningStats(
   const periodTitle = periodLabel(range, anchor);
 
   const buckets = useMemo(
-    () => toBuckets(SPAN_BUILDERS[range](anchor), events),
-    [range, anchor, events]
+    () => toBuckets(SPAN_BUILDERS[range](anchor), events, todayKey),
+    [range, anchor, events, todayKey]
   );
 
   const rollup = useMemo(() => {

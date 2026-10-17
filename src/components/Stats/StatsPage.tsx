@@ -3,6 +3,7 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
   LabelList,
   ResponsiveContainer,
   XAxis,
@@ -26,6 +27,11 @@ const HERO_VARS: Record<string, string> = {
   "--hero-line": "rgba(245, 245, 245, 0.34)",
   "--hero-fill": "rgba(245, 245, 245, 0.16)",
 };
+
+// Bar fills: solid for real values, a muted stub for past periods with no
+// listens so the chart doesn't read as sparse. Future periods get no stub.
+const BAR_FILL = "rgba(255, 255, 255, 0.88)";
+const BAR_EMPTY_FILL = "rgba(245, 245, 245, 0.16)";
 
 export default function StatsPage() {
   const { events, isLoading } = useActivity();
@@ -158,9 +164,24 @@ export default function StatsPage() {
                   dataKey={metricKey}
                   radius={[6, 6, 0, 0]}
                   maxBarSize={56}
+                  minPointSize={(value, index) =>
+                    value > 0 || buckets[index]?.future ? 0 : 4
+                  }
                   animationDuration={500}
                   animationEasing="ease-out"
                 >
+                  {buckets.map((bucket, index) => (
+                    <Cell
+                      key={index}
+                      fill={
+                        bucket[metricKey] > 0
+                          ? BAR_FILL
+                          : bucket.future
+                            ? "transparent"
+                            : BAR_EMPTY_FILL
+                      }
+                    />
+                  ))}
                   <LabelList
                     dataKey={metricKey}
                     position="top"

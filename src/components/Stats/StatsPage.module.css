@@ -139,15 +139,8 @@
   min-height: 240px;
 }
 
-/* Recharts sets fills as SVG presentation attributes; CSS wins over those. */
-.chart :global(.recharts-bar-rectangle path) {
-  fill: rgba(255, 255, 255, 0.88);
-  transition: fill 0.15s ease;
-}
-
-.chart :global(.recharts-bar-rectangle:hover path) {
-  fill: #ffffff;
-}
+/* Bar fills come from per-bucket <Cell> props (muted stubs for empty past
+   periods), so there is no blanket fill rule here. */
 
 .chart :global(.recharts-cartesian-axis-tick text),
 .chart :global(.recharts-cartesian-axis-tick-value) {
