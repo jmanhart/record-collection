@@ -6,13 +6,16 @@ import {
   Cell,
   LabelList,
   ResponsiveContainer,
+  Tooltip,
   XAxis,
+  YAxis,
 } from "recharts";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useActivity, toDateKey } from "../../hooks/useActivity";
 import {
   useListeningStats,
   RANGE_OPTIONS,
+  type ChartBucket,
   type Range,
   type Measure,
 } from "../../hooks/useListeningStats";
@@ -32,6 +35,36 @@ const HERO_VARS: Record<string, string> = {
 // listens so the chart doesn't read as sparse. Future periods get no stub.
 const BAR_FILL = "rgba(255, 255, 255, 0.88)";
 const BAR_EMPTY_FILL = "rgba(245, 245, 245, 0.16)";
+
+interface ChartTooltipProps {
+  active?: boolean;
+  payload?: { payload: ChartBucket }[];
+}
+
+// Styled to match the app's hover tooltips (see Timeline/DayRow): a light
+// surface card floating over the dark hero, showing the span's time + albums.
+function ChartTooltip({ active, payload }: ChartTooltipProps) {
+  if (!active || !payload?.length) return null;
+  const bucket = payload[0].payload;
+  const empty = bucket.minutes === 0 && bucket.albums === 0;
+  return (
+    <div className={styles.tooltip}>
+      <span className={styles.tooltipTitle}>{bucket.label}</span>
+      {empty ? (
+        <span className={styles.tooltipMeta}>No listens</span>
+      ) : (
+        <>
+          <span className={styles.tooltipRow}>
+            {formatRuntimeCompact(bucket.minutes * 60)}
+          </span>
+          <span className={styles.tooltipMeta}>
+            {bucket.albums} {bucket.albums === 1 ? "album" : "albums"}
+          </span>
+        </>
+      )}
+    </div>
+  );
+}
 
 export default function StatsPage() {
   const { events, isLoading } = useActivity();
@@ -157,6 +190,21 @@ export default function StatsPage() {
                   axisLine={{ stroke: "rgba(245, 245, 245, 0.28)" }}
                   interval={0}
                 />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  width={46}
+                  allowDecimals={false}
+                  tickFormatter={(value) => {
+                    if (measure !== "time") return String(value);
+                    const mins = Number(value);
+                    return mins < 60 ? `${mins}m` : `${Math.round(mins / 60)}h`;
+                  }}
+                />
+                <Tooltip
+                  cursor={{ fill: "rgba(245, 245, 245, 0.08)" }}
+                  content={<ChartTooltip />}
+                />
                 {/* Keyed on the selection so switching range/measure remounts the
                     series and replays the grow-in. */}
                 <Bar
@@ -165,7 +213,7 @@ export default function StatsPage() {
                   radius={[6, 6, 0, 0]}
                   maxBarSize={56}
                   minPointSize={(value, index) =>
-                    value > 0 || buckets[index]?.future ? 0 : 4
+                    (value ?? 0) > 0 || buckets[index]?.future ? 0 : 4
                   }
                   animationDuration={500}
                   animationEasing="ease-out"
