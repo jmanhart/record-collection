@@ -1,13 +1,14 @@
 import { Link, useLocation, useSearchParams } from "react-router-dom";
-import { LayoutGrid, Clock, ListOrdered } from "lucide-react";
+import { LayoutGrid, Clock, ListOrdered, BarChart3 } from "lucide-react";
 import styles from "./ViewNav.module.css";
 
-type ViewKey = "grid" | "timeline" | "top";
+type ViewKey = "grid" | "timeline" | "top" | "stats";
 
 const ITEMS: { key: ViewKey; to: string; label: string; Icon: typeof LayoutGrid }[] = [
   { key: "grid", to: "/", label: "Collection grid", Icon: LayoutGrid },
   { key: "timeline", to: "/?view=timeline", label: "Timeline", Icon: Clock },
   { key: "top", to: "/top-listens", label: "Top listens", Icon: ListOrdered },
+  { key: "stats", to: "/stats", label: "Stats", Icon: BarChart3 },
 ];
 
 /**
@@ -22,9 +23,11 @@ export function ViewNav() {
   const current: ViewKey =
     pathname === "/top-listens"
       ? "top"
-      : params.get("view") === "timeline"
-        ? "timeline"
-        : "grid";
+      : pathname === "/stats"
+        ? "stats"
+        : params.get("view") === "timeline"
+          ? "timeline"
+          : "grid";
 
   return (
     <nav className={styles.nav} aria-label="Views">
