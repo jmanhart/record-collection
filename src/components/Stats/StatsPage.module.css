@@ -148,49 +148,13 @@
   font-size: 0.72rem;
 }
 
-/* Hover tooltip — matches the app's tooltips (Timeline/DayRow): a light
-   surface card floating over the dark hero. recharts wraps it, so the focus
-   outline is suppressed. */
-.chart :global(.recharts-tooltip-wrapper) {
-  outline: none;
-}
-
-.tooltip {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  width: max-content;
-  max-width: 15rem;
-  padding: 0.4rem 0.6rem;
-  border: 1px solid var(--divider);
-  border-radius: 6px;
-  background: var(--surface100);
-  box-shadow: var(--card-shadow);
-  pointer-events: none;
-}
-
-.tooltipTitle {
+/* Value pinned above the hovered bar (custom LabelList content). Shown only on
+   hover; replaces the old always-on labels and the cursor-following tooltip. */
+.hoverLabel {
+  fill: rgba(245, 245, 245, 0.95);
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--text-primary);
-}
-
-.tooltipRow {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  font-variant-numeric: tabular-nums;
-}
-
-.tooltipMeta {
-  font-size: 0.7rem;
-  color: var(--text-tertiary);
-  font-variant-numeric: tabular-nums;
-}
-
-.chart :global(.recharts-label-list text) {
-  fill: rgba(245, 245, 245, 0.92);
-  font-size: 0.78rem;
-  font-weight: 600;
+  pointer-events: none;
 }
 
 /* Period totals as plain text — no cards, matching the site's text styles.

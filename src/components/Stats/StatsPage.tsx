@@ -6,7 +6,6 @@ import {
   Cell,
   LabelList,
   ResponsiveContainer,
-  Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
@@ -15,7 +14,6 @@ import { useActivity, toDateKey } from "../../hooks/useActivity";
 import {
   useListeningStats,
   RANGE_OPTIONS,
-  type ChartBucket,
   type Range,
   type Measure,
 } from "../../hooks/useListeningStats";
@@ -36,36 +34,6 @@ const HERO_VARS: Record<string, string> = {
 const BAR_FILL = "rgba(255, 255, 255, 0.88)";
 const BAR_EMPTY_FILL = "rgba(245, 245, 245, 0.16)";
 
-interface ChartTooltipProps {
-  active?: boolean;
-  payload?: { payload: ChartBucket }[];
-}
-
-// Styled to match the app's hover tooltips (see Timeline/DayRow): a light
-// surface card floating over the dark hero, showing the span's time + albums.
-function ChartTooltip({ active, payload }: ChartTooltipProps) {
-  if (!active || !payload?.length) return null;
-  const bucket = payload[0].payload;
-  const empty = bucket.minutes === 0 && bucket.albums === 0;
-  return (
-    <div className={styles.tooltip}>
-      <span className={styles.tooltipTitle}>{bucket.label}</span>
-      {empty ? (
-        <span className={styles.tooltipMeta}>No listens</span>
-      ) : (
-        <>
-          <span className={styles.tooltipRow}>
-            {formatRuntimeCompact(bucket.minutes * 60)}
-          </span>
-          <span className={styles.tooltipMeta}>
-            {bucket.albums} {bucket.albums === 1 ? "album" : "albums"}
-          </span>
-        </>
-      )}
-    </div>
-  );
-}
-
 export default function StatsPage() {
   const { events, isLoading } = useActivity();
   const todayKey = toDateKey(new Date().toISOString());
@@ -74,6 +42,8 @@ export default function StatsPage() {
   const [measure, setMeasure] = useState<Measure>("time");
   // 0 = current period; each increment walks one whole period into the past.
   const [offset, setOffset] = useState(0);
+  // Index of the bar under the cursor; drives the pinned hover label.
+  const [hovered, setHovered] = useState<number | null>(null);
 
   const stats = useListeningStats(range, offset, events, todayKey);
   const { buckets, periodTitle, isEmpty, topArtists, topAlbums } = stats;
@@ -201,10 +171,6 @@ export default function StatsPage() {
                     return mins < 60 ? `${mins}m` : `${Math.round(mins / 60)}h`;
                   }}
                 />
-                <Tooltip
-                  cursor={{ fill: "rgba(245, 245, 245, 0.08)" }}
-                  content={<ChartTooltip />}
-                />
                 {/* Keyed on the selection so switching range/measure remounts the
                     series and replays the grow-in. */}
                 <Bar
@@ -217,28 +183,49 @@ export default function StatsPage() {
                   }
                   animationDuration={500}
                   animationEasing="ease-out"
+                  onMouseEnter={(_, index) => setHovered(index)}
+                  onMouseLeave={() => setHovered(null)}
                 >
-                  {buckets.map((bucket, index) => (
-                    <Cell
-                      key={index}
-                      fill={
-                        bucket[metricKey] > 0
-                          ? BAR_FILL
-                          : bucket.future
-                            ? "transparent"
-                            : BAR_EMPTY_FILL
-                      }
-                    />
-                  ))}
+                  {buckets.map((bucket, index) => {
+                    const value = bucket[metricKey];
+                    const fill =
+                      value > 0
+                        ? hovered === index
+                          ? "#ffffff"
+                          : BAR_FILL
+                        : bucket.future
+                          ? "transparent"
+                          : BAR_EMPTY_FILL;
+                    return <Cell key={index} fill={fill} />;
+                  })}
+                  {/* The value shows only for the hovered bar, pinned above it —
+                      no always-on labels, no cursor-following tooltip, nothing
+                      on empty bars. */}
                   <LabelList
                     dataKey={metricKey}
-                    position="top"
-                    formatter={(value) => {
-                      const n = Number(value);
-                      if (!n) return "";
-                      return measure === "time"
-                        ? formatRuntimeCompact(n * 60)
-                        : String(n);
+                    content={(props) => {
+                      const { x, y, width, index, value } = props as {
+                        x: number;
+                        y: number;
+                        width: number;
+                        index: number;
+                        value: number;
+                      };
+                      if (index !== hovered || !value) return null;
+                      const text =
+                        measure === "time"
+                          ? formatRuntimeCompact(value * 60)
+                          : String(value);
+                      return (
+                        <text
+                          x={x + width / 2}
+                          y={y - 10}
+                          textAnchor="middle"
+                          className={styles.hoverLabel}
+                        >
+                          {text}
+                        </text>
+                      );
                     }}
                   />
                 </Bar>
