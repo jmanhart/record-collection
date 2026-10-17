@@ -106,6 +106,28 @@ export default function StatsPage() {
             </button>
           </div>
         </div>
+        <div className={styles.summary}>
+          <div className={styles.summaryItem}>
+            <span className={styles.summaryValue}>{stats.listens}</span>
+            <span className={styles.summaryLabel}>
+              listens · {stats.albums} albums
+            </span>
+          </div>
+          <div className={styles.summaryItem}>
+            <span className={styles.summaryValue}>
+              {formatRuntimeCompact(stats.seconds)}
+            </span>
+            <span className={styles.summaryLabel}>
+              {offset === 0 ? `this ${range}` : periodTitle}
+            </span>
+          </div>
+          <div className={styles.summaryItem}>
+            <span className={styles.summaryValue}>
+              {formatRuntimeCompact(stats.prevSeconds)}
+            </span>
+            <span className={styles.summaryLabel}>last {range}</span>
+          </div>
+        </div>
 
         {isLoading ? (
           <p className={styles.status}>Loading…</p>
@@ -156,28 +178,6 @@ export default function StatsPage() {
           </div>
         )}
 
-        <div className={styles.summary}>
-          <div className={styles.summaryItem}>
-            <span className={styles.summaryValue}>{stats.listens}</span>
-            <span className={styles.summaryLabel}>
-              listens · {stats.albums} albums
-            </span>
-          </div>
-          <div className={styles.summaryItem}>
-            <span className={styles.summaryValue}>
-              {formatRuntimeCompact(stats.seconds)}
-            </span>
-            <span className={styles.summaryLabel}>
-              {offset === 0 ? `this ${range}` : periodTitle}
-            </span>
-          </div>
-          <div className={styles.summaryItem}>
-            <span className={styles.summaryValue}>
-              {formatRuntimeCompact(stats.prevSeconds)}
-            </span>
-            <span className={styles.summaryLabel}>last {range}</span>
-          </div>
-        </div>
       </section>
 
       <section className={styles.lists}>
