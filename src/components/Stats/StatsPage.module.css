@@ -298,3 +298,44 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Entrance: the hero's rows and the lists rise + fade in on mount, so the view
+   "pops up" when you switch routes into it. The chart bars replay their own
+   grow-in (recharts, keyed on the selection). */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.controls {
+  animation: rise 0.5s ease-out both;
+}
+
+.chart,
+.status {
+  animation: rise 0.5s ease-out 0.08s both;
+}
+
+.statRow {
+  animation: rise 0.5s ease-out 0.16s both;
+}
+
+.lists {
+  animation: rise 0.55s ease-out 0.24s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .controls,
+  .chart,
+  .status,
+  .statRow,
+  .lists {
+    animation: none;
+  }
+}
