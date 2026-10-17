@@ -135,18 +135,15 @@
 }
 
 .chart {
+  position: relative;
   flex: 1;
   min-height: 240px;
 }
 
 /* Bar fills come from per-bucket <Cell> props (muted stubs for empty past
-   periods). The hover highlight is pure CSS so it never re-renders the chart. */
+   periods); the hovered bar brightens via state. Transition keeps that smooth. */
 .chart :global(.recharts-bar-rectangle path) {
   transition: fill 0.15s ease;
-}
-
-.chart :global(.recharts-bar-rectangle:hover path) {
-  fill: #ffffff;
 }
 
 .chart :global(.recharts-cartesian-axis-tick text),
@@ -155,13 +152,18 @@
   font-size: 0.72rem;
 }
 
-/* Value pinned above the hovered bar (custom LabelList content). Shown only on
-   hover; replaces the old always-on labels and the cursor-following tooltip. */
+/* Value pinned above the hovered bar — an HTML overlay positioned over the
+   chart (recharts stops re-invoking in-SVG labels once the grow-in ends).
+   Shown only on hover; replaces the old always-on labels + moving tooltip. */
 .hoverLabel {
-  fill: rgba(245, 245, 245, 0.95);
+  position: absolute;
+  transform: translate(-50%, calc(-100% - 6px));
+  pointer-events: none;
   font-size: 0.8rem;
   font-weight: 600;
-  pointer-events: none;
+  color: rgba(245, 245, 245, 0.95);
+  white-space: nowrap;
+  z-index: 2;
 }
 
 /* Period totals as plain text — no cards, matching the site's text styles.

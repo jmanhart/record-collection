@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Bar,
   BarChart,
   CartesianGrid,
   Cell,
-  LabelList,
   ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
@@ -47,6 +47,13 @@ export default function StatsPage() {
   // Bar grow-in runs only right after a selection change, never on the hover
   // re-renders — otherwise recharts replays the animation on every hover.
   const [animateBars, setAnimateBars] = useState(true);
+  const chartRef = useRef<HTMLDivElement>(null);
+  // Pixel position (relative to the chart box) of the hovered bar's value label.
+  const [labelPos, setLabelPos] = useState<{
+    left: number;
+    top: number;
+    text: string;
+  } | null>(null);
 
   const stats = useListeningStats(range, offset, events, todayKey);
   const { buckets, periodTitle, isEmpty, topArtists, topAlbums } = stats;
@@ -69,6 +76,34 @@ export default function StatsPage() {
     const timer = window.setTimeout(() => setAnimateBars(false), 650);
     return () => window.clearTimeout(timer);
   }, [range, measure, offset]);
+
+  // Pin the value label above the hovered bar by reading the bar's rendered
+  // geometry — recharts stops invoking LabelList content once the grow-in ends,
+  // so the label lives outside the chart as an HTML overlay.
+  useEffect(() => {
+    const container = chartRef.current;
+    const index = hovered;
+    const bucket = index == null ? undefined : buckets[index];
+    const value = bucket ? bucket[metricKey] : 0;
+    if (!container || index == null || !bucket || value <= 0) {
+      setLabelPos(null);
+      return;
+    }
+    const bars = container.querySelectorAll(".recharts-bar .recharts-rectangle");
+    const barEl = bars[index];
+    if (!barEl) {
+      setLabelPos(null);
+      return;
+    }
+    const barRect = barEl.getBoundingClientRect();
+    const boxRect = container.getBoundingClientRect();
+    setLabelPos({
+      left: barRect.left - boxRect.left + barRect.width / 2,
+      top: barRect.top - boxRect.top,
+      text:
+        measure === "time" ? formatRuntimeCompact(value * 60) : String(value),
+    });
+  }, [hovered, buckets, metricKey, measure]);
 
   return (
     <div className={styles.page}>
@@ -154,11 +189,21 @@ export default function StatsPage() {
         ) : isEmpty ? (
           <p className={styles.status}>No listens in {periodTitle}.</p>
         ) : (
-          <div className={styles.chart}>
+          <div className={styles.chart} ref={chartRef}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={buckets}
                 margin={{ top: 28, right: 8, bottom: 0, left: 8 }}
+                onMouseMove={(state) => {
+                  const raw = state?.activeTooltipIndex;
+                  const idx = raw == null ? null : Number(raw);
+                  const next =
+                    state?.isTooltipActive && idx !== null && !Number.isNaN(idx)
+                      ? idx
+                      : null;
+                  setHovered((prev) => (prev === next ? prev : next));
+                }}
+                onMouseLeave={() => setHovered(null)}
               >
                 <CartesianGrid
                   vertical={false}
@@ -182,8 +227,15 @@ export default function StatsPage() {
                     return mins < 60 ? `${mins}m` : `${Math.round(mins / 60)}h`;
                   }}
                 />
-                {/* Keyed on the selection so switching range/measure remounts the
-                    series and replays the grow-in. */}
+                {/* Invisible: present only so the chart tracks the active bar
+                    index via onMouseMove. The value is drawn as an HTML overlay
+                    pinned above the bar; the cursor is the lone column tint. */}
+                <Tooltip
+                  cursor={{ fill: "rgba(245, 245, 245, 0.06)" }}
+                  content={() => null}
+                />
+                {/* Keyed on the selection so switching range/measure remounts
+                    the series and replays the grow-in. */}
                 <Bar
                   key={`${range}-${measure}-${offset}`}
                   dataKey={metricKey}
@@ -195,54 +247,32 @@ export default function StatsPage() {
                   isAnimationActive={animateBars}
                   animationDuration={500}
                   animationEasing="ease-out"
-                  onMouseEnter={(_, index) => setHovered(index)}
-                  onMouseLeave={() => setHovered(null)}
                 >
-                  {buckets.map((bucket, index) => (
-                    <Cell
-                      key={index}
-                      fill={
-                        bucket[metricKey] > 0
-                          ? BAR_FILL
-                          : bucket.future
-                            ? "transparent"
-                            : BAR_EMPTY_FILL
-                      }
-                    />
-                  ))}
-                  {/* The value shows only for the hovered bar, pinned above it —
-                      no always-on labels, no cursor-following tooltip, nothing
-                      on empty bars. */}
-                  <LabelList
-                    dataKey={metricKey}
-                    content={(props) => {
-                      const { x, y, width, index, value } = props as {
-                        x: number;
-                        y: number;
-                        width: number;
-                        index: number;
-                        value: number;
-                      };
-                      if (index !== hovered || !value) return null;
-                      const text =
-                        measure === "time"
-                          ? formatRuntimeCompact(value * 60)
-                          : String(value);
-                      return (
-                        <text
-                          x={x + width / 2}
-                          y={y - 10}
-                          textAnchor="middle"
-                          className={styles.hoverLabel}
-                        >
-                          {text}
-                        </text>
-                      );
-                    }}
-                  />
+                  {buckets.map((bucket, index) => {
+                    const value = bucket[metricKey];
+                    const fill =
+                      value > 0
+                        ? hovered === index
+                          ? "#ffffff"
+                          : BAR_FILL
+                        : bucket.future
+                          ? "transparent"
+                          : BAR_EMPTY_FILL;
+                    return <Cell key={index} fill={fill} />;
+                  })}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
+            {/* Value pinned above the hovered bar — consistent spot, shown only
+                on hover, nothing on empty bars. */}
+            {labelPos && (
+              <div
+                className={styles.hoverLabel}
+                style={{ left: labelPos.left, top: labelPos.top }}
+              >
+                {labelPos.text}
+              </div>
+            )}
           </div>
         )}
 
