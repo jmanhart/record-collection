@@ -44,6 +44,9 @@ export default function StatsPage() {
   const [offset, setOffset] = useState(0);
   // Index of the bar under the cursor; drives the pinned hover label.
   const [hovered, setHovered] = useState<number | null>(null);
+  // Bar grow-in runs only right after a selection change, never on the hover
+  // re-renders — otherwise recharts replays the animation on every hover.
+  const [animateBars, setAnimateBars] = useState(true);
 
   const stats = useListeningStats(range, offset, events, todayKey);
   const { buckets, periodTitle, isEmpty, topArtists, topAlbums } = stats;
@@ -58,6 +61,14 @@ export default function StatsPage() {
       document.body.classList.remove("nav-over-hero");
     };
   }, []);
+
+  // Re-arm the grow-in when the viewed series changes, then disable it so
+  // hover-driven re-renders don't replay the animation.
+  useEffect(() => {
+    setAnimateBars(true);
+    const timer = window.setTimeout(() => setAnimateBars(false), 650);
+    return () => window.clearTimeout(timer);
+  }, [range, measure, offset]);
 
   return (
     <div className={styles.page}>
@@ -181,23 +192,24 @@ export default function StatsPage() {
                   minPointSize={(value, index) =>
                     (value ?? 0) > 0 || buckets[index]?.future ? 0 : 4
                   }
+                  isAnimationActive={animateBars}
                   animationDuration={500}
                   animationEasing="ease-out"
                   onMouseEnter={(_, index) => setHovered(index)}
                   onMouseLeave={() => setHovered(null)}
                 >
-                  {buckets.map((bucket, index) => {
-                    const value = bucket[metricKey];
-                    const fill =
-                      value > 0
-                        ? hovered === index
-                          ? "#ffffff"
-                          : BAR_FILL
-                        : bucket.future
-                          ? "transparent"
-                          : BAR_EMPTY_FILL;
-                    return <Cell key={index} fill={fill} />;
-                  })}
+                  {buckets.map((bucket, index) => (
+                    <Cell
+                      key={index}
+                      fill={
+                        bucket[metricKey] > 0
+                          ? BAR_FILL
+                          : bucket.future
+                            ? "transparent"
+                            : BAR_EMPTY_FILL
+                      }
+                    />
+                  ))}
                   {/* The value shows only for the hovered bar, pinned above it —
                       no always-on labels, no cursor-following tooltip, nothing
                       on empty bars. */}
