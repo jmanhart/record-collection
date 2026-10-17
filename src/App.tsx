@@ -26,6 +26,7 @@ import "./App.css";
 const HomePage = lazy(() => import("./components/Home/HomePage"));
 const TimelinePage = lazy(() => import("./components/Timeline/TimelinePage"));
 const StatsPage = lazy(() => import("./components/Stats/StatsPage"));
+const WebView = lazy(() => import("./components/Web/WebView"));
 
 function RecordList() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -124,6 +125,14 @@ export default function App() {
               element={
                 <Suspense fallback={null}>
                   <StatsPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/web"
+              element={
+                <Suspense fallback={null}>
+                  <WebView />
                 </Suspense>
               }
             />
