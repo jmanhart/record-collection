@@ -2,10 +2,10 @@ import { useMemo } from "react";
 import type { ElementDefinition } from "cytoscape";
 import type { Record } from "../types/Record";
 
-export type NodeKind = "genre" | "artist";
+export type NodeKind = "genre" | "artist" | "album";
 
-// A fixed hue per genre so the 14 genres read as stable color families; artists
-// inherit their representative album's dominant color, falling back to genre.
+// A fixed hue per genre so the genres read as stable color families; albums keep
+// their own dominant color, artists inherit their most-common album color.
 const GENRE_COLORS: { [genre: string]: string } = {
   Rock: "#e2504f",
   Pop: "#e86fb0",
@@ -28,82 +28,109 @@ export interface CollectionGraph {
   elements: ElementDefinition[];
   genreCount: number;
   artistCount: number;
-  /** [name, color] for the legend, ordered by record count desc. */
+  albumCount: number;
+  /** [name, color, count] for the legend, ordered by record count desc. */
   genreLegend: { name: string; color: string; count: number }[];
 }
 
-interface ArtistAgg {
-  count: number;
+interface AlbumEntry {
+  id: number;
+  title: string;
   color?: string;
-  genres: Set<string>;
+}
+
+interface ArtistAgg {
+  albums: AlbumEntry[];
+  genreCounts: Map<string, number>;
+  color?: string;
 }
 
 export function useCollectionGraph(records: Record[]): CollectionGraph {
   return useMemo(() => {
-    const genreCounts = new Map<string, number>();
     const artists = new Map<string, ArtistAgg>();
-    const pairs = new Set<string>();
+    const genreTotals = new Map<string, number>();
 
     for (const record of records) {
-      const artist = record.artist;
-      const agg = artists.get(artist) ?? {
-        count: 0,
+      const agg = artists.get(record.artist) ?? {
+        albums: [],
+        genreCounts: new Map<string, number>(),
         color: undefined,
-        genres: new Set<string>(),
       };
-      agg.count += 1;
+      agg.albums.push({
+        id: record.id,
+        title: record.title,
+        color: record.dominant_color ?? undefined,
+      });
       if (!agg.color && record.dominant_color) agg.color = record.dominant_color;
       for (const genre of record.genres ?? []) {
-        genreCounts.set(genre, (genreCounts.get(genre) ?? 0) + 1);
-        agg.genres.add(genre);
-        pairs.add(`${artist}\u0000${genre}`);
+        agg.genreCounts.set(genre, (agg.genreCounts.get(genre) ?? 0) + 1);
+        genreTotals.set(genre, (genreTotals.get(genre) ?? 0) + 1);
       }
-      artists.set(artist, agg);
+      artists.set(record.artist, agg);
+    }
+
+    // Each artist lands in a single zone: their most-common genre.
+    const artistPrimary = new Map<string, string>();
+    const usedGenres = new Set<string>();
+    for (const [name, agg] of artists) {
+      let best: string | undefined;
+      let bestCount = -1;
+      for (const [genre, count] of agg.genreCounts) {
+        if (count > bestCount) {
+          bestCount = count;
+          best = genre;
+        }
+      }
+      const primary = best ?? "Other";
+      artistPrimary.set(name, primary);
+      usedGenres.add(primary);
     }
 
     const elements: ElementDefinition[] = [];
 
-    for (const [genre, count] of genreCounts) {
+    for (const genre of usedGenres) {
       elements.push({
         data: {
           id: `genre:${genre}`,
           kind: "genre",
           label: genre,
-          count,
           color: GENRE_COLORS[genre] ?? FALLBACK_COLOR,
-          diam: 40 + Math.sqrt(count) * 5,
         },
       });
     }
 
-    for (const [artist, agg] of artists) {
-      const domGenre = agg.genres.values().next().value;
-      const color =
-        agg.color ?? (domGenre ? GENRE_COLORS[domGenre] : undefined) ?? FALLBACK_COLOR;
+    let albumCount = 0;
+    for (const [name, agg] of artists) {
+      const genre = artistPrimary.get(name) ?? "Other";
+      const genreColor = GENRE_COLORS[genre] ?? FALLBACK_COLOR;
+      const artistColor = agg.color ?? genreColor;
       elements.push({
         data: {
-          id: `artist:${artist}`,
+          id: `artist:${name}`,
           kind: "artist",
-          label: artist,
-          count: agg.count,
-          color,
-          diam: 13 + Math.sqrt(agg.count) * 6,
+          parent: `genre:${genre}`,
+          label: name,
+          color: artistColor,
+          count: agg.albums.length,
         },
       });
+      for (const album of agg.albums) {
+        albumCount += 1;
+        elements.push({
+          data: {
+            id: `album:${album.id}`,
+            kind: "album",
+            parent: `artist:${name}`,
+            label: album.title,
+            color: album.color ?? artistColor,
+            artist: name,
+            title: album.title,
+          },
+        });
+      }
     }
 
-    for (const pair of pairs) {
-      const [artist, genre] = pair.split("\u0000");
-      elements.push({
-        data: {
-          id: `edge:${artist}\u0000${genre}`,
-          source: `artist:${artist}`,
-          target: `genre:${genre}`,
-        },
-      });
-    }
-
-    const genreLegend = Array.from(genreCounts.entries())
+    const genreLegend = Array.from(genreTotals.entries())
       .sort((a, b) => b[1] - a[1])
       .map(([name, count]) => ({
         name,
@@ -113,8 +140,9 @@ export function useCollectionGraph(records: Record[]): CollectionGraph {
 
     return {
       elements,
-      genreCount: genreCounts.size,
+      genreCount: usedGenres.size,
       artistCount: artists.size,
+      albumCount,
       genreLegend,
     };
   }, [records]);
