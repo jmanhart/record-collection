@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
-import { Bar, BarChart, LabelList, ResponsiveContainer, XAxis } from "recharts";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  LabelList,
+  ResponsiveContainer,
+  XAxis,
+} from "recharts";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useActivity, toDateKey } from "../../hooks/useActivity";
 import {
@@ -8,7 +15,6 @@ import {
   type Range,
   type Measure,
 } from "../../hooks/useListeningStats";
-import { StatCard, StatCardRow } from "../StatCard/StatCard";
 import { ViewNav } from "../ViewNav/ViewNav";
 import { formatRuntimeCompact } from "../../utils/formatDuration";
 import styles from "./StatsPage.module.css";
@@ -50,40 +56,38 @@ export default function StatsPage() {
 
       <section className={styles.hero} data-stats-hero>
         <div className={styles.controls}>
-          <div className={styles.controlGroup}>
-            <div className={styles.toggle} role="group" aria-label="Chart range">
-              {RANGE_OPTIONS.map(({ value, label }) => (
-                <button
-                  key={value}
-                  className={`${styles.toggleButton} ${range === value ? styles.toggleActive : ""}`}
-                  onClick={() => {
-                    setRange(value);
-                    setOffset(0);
-                  }}
-                  aria-pressed={range === value}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-            <div className={styles.periodNav}>
+          <div className={styles.toggle} role="group" aria-label="Chart range">
+            {RANGE_OPTIONS.map(({ value, label }) => (
               <button
-                className={styles.navButton}
-                onClick={() => setOffset((o) => o + 1)}
-                aria-label={`Previous ${range}`}
+                key={value}
+                className={`${styles.toggleButton} ${range === value ? styles.toggleActive : ""}`}
+                onClick={() => {
+                  setRange(value);
+                  setOffset(0);
+                }}
+                aria-pressed={range === value}
               >
-                <ChevronLeft size={16} aria-hidden />
+                {label}
               </button>
-              <span className={styles.periodLabel}>{periodTitle}</span>
-              <button
-                className={styles.navButton}
-                onClick={() => setOffset((o) => Math.max(0, o - 1))}
-                disabled={offset === 0}
-                aria-label={`Next ${range}`}
-              >
-                <ChevronRight size={16} aria-hidden />
-              </button>
-            </div>
+            ))}
+          </div>
+          <div className={styles.periodNav}>
+            <button
+              className={styles.navButton}
+              onClick={() => setOffset((o) => o + 1)}
+              aria-label={`Previous ${range}`}
+            >
+              <ChevronLeft size={16} aria-hidden />
+            </button>
+            <span className={styles.periodLabel}>{periodTitle}</span>
+            <button
+              className={styles.navButton}
+              onClick={() => setOffset((o) => Math.max(0, o - 1))}
+              disabled={offset === 0}
+              aria-label={`Next ${range}`}
+            >
+              <ChevronRight size={16} aria-hidden />
+            </button>
           </div>
           <div className={styles.toggle} role="group" aria-label="Chart measure">
             <button
@@ -114,10 +118,15 @@ export default function StatsPage() {
                 data={buckets}
                 margin={{ top: 28, right: 8, bottom: 0, left: 8 }}
               >
+                <CartesianGrid
+                  vertical={false}
+                  stroke="rgba(245, 245, 245, 0.1)"
+                  strokeDasharray="2 5"
+                />
                 <XAxis
                   dataKey="label"
                   tickLine={false}
-                  axisLine={false}
+                  axisLine={{ stroke: "rgba(245, 245, 245, 0.28)" }}
                   interval={0}
                 />
                 {/* Keyed on the selection so switching range/measure remounts the
@@ -147,27 +156,27 @@ export default function StatsPage() {
           </div>
         )}
 
-        <div className={styles.statRow}>
-          <StatCardRow>
-            <StatCard
-              size="sm"
-              label="Listens"
-              value={stats.listens}
-              sub={`${stats.albums} different albums`}
-            />
-            <StatCard
-              size="sm"
-              label="Time listened"
-              value={formatRuntimeCompact(stats.seconds)}
-              sub={offset === 0 ? `this ${range}` : periodTitle}
-            />
-            <StatCard
-              size="sm"
-              label={`Last ${range}`}
-              value={formatRuntimeCompact(stats.prevSeconds)}
-              sub="time listened"
-            />
-          </StatCardRow>
+        <div className={styles.summary}>
+          <div className={styles.summaryItem}>
+            <span className={styles.summaryValue}>{stats.listens}</span>
+            <span className={styles.summaryLabel}>
+              listens · {stats.albums} albums
+            </span>
+          </div>
+          <div className={styles.summaryItem}>
+            <span className={styles.summaryValue}>
+              {formatRuntimeCompact(stats.seconds)}
+            </span>
+            <span className={styles.summaryLabel}>
+              {offset === 0 ? `this ${range}` : periodTitle}
+            </span>
+          </div>
+          <div className={styles.summaryItem}>
+            <span className={styles.summaryValue}>
+              {formatRuntimeCompact(stats.prevSeconds)}
+            </span>
+            <span className={styles.summaryLabel}>last {range}</span>
+          </div>
         </div>
       </section>
 

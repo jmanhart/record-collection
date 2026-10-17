@@ -26,17 +26,10 @@
 .controls {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
+  justify-content: flex-start;
+  gap: 0.5rem;
   flex-wrap: wrap;
   flex-shrink: 0;
-}
-
-.controlGroup {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 0;
 }
 
 /* Glassy segmented controls that read on the gradient. */
@@ -157,16 +150,31 @@
   font-weight: 600;
 }
 
-/* Glassy stat cards over the gradient: rebind the StatCard tokens rather than
-   threading props through the shared component. */
-.statRow {
-  --card-bg: rgba(255, 255, 255, 0.08);
-  --card-bg-hover: rgba(255, 255, 255, 0.14);
-  --divider: rgba(245, 245, 245, 0.22);
-  --text-primary: #ffffff;
-  --text-secondary: rgba(245, 245, 245, 0.78);
-  --text-tertiary: rgba(245, 245, 245, 0.55);
+/* Period totals as plain text — no cards, matching the site's text styles.
+   Sits directly on the gradient below the chart. */
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
   flex-shrink: 0;
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.summaryValue {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.1;
+  color: #ffffff;
+}
+
+.summaryLabel {
+  font-size: 0.8rem;
+  color: rgba(245, 245, 245, 0.68);
 }
 
 /* Period rankings below the hero, aligned to the same page gutter. */
@@ -322,7 +330,7 @@
   animation: rise 0.5s ease-out 0.08s both;
 }
 
-.statRow {
+.summary {
   animation: rise 0.5s ease-out 0.16s both;
 }
 
@@ -334,7 +342,7 @@
   .controls,
   .chart,
   .status,
-  .statRow,
+  .summary,
   .lists {
     animation: none;
   }
