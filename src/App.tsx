@@ -25,6 +25,7 @@ import "./App.css";
 // Lazy so the collection bundle doesn't pay for the charting library
 const HomePage = lazy(() => import("./components/Home/HomePage"));
 const TimelinePage = lazy(() => import("./components/Timeline/TimelinePage"));
+const StatsPage = lazy(() => import("./components/Stats/StatsPage"));
 
 function RecordList() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -115,6 +116,14 @@ export default function App() {
               element={
                 <Suspense fallback={null}>
                   <HomePage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/stats"
+              element={
+                <Suspense fallback={null}>
+                  <StatsPage />
                 </Suspense>
               }
             />
