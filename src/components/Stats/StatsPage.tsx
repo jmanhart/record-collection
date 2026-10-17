@@ -31,7 +31,9 @@ const HERO_VARS: Record<string, string> = {
 
 // Bar fills: solid for real values, a muted stub for past periods with no
 // listens so the chart doesn't read as sparse. Future periods get no stub.
+// While a bar is hovered, the others recede to BAR_DIM so it reads as focus.
 const BAR_FILL = "rgba(255, 255, 255, 0.88)";
+const BAR_DIM = "rgba(255, 255, 255, 0.32)";
 const BAR_EMPTY_FILL = "rgba(245, 245, 245, 0.16)";
 
 export default function StatsPage() {
@@ -250,10 +252,11 @@ export default function StatsPage() {
                 >
                   {buckets.map((bucket, index) => {
                     const value = bucket[metricKey];
+                    const dimmed = hovered !== null && hovered !== index;
                     const fill =
                       value > 0
-                        ? hovered === index
-                          ? "#ffffff"
+                        ? dimmed
+                          ? BAR_DIM
                           : BAR_FILL
                         : bucket.future
                           ? "transparent"
