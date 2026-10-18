@@ -172,7 +172,7 @@ export default function StatsPage() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={buckets}
-                margin={{ top: 28, right: 8, bottom: 0, left: 8 }}
+                margin={{ top: 28, right: 0, bottom: 0, left: 0 }}
                 onMouseMove={(state) => {
                   const raw = state?.activeTooltipIndex;
                   const idx = raw == null ? null : Number(raw);

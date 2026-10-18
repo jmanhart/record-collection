@@ -134,10 +134,15 @@
   color: rgba(245, 245, 245, 0.62);
 }
 
+/* Pull the chart left by the y-axis width so its baseline/plot aligns edge to
+   edge with the controls above and the band below; the axis labels overhang
+   into the left gutter. --yaxis-w matches the recharts <YAxis width>. */
 .chart {
+  --yaxis-w: 46px;
   position: relative;
   flex: 1;
   min-height: 240px;
+  margin-left: calc(-1 * var(--yaxis-w));
 }
 
 /* Bar fills come from per-bucket <Cell> props (muted stubs for empty past
