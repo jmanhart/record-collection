@@ -46,6 +46,9 @@ export interface ListeningStats {
   topAlbums: TopAlbum[];
   /** True when the frame has no listens to chart. */
   isEmpty: boolean;
+  /** Calendar bounds of the viewed frame (YYYY-MM-DD, inclusive). */
+  startKey: string;
+  endKey: string;
 }
 
 export const RANGE_OPTIONS: { value: Range; label: string }[] = [
@@ -306,6 +309,8 @@ export function useListeningStats(
     );
 
     return {
+      startKey: bounds.startKey,
+      endKey: bounds.endKey,
       listens: listens.length,
       albums,
       seconds,
