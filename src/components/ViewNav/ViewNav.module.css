@@ -50,11 +50,117 @@
   opacity: 1;
 }
 
+/* Hamburger (mobile only) — same circle skin as the buttons, fixed in the
+   same corner; hidden on desktop where the full cluster shows. */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 10000;
+}
+
+/* Full-screen scrim + top sheet listing the views. */
+.sheetOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: flex;
+  flex-direction: column;
+  padding: 0.6rem;
+  background: rgba(0, 0, 0, 0.45);
+  animation: navFade 0.18s ease;
+}
+
+.sheet {
+  background: var(--surface000);
+  border: 1px solid var(--divider);
+  border-radius: 18px;
+  padding: 0.5rem;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+  animation: navSlide 0.22s ease;
+}
+
+.sheetHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem 0.25rem;
+}
+
+.sheetTitle {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.sheetClose {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.sheetItem {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.85rem 0.75rem;
+  border-radius: 12px;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.sheetItem svg {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.sheetItemActive {
+  background: var(--surface100);
+}
+
+.sheetItemActive svg {
+  color: var(--text-primary);
+}
+
+@keyframes navFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes navSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @media (max-width: 768px) {
   .nav {
-    top: 0.75rem;
-    right: 0.75rem;
-    gap: 0.4rem;
+    display: none;
+  }
+
+  .hamburger {
+    display: flex;
   }
 
   .button {

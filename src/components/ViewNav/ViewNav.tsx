@@ -1,5 +1,14 @@
+import { useState, useEffect } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
-import { LayoutGrid, Clock, ListOrdered, BarChart3, Waypoints } from "lucide-react";
+import {
+  LayoutGrid,
+  Clock,
+  ListOrdered,
+  BarChart3,
+  Waypoints,
+  Menu,
+  X,
+} from "lucide-react";
 import styles from "./ViewNav.module.css";
 
 type ViewKey = "grid" | "timeline" | "top" | "stats" | "web";
@@ -13,14 +22,15 @@ const ITEMS: { key: ViewKey; to: string; label: string; Icon: typeof LayoutGrid 
 ];
 
 /**
- * Persistent top-right cluster linking the three collection views. Rendered
- * identically on each so you can jump between them from anywhere; the current
- * view's button is marked active. Grid/timeline are `view` params on `/`; top
- * listens is its own route.
+ * Persistent top-right view switcher. On desktop it's a cluster of circle
+ * buttons; on mobile it collapses to a single hamburger that opens a sheet so
+ * the buttons never fight the page's own controls for the top row.
  */
 export function ViewNav() {
   const { pathname } = useLocation();
   const [params] = useSearchParams();
+  const [open, setOpen] = useState(false);
+
   const current: ViewKey =
     pathname === "/top-listens"
       ? "top"
@@ -28,26 +38,83 @@ export function ViewNav() {
         ? "stats"
         : pathname === "/web"
           ? "web"
-        : params.get("view") === "timeline"
-          ? "timeline"
-          : "grid";
+          : params.get("view") === "timeline"
+            ? "timeline"
+            : "grid";
+
+  // Close the sheet whenever the destination changes, and on Escape.
+  useEffect(() => setOpen(false), [pathname, params]);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
 
   return (
-    <nav className={styles.nav} aria-label="Views">
-      {ITEMS.map(({ key, to, label, Icon }) => {
-        const active = key === current;
-        return (
+    <>
+      <nav className={styles.nav} aria-label="Views">
+        {ITEMS.map(({ key, to, label, Icon }) => (
           <Link
             key={key}
             to={to}
             aria-label={label}
-            aria-current={active ? "page" : undefined}
-            className={`${styles.button} ${active ? styles.buttonActive : ""}`}
+            aria-current={key === current ? "page" : undefined}
+            className={`${styles.button} ${key === current ? styles.buttonActive : ""}`}
           >
             <Icon size={20} />
           </Link>
-        );
-      })}
-    </nav>
+        ))}
+      </nav>
+
+      <button
+        type="button"
+        className={`${styles.button} ${styles.hamburger}`}
+        aria-label="Open navigation"
+        aria-expanded={open}
+        onClick={() => setOpen(true)}
+      >
+        <Menu size={20} />
+      </button>
+
+      {open && (
+        <div
+          className={styles.sheetOverlay}
+          onClick={() => setOpen(false)}
+          role="presentation"
+        >
+          <div
+            className={styles.sheet}
+            role="dialog"
+            aria-label="Views"
+            aria-modal="true"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.sheetHeader}>
+              <span className={styles.sheetTitle}>Views</span>
+              <button
+                type="button"
+                className={styles.sheetClose}
+                aria-label="Close navigation"
+                onClick={() => setOpen(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
+            {ITEMS.map(({ key, to, label, Icon }) => (
+              <Link
+                key={key}
+                to={to}
+                aria-current={key === current ? "page" : undefined}
+                className={`${styles.sheetItem} ${key === current ? styles.sheetItemActive : ""}`}
+              >
+                <Icon size={20} aria-hidden />
+                <span>{label}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+    </>
   );
 }
