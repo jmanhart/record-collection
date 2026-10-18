@@ -59,8 +59,15 @@ export default function StatsPage() {
   } | null>(null);
 
   const stats = useListeningStats(range, offset, events, todayKey);
-  const { buckets, periodTitle, isEmpty, topArtists, topAlbums } = stats;
+  const { buckets, periodTitle, isEmpty, topAlbums } = stats;
   const metricKey = measure === "time" ? "minutes" : "albums";
+  // Top time-spans of the frame (days in a week, weeks in a month, months in a
+  // year) ranked by listening time — sits under the "time this period" card.
+  const periodUnit =
+    range === "week" ? "days" : range === "month" ? "weeks" : "months";
+  const topPeriods = buckets
+    .filter((bucket) => bucket.minutes > 0)
+    .sort((a, b) => b.minutes - a.minutes);
 
   // Records acquired within the viewed frame — "new this period".
   const { records } = useRecords();
@@ -340,19 +347,19 @@ export default function StatsPage() {
         <div className={styles.listCol}>
           <span className={styles.listLabel}>
             {offset === 0
-              ? `Top artists this ${range}`
-              : `Top artists · ${periodTitle}`}
+              ? `Top ${periodUnit} this ${range}`
+              : `Top ${periodUnit} · ${periodTitle}`}
           </span>
           <div className={styles.list}>
-            {topArtists.length === 0 ? (
-              <p className={styles.listEmpty}>No artists in {periodTitle}.</p>
+            {topPeriods.length === 0 ? (
+              <p className={styles.listEmpty}>No listens in {periodTitle}.</p>
             ) : (
-              topArtists.map((entry, index) => (
-                <div key={entry.artist} className={styles.artistRow}>
+              topPeriods.map((period, index) => (
+                <div key={period.label} className={styles.artistRow}>
                   <span className={styles.rank}>{index + 1}</span>
-                  <span className={styles.artistName}>{entry.artist}</span>
+                  <span className={styles.artistName}>{period.label}</span>
                   <span className={styles.count}>
-                    {entry.count} {entry.count === 1 ? "listen" : "listens"}
+                    {formatRuntimeCompact(period.minutes * 60)}
                   </span>
                 </div>
               ))
