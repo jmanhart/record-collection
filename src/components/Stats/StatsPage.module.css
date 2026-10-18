@@ -268,7 +268,8 @@
 
 .rank {
   flex-shrink: 0;
-  width: 1.3rem;
+  width: 1.9rem;
+  white-space: nowrap;
   font-size: 0.8rem;
   color: var(--text-tertiary);
   font-variant-numeric: tabular-nums;
