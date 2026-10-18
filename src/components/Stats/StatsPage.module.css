@@ -200,6 +200,7 @@
   width: auto;
   height: auto;
   border: none;
+  border-radius: 0;
   background: none;
   font: inherit;
   text-align: left;
@@ -396,6 +397,12 @@
   .bandItem {
     cursor: pointer;
     position: relative;
+  }
+
+  /* No vertical dividers in tab mode — the underline is the only indicator. */
+  .bandItem:not(:first-child) {
+    border-left: none;
+    padding-left: 0.75rem;
   }
 
   .bandValue {
