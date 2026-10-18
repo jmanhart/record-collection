@@ -163,8 +163,10 @@
     display: flex;
   }
 
-  .button {
-    width: 2rem;
-    height: 2rem;
+  /* Match the stats page controls (2.25rem) so the hamburger lines up with
+     the options button and date stepper. */
+  .hamburger {
+    width: 2.25rem;
+    height: 2.25rem;
   }
 }

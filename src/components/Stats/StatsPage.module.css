@@ -135,10 +135,10 @@
   flex-shrink: 0;
   width: 2.25rem;
   height: 2.25rem;
-  border: 1px solid var(--hero-line);
+  border: 1px solid var(--control-border);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--hero-text);
+  background: var(--control-bg);
+  color: var(--control-text);
   cursor: pointer;
 }
 
@@ -458,6 +458,9 @@
 @media (max-width: 768px) {
   .hero {
     min-height: 70vh;
+    /* Start the controls at the hamburger's top (0.75rem) so the date stepper,
+       options button and hamburger share one line. */
+    padding-top: 0.75rem;
   }
 
   /* One compact row: the date stepper fills the width with the options button
@@ -466,7 +469,7 @@
   .controls {
     flex-wrap: nowrap;
     gap: 0.5rem;
-    padding-right: 2.75rem;
+    padding-right: 1.5rem;
   }
 
   .controls > .toggle {
