@@ -343,6 +343,35 @@
     min-height: 70vh;
   }
 
+  /* Stack the controls into full-width rows: segmented toggles and a wide,
+     easy-to-tap date stepper. padding-right keeps the top row clear of the
+     fixed hamburger. */
+  .controls {
+    gap: 0.45rem;
+    padding-right: 2.5rem;
+  }
+
+  .toggle,
+  .periodNav {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .toggle .toggleButton {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .periodNav {
+    justify-content: space-between;
+  }
+
+  .periodLabel {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+  }
+
   .lists {
     grid-template-columns: 1fr;
   }
