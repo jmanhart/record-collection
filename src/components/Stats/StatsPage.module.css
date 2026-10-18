@@ -125,6 +125,106 @@
   white-space: nowrap;
 }
 
+/* Options button + sheet (mobile): holds the range + measure toggles so the
+   top bar stays to just the date stepper. Hidden on desktop where the toggles
+   sit inline. */
+.optionsButton {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--hero-line);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--hero-text);
+  cursor: pointer;
+}
+
+.optionsOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: flex;
+  flex-direction: column;
+  padding: 0.6rem;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.optionsSheet {
+  background: var(--surface000);
+  border: 1px solid var(--divider);
+  border-radius: 18px;
+  padding: 0.5rem 0.9rem 1.1rem;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+}
+
+.optionsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0 0.75rem;
+}
+
+.optionsTitle {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.optionsClose {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.optionsGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.5rem 0;
+}
+
+.optionsLabel {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* Re-skin the segmented control for the light sheet (it's glassy on the hero). */
+.optionsSheet .toggle {
+  width: 100%;
+  background: var(--surface100);
+  border-color: var(--divider);
+}
+
+.optionsSheet .toggleButton {
+  flex: 1;
+  color: var(--text-secondary);
+}
+
+.optionsSheet .toggleButton:hover {
+  background: var(--surface200);
+  color: var(--text-primary);
+}
+
+.optionsSheet .toggleActive,
+.optionsSheet .toggleActive:hover {
+  background: var(--surface000);
+  color: var(--text-primary);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
 .status {
   flex: 1;
   display: flex;
@@ -360,26 +460,25 @@
     min-height: 70vh;
   }
 
-  /* Stack the controls into full-width rows: segmented toggles and a wide,
-     easy-to-tap date stepper. padding-right keeps the top row clear of the
-     fixed hamburger. */
+  /* One compact row: the date stepper fills the width with the options button
+     beside it; the range + measure toggles move into the options sheet.
+     padding-right keeps it clear of the fixed hamburger. */
   .controls {
-    gap: 0.45rem;
-    padding-right: 2.5rem;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    padding-right: 2.75rem;
   }
 
-  .toggle,
+  .controls > .toggle {
+    display: none;
+  }
+
+  .optionsButton {
+    display: flex;
+  }
+
   .periodNav {
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .toggle .toggleButton {
     flex: 1;
-    justify-content: center;
-  }
-
-  .periodNav {
     justify-content: space-between;
   }
 

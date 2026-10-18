@@ -9,7 +9,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
 import { useActivity, toDateKey } from "../../hooks/useActivity";
 import { useRecords } from "../../hooks/useRecords";
 import {
@@ -37,6 +42,41 @@ const BAR_FILL = "rgba(255, 255, 255, 0.88)";
 const BAR_DIM = "rgba(255, 255, 255, 0.32)";
 const BAR_EMPTY_FILL = "rgba(245, 245, 245, 0.16)";
 
+const MEASURE_OPTIONS: { value: Measure; label: string }[] = [
+  { value: "time", label: "Time" },
+  { value: "albums", label: "Albums" },
+];
+
+// Shared segmented control — rendered inline on desktop and inside the mobile
+// options sheet, so both stay in lockstep with the same state.
+function Segmented<T extends string>({
+  options,
+  value,
+  onChange,
+  ariaLabel,
+}: {
+  options: { value: T; label: string }[];
+  value: T;
+  onChange: (value: T) => void;
+  ariaLabel: string;
+}) {
+  return (
+    <div className={styles.toggle} role="group" aria-label={ariaLabel}>
+      {options.map((option) => (
+        <button
+          key={option.value}
+          type="button"
+          className={`${styles.toggleButton} ${value === option.value ? styles.toggleActive : ""}`}
+          onClick={() => onChange(option.value)}
+          aria-pressed={value === option.value}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function StatsPage() {
   const { events, isLoading } = useActivity();
   const todayKey = toDateKey(new Date().toISOString());
@@ -49,6 +89,8 @@ export default function StatsPage() {
   const [activeTab, setActiveTab] = useState<"albums" | "periods" | "records">(
     "albums"
   );
+  // Mobile only: the chart options (range + measure) live in a sheet.
+  const [optionsOpen, setOptionsOpen] = useState(false);
   // Index of the bar under the cursor; drives the pinned hover label.
   const [hovered, setHovered] = useState<number | null>(null);
   // Bar grow-in runs only right after a selection change, never on the hover
@@ -141,21 +183,15 @@ export default function StatsPage() {
 
       <section className={styles.hero} data-stats-hero>
         <div className={styles.controls}>
-          <div className={styles.toggle} role="group" aria-label="Chart range">
-            {RANGE_OPTIONS.map(({ value, label }) => (
-              <button
-                key={value}
-                className={`${styles.toggleButton} ${range === value ? styles.toggleActive : ""}`}
-                onClick={() => {
-                  setRange(value);
-                  setOffset(0);
-                }}
-                aria-pressed={range === value}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          <Segmented
+            ariaLabel="Chart range"
+            options={RANGE_OPTIONS}
+            value={range}
+            onChange={(value) => {
+              setRange(value);
+              setOffset(0);
+            }}
+          />
           <div className={styles.periodNav}>
             <button
               className={styles.navButton}
@@ -174,23 +210,71 @@ export default function StatsPage() {
               <ChevronRight size={16} aria-hidden />
             </button>
           </div>
-          <div className={styles.toggle} role="group" aria-label="Chart measure">
-            <button
-              className={`${styles.toggleButton} ${measure === "time" ? styles.toggleActive : ""}`}
-              onClick={() => setMeasure("time")}
-              aria-pressed={measure === "time"}
-            >
-              Time
-            </button>
-            <button
-              className={`${styles.toggleButton} ${measure === "albums" ? styles.toggleActive : ""}`}
-              onClick={() => setMeasure("albums")}
-              aria-pressed={measure === "albums"}
-            >
-              Albums
-            </button>
-          </div>
+          <Segmented
+            ariaLabel="Chart measure"
+            options={MEASURE_OPTIONS}
+            value={measure}
+            onChange={setMeasure}
+          />
+          <button
+            type="button"
+            className={styles.optionsButton}
+            aria-label="Chart options"
+            aria-expanded={optionsOpen}
+            onClick={() => setOptionsOpen(true)}
+          >
+            <SlidersHorizontal size={18} aria-hidden />
+          </button>
         </div>
+
+        {optionsOpen && (
+          <div
+            className={styles.optionsOverlay}
+            onClick={() => setOptionsOpen(false)}
+            role="presentation"
+          >
+            <div
+              className={styles.optionsSheet}
+              role="dialog"
+              aria-label="Chart options"
+              aria-modal="true"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className={styles.optionsHeader}>
+                <span className={styles.optionsTitle}>Chart options</span>
+                <button
+                  type="button"
+                  className={styles.optionsClose}
+                  aria-label="Close options"
+                  onClick={() => setOptionsOpen(false)}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+              <div className={styles.optionsGroup}>
+                <span className={styles.optionsLabel}>Range</span>
+                <Segmented
+                  ariaLabel="Chart range"
+                  options={RANGE_OPTIONS}
+                  value={range}
+                  onChange={(value) => {
+                    setRange(value);
+                    setOffset(0);
+                  }}
+                />
+              </div>
+              <div className={styles.optionsGroup}>
+                <span className={styles.optionsLabel}>Measure</span>
+                <Segmented
+                  ariaLabel="Chart measure"
+                  options={MEASURE_OPTIONS}
+                  value={measure}
+                  onChange={setMeasure}
+                />
+              </div>
+            </div>
+          </div>
+        )}
         {isLoading ? (
           <p className={styles.status}>Loading…</p>
         ) : isEmpty ? (
