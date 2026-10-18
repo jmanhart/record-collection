@@ -186,14 +186,18 @@
   --grid-left: max(2rem, calc((100vw - 1280px) / 2 + 2rem));
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  padding: clamp(1.25rem, 3vh, 2rem) var(--grid-left);
+  padding: 0 var(--grid-left);
 }
 
 .bandItem {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 0.2rem;
   min-width: 0;
+  /* Vertical padding lives on the items (not the grid container) so each
+     cell fills the band's full height and its divider spans top to bottom. */
+  padding: clamp(0.8rem, 2vh, 1.15rem) 0;
 }
 
 .bandItem:not(:first-child) {
