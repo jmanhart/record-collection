@@ -163,29 +163,6 @@ export default function StatsPage() {
             </button>
           </div>
         </div>
-        <div className={styles.summary}>
-          <div className={styles.summaryItem}>
-            <span className={styles.summaryValue}>{stats.listens}</span>
-            <span className={styles.summaryLabel}>
-              listens · {stats.albums} albums
-            </span>
-          </div>
-          <div className={styles.summaryItem}>
-            <span className={styles.summaryValue}>
-              {formatRuntimeCompact(stats.seconds)}
-            </span>
-            <span className={styles.summaryLabel}>
-              {offset === 0 ? `this ${range}` : periodTitle}
-            </span>
-          </div>
-          <div className={styles.summaryItem}>
-            <span className={styles.summaryValue}>
-              {formatRuntimeCompact(stats.prevSeconds)}
-            </span>
-            <span className={styles.summaryLabel}>last {range}</span>
-          </div>
-        </div>
-
         {isLoading ? (
           <p className={styles.status}>Loading…</p>
         ) : isEmpty ? (
@@ -279,6 +256,31 @@ export default function StatsPage() {
           </div>
         )}
 
+      </section>
+
+      <section className={styles.statsBand}>
+        <div className={styles.statsBandInner}>
+          <div className={styles.bandItem}>
+            <span className={styles.bandValue}>{stats.listens}</span>
+            <span className={styles.bandLabel}>
+              listens · {stats.albums} albums
+            </span>
+          </div>
+          <div className={styles.bandItem}>
+            <span className={styles.bandValue}>
+              {formatRuntimeCompact(stats.seconds)}
+            </span>
+            <span className={styles.bandLabel}>
+              {offset === 0 ? `this ${range}` : periodTitle}
+            </span>
+          </div>
+          <div className={styles.bandItem}>
+            <span className={styles.bandValue}>
+              {formatRuntimeCompact(stats.prevSeconds)}
+            </span>
+            <span className={styles.bandLabel}>last {range}</span>
+          </div>
+        </div>
       </section>
 
       <section className={styles.lists}>

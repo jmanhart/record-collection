@@ -13,8 +13,8 @@
   flex-direction: column;
   gap: clamp(1.25rem, 3vh, 2rem);
   width: 100vw;
-  height: 80vh;
-  min-height: 560px;
+  height: 64vh;
+  min-height: 440px;
   margin-left: calc(50% - 50vw);
   padding: 1rem var(--grid-left) clamp(1.5rem, 4vh, 2.5rem);
   box-sizing: border-box;
@@ -166,31 +166,46 @@
   z-index: 2;
 }
 
-/* Period totals as plain text — no cards, matching the site's text styles.
-   Sits directly on the gradient below the chart. */
-.summary {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2.5rem;
-  flex-shrink: 0;
+/* Edge-to-edge white band below the colored hero: period totals in three
+   columns, bordered top and bottom, on the page's default (non-colored)
+   surface. */
+.statsBand {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  background: var(--surface000);
+  border-top: 1px solid var(--divider);
+  border-bottom: 1px solid var(--divider);
 }
 
-.summaryItem {
+.statsBandInner {
+  --grid-left: max(2rem, calc((100vw - 1280px) / 2 + 2rem));
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: clamp(1.25rem, 3vh, 2rem) var(--grid-left);
+}
+
+.bandItem {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.2rem;
+  min-width: 0;
 }
 
-.summaryValue {
-  font-size: 1.5rem;
+.bandItem:not(:first-child) {
+  padding-left: clamp(1rem, 4vw, 2.5rem);
+  border-left: 1px solid var(--divider);
+}
+
+.bandValue {
+  font-size: 1.6rem;
   font-weight: 600;
   line-height: 1.1;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
-.summaryLabel {
+.bandLabel {
   font-size: 0.8rem;
-  color: rgba(245, 245, 245, 0.68);
+  color: var(--text-tertiary);
 }
 
 /* Period rankings below the hero, aligned to the same page gutter. */
@@ -360,10 +375,6 @@
   }
 }
 
-.summary {
-  animation: rise 0.5s ease-out 0.16s both;
-}
-
 .lists {
   animation: rise 0.55s ease-out 0.24s both;
 }
@@ -372,7 +383,6 @@
   .controls,
   .chart,
   .status,
-  .summary,
   .lists {
     animation: none;
   }
