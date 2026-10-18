@@ -45,6 +45,10 @@ export default function StatsPage() {
   const [measure, setMeasure] = useState<Measure>("time");
   // 0 = current period; each increment walks one whole period into the past.
   const [offset, setOffset] = useState(0);
+  // Mobile only: the band chips act as tabs choosing which list is shown.
+  const [activeTab, setActiveTab] = useState<"albums" | "periods" | "records">(
+    "albums"
+  );
   // Index of the bar under the cursor; drives the pinned hover label.
   const [hovered, setHovered] = useState<number | null>(null);
   // Bar grow-in runs only right after a selection change, never on the hover
@@ -284,29 +288,44 @@ export default function StatsPage() {
 
       <section className={styles.statsBand}>
         <div className={styles.statsBandInner}>
-          <div className={styles.bandItem}>
+          <button
+            type="button"
+            className={`${styles.bandItem} ${activeTab === "albums" ? styles.bandItemActive : ""}`}
+            onClick={() => setActiveTab("albums")}
+            aria-pressed={activeTab === "albums"}
+          >
             <span className={styles.bandValue}>{stats.listens}</span>
             <span className={styles.bandLabel}>
               listens · {stats.albums} albums
             </span>
-          </div>
-          <div className={styles.bandItem}>
+          </button>
+          <button
+            type="button"
+            className={`${styles.bandItem} ${activeTab === "periods" ? styles.bandItemActive : ""}`}
+            onClick={() => setActiveTab("periods")}
+            aria-pressed={activeTab === "periods"}
+          >
             <span className={styles.bandValue}>
               {formatRuntimeCompact(stats.seconds)}
             </span>
             <span className={styles.bandLabel}>
               {offset === 0 ? `this ${range}` : periodTitle}
             </span>
-          </div>
-          <div className={styles.bandItem}>
+          </button>
+          <button
+            type="button"
+            className={`${styles.bandItem} ${activeTab === "records" ? styles.bandItemActive : ""}`}
+            onClick={() => setActiveTab("records")}
+            aria-pressed={activeTab === "records"}
+          >
             <span className={styles.bandValue}>{newRecords.length}</span>
             <span className={styles.bandLabel}>new records</span>
-          </div>
+          </button>
         </div>
       </section>
 
       <section className={styles.lists}>
-        <div className={styles.listCol}>
+        <div className={`${styles.listCol} ${activeTab === "albums" ? styles.listColActive : ""}`}>
           <span className={styles.listLabel}>
             {offset === 0
               ? `Top albums this ${range}`
@@ -344,7 +363,7 @@ export default function StatsPage() {
           </div>
         </div>
 
-        <div className={styles.listCol}>
+        <div className={`${styles.listCol} ${activeTab === "periods" ? styles.listColActive : ""}`}>
           <span className={styles.listLabel}>
             {offset === 0
               ? `Top ${periodUnit} this ${range}`
@@ -367,7 +386,7 @@ export default function StatsPage() {
           </div>
         </div>
 
-        <div className={styles.listCol}>
+        <div className={`${styles.listCol} ${activeTab === "records" ? styles.listColActive : ""}`}>
           <span className={styles.listLabel}>
             {offset === 0
               ? `New records this ${range}`

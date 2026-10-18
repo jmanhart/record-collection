@@ -189,15 +189,31 @@
   padding: 0 var(--grid-left);
 }
 
+/* Rendered as a <button> so the chips can act as tabs on mobile; reset the
+   global button chrome so on desktop it reads as a plain stat. */
 .bandItem {
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 0.2rem;
   min-width: 0;
+  width: auto;
+  height: auto;
+  border: none;
+  background: none;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: default;
   /* Vertical padding lives on the items (not the grid container) so each
      cell fills the band's full height and its divider spans top to bottom. */
   padding: clamp(0.8rem, 2vh, 1.15rem) 0;
+}
+
+.bandItem:hover,
+.bandItem:focus,
+.bandItem:active {
+  background: none;
 }
 
 .bandItem:not(:first-child) {
@@ -374,6 +390,39 @@
 
   .lists {
     grid-template-columns: 1fr;
+  }
+
+  /* The band chips act as tabs: tap one to show its list, hide the others. */
+  .bandItem {
+    cursor: pointer;
+    position: relative;
+  }
+
+  .bandValue {
+    color: var(--text-tertiary);
+    transition: color 0.15s ease;
+  }
+
+  .bandItemActive .bandValue {
+    color: var(--text-primary);
+  }
+
+  .bandItemActive::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+    background: var(--text-primary);
+  }
+
+  .listCol {
+    display: none;
+  }
+
+  .listColActive {
+    display: flex;
   }
 }
 
