@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import {
   Bar,
   BarChart,
@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useActivity, toDateKey } from "../../hooks/useActivity";
+import { useRecords } from "../../hooks/useRecords";
 import {
   useListeningStats,
   RANGE_OPTIONS,
@@ -60,6 +61,22 @@ export default function StatsPage() {
   const stats = useListeningStats(range, offset, events, todayKey);
   const { buckets, periodTitle, isEmpty, topArtists, topAlbums } = stats;
   const metricKey = measure === "time" ? "minutes" : "albums";
+
+  // Records acquired within the viewed frame — "new this period".
+  const { records } = useRecords();
+  const newRecords = useMemo(
+    () =>
+      records
+        .filter((r) => {
+          if (!r.acquired_at) return false;
+          const key = toDateKey(r.acquired_at);
+          return key >= stats.startKey && key <= stats.endKey;
+        })
+        .sort((a, b) =>
+          (b.acquired_at ?? "").localeCompare(a.acquired_at ?? "")
+        ),
+    [records, stats.startKey, stats.endKey]
+  );
 
   useEffect(() => {
     const root = document.documentElement;
@@ -275,10 +292,8 @@ export default function StatsPage() {
             </span>
           </div>
           <div className={styles.bandItem}>
-            <span className={styles.bandValue}>
-              {formatRuntimeCompact(stats.prevSeconds)}
-            </span>
-            <span className={styles.bandLabel}>last {range}</span>
+            <span className={styles.bandValue}>{newRecords.length}</span>
+            <span className={styles.bandLabel}>new records</span>
           </div>
         </div>
       </section>
@@ -341,6 +356,45 @@ export default function StatsPage() {
                   </span>
                 </div>
               ))
+            )}
+          </div>
+        </div>
+
+        <div className={styles.listCol}>
+          <span className={styles.listLabel}>
+            {offset === 0
+              ? `New records this ${range}`
+              : `New records · ${periodTitle}`}
+          </span>
+          <div className={styles.list}>
+            {newRecords.length === 0 ? (
+              <p className={styles.listEmpty}>
+                No records added in {periodTitle}.
+              </p>
+            ) : (
+              newRecords.map((record) => {
+                const cover = record.supabase_image_url || record.coverImage;
+                return (
+                  <div key={record.id} className={styles.albumRow}>
+                    {cover ? (
+                      <img
+                        src={cover}
+                        alt=""
+                        className={styles.cover}
+                        loading="lazy"
+                      />
+                    ) : (
+                      <span className={styles.coverPlaceholder}>
+                        {record.title[0]}
+                      </span>
+                    )}
+                    <span className={styles.albumMeta}>
+                      <span className={styles.albumTitle}>{record.title}</span>
+                      <span className={styles.albumArtist}>{record.artist}</span>
+                    </span>
+                  </div>
+                );
+              })
             )}
           </div>
         </div>
