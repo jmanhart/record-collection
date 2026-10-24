@@ -1,8 +1,8 @@
 /* Continuous per-day listening chart in the stats hero: one bar per day, pinned
    to the bottom edge so bars grow out of it. Today starts centered with a
-   "Today" marker, and the strip scrolls either direction. Faint full-height
-   line + month label at each month boundary, no axis labels. Rendered
-   light-on-dark over the album mosaic. */
+   "Today" marker, and the strip scrolls either direction (stopping at the first
+   month on the left). Faint full-height line + month label at each month
+   boundary, no axis labels. Rendered light-on-dark over the album mosaic. */
 .chart {
   position: relative;
   /* Break out of the hero's gutter so the strip spans the whole header width. */
@@ -16,6 +16,10 @@
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  /* Horizontal swipes pan the strip; vertical swipes still scroll the page. */
+  touch-action: pan-x;
 }
 
 .scroll::-webkit-scrollbar {
@@ -27,8 +31,9 @@
   align-items: flex-end;
   height: 100%;
   width: max-content;
-  /* Half-viewport runway each side so the first day and today can center. */
-  padding: 0 50vw;
+  /* Right runway lets today sit centered; the left stops at the first month
+     with just a little breathing room. */
+  padding: 0 50vw 0 1.5rem;
   box-sizing: content-box;
 }
 

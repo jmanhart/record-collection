@@ -52,7 +52,10 @@ export function DailyListensChart({ byDay, measure }: Props) {
   const days = useMemo<DayDatum[]>(() => {
     const keys = [...byDay.keys()].sort();
     if (!keys.length) return [];
-    const start = new Date(`${keys[0]}T00:00:00`);
+    // Start at the first of the earliest listen's month so that month's leading
+    // empty days (and its month line) are shown.
+    const first = new Date(`${keys[0]}T00:00:00`);
+    const start = new Date(first.getFullYear(), first.getMonth(), 1);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const out: DayDatum[] = [];
