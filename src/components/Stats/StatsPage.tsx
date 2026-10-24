@@ -220,8 +220,13 @@ export default function StatsPage() {
         </div>
       </section>
 
-      <CollectionByYear records={records} />
-      <CollectionByDecade records={records} />
+      {/* Hidden for now — kept so the work isn't lost; flip to re-enable. */}
+      {false && (
+        <>
+          <CollectionByYear records={records} />
+          <CollectionByDecade records={records} />
+        </>
+      )}
     </div>
   );
 }
