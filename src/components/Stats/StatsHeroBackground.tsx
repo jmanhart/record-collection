@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { muteColor } from "../../utils/color";
 import styles from "./StatsHeroBackground.module.css";
 
@@ -57,14 +58,29 @@ export function StatsHeroBackground({ colors, seed }: StatsHeroBackgroundProps) 
   }, [source, seed]);
 
   return (
-    <div className={styles.bg} aria-hidden>
-      <div className={styles.wash} style={{ backgroundImage: wash }} />
-      <div className={styles.quilt}>
-        {tiles.map((color, i) => (
-          <span key={i} className={styles.tile} style={{ backgroundColor: color }} />
-        ))}
-      </div>
-      <div className={styles.scrim} />
+    <div className={styles.frame} aria-hidden>
+      <AnimatePresence initial={false}>
+        <motion.div
+          key={seed}
+          className={styles.bg}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.7, ease: "easeInOut" }}
+        >
+          <div className={styles.wash} style={{ backgroundImage: wash }} />
+          <div className={styles.quilt}>
+            {tiles.map((color, i) => (
+              <span
+                key={i}
+                className={styles.tile}
+                style={{ backgroundColor: color }}
+              />
+            ))}
+          </div>
+          <div className={styles.scrim} />
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }

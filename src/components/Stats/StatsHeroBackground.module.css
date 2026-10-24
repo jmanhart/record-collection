@@ -1,12 +1,18 @@
 /* Generative mosaic behind the stats hero: a quilt of the period's album
    colors, blurred into a soft field (crisp tiles + blur = the mix), under a
    scrim so the chart and text stay legible. Sits behind the hero content. */
-.bg {
+.frame {
   position: absolute;
   inset: 0;
   z-index: -1;
   overflow: hidden;
   background: #14121f;
+}
+
+/* Each color field is its own layer so period changes crossfade between them. */
+.bg {
+  position: absolute;
+  inset: 0;
 }
 
 /* Soft atmospheric mesh under the crisp quilt. */
