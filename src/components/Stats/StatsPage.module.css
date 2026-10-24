@@ -2,6 +2,19 @@
   min-height: 100vh;
 }
 
+/* Soft bleed at the bottom edge of the viewport as the list scrolls past. */
+.page::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3rem;
+  background: linear-gradient(to top, var(--surface000), transparent);
+  pointer-events: none;
+  z-index: 4;
+}
+
 /* The chart + metric stay pinned while the diary scrolls beneath them. */
 .stickyHeader {
   position: sticky;
@@ -359,7 +372,6 @@
    counts, as a single centered column with a left rail. */
 .dayList {
   padding: clamp(1.75rem, 4vh, 3rem) 1.5rem 4rem;
-  animation: rise 0.55s ease-out 0.24s both;
 }
 
 .dayListInner {
@@ -372,12 +384,31 @@
   flex-direction: column;
 }
 
+/* Rows start hidden and reveal (fade + rise) once as they enter the viewport,
+   via an IntersectionObserver that adds .rowVisible. */
 .row {
   display: flex;
   gap: 1rem;
   padding: 0.6rem 0;
   position: relative;
-  animation: rowIn 0.4s ease both;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.rowVisible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Album covers fade in once decoded (.coverLoaded added on load). */
+.coverFade {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.coverLoaded {
+  opacity: 1;
 }
 
 /* Left rail: one continuous line; ring for day headers, filled dot for entries. */
@@ -556,17 +587,6 @@
   height: 0.85rem;
 }
 
-@keyframes rowIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
 @keyframes pulse {
   0%,
   100% {
@@ -635,5 +655,12 @@
   .status,
   .lists {
     animation: none;
+  }
+
+  .row,
+  .coverFade {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }
