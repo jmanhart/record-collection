@@ -28,16 +28,37 @@ interface StatsHeroBackgroundProps {
   seed: number;
 }
 
+const WASH_POSITIONS = [
+  [18, 26],
+  [72, 20],
+  [40, 66],
+  [86, 58],
+  [10, 82],
+  [58, 44],
+];
+
 export function StatsHeroBackground({ colors, seed }: StatsHeroBackgroundProps) {
+  const source = colors.length ? colors : FALLBACK;
+
   const tiles = useMemo(() => {
-    const source = colors.length ? colors : FALLBACK;
     const muted = source.map((c) => muteColor(c));
     const shuffled = seededShuffle(muted, seed);
     return Array.from({ length: CELLS }, (_, i) => shuffled[i % shuffled.length]);
-  }, [colors, seed]);
+  }, [source, seed]);
+
+  // Soft mesh of a few deeper tones — the atmospheric wash under the quilt.
+  const wash = useMemo(() => {
+    const deep = source.map((c) => muteColor(c, { minL: 0.18, maxL: 0.4 }));
+    const shuffled = seededShuffle(deep, seed + 7);
+    return WASH_POSITIONS.map(
+      ([x, y], i) =>
+        `radial-gradient(60% 55% at ${x}% ${y}%, ${shuffled[i % shuffled.length]} 0%, transparent 62%)`
+    ).join(", ");
+  }, [source, seed]);
 
   return (
     <div className={styles.bg} aria-hidden>
+      <div className={styles.wash} style={{ backgroundImage: wash }} />
       <div className={styles.quilt}>
         {tiles.map((color, i) => (
           <span key={i} className={styles.tile} style={{ backgroundColor: color }} />
