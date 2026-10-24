@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, useLayoutEffect } from "react";
+import { useMemo, useRef, useState } from "react";
 import type { DayStats } from "../../hooks/useActivity";
 import type { Measure } from "../../hooks/useListeningStats";
 import { formatRuntimeCompact } from "../../utils/formatDuration";
@@ -9,8 +9,10 @@ interface Props {
   measure: Measure;
 }
 
-// Width of each day's slot in px; kept thin to match the By Year chart's bars.
-const DAY_SLOT = 8;
+// Chart box height and the tallest a bar may grow — the gap leaves headroom at
+// the top for the month labels and the hover tooltip.
+const CHART_H = 190;
+const MAX_BAR = 140;
 
 // teal #5eead4 -> blue #60a5fa across the whole timeline, left (oldest) to
 // right (today) — same spectrum as the By Year chart.
@@ -36,6 +38,7 @@ interface DayDatum {
 interface HoverState {
   i: number;
   left: number;
+  barPx: number;
 }
 
 export function DailyListensChart({ byDay, measure }: Props) {
@@ -47,10 +50,9 @@ export function DailyListensChart({ byDay, measure }: Props) {
     today.setHours(0, 0, 0, 0);
     const out: DayDatum[] = [];
     for (let d = new Date(start); d <= today; d.setDate(d.getDate() + 1)) {
-      const key = keyOf(d);
-      const stat = byDay.get(key);
+      const stat = byDay.get(keyOf(d));
       out.push({
-        key,
+        key: keyOf(d),
         date: new Date(d),
         seconds: stat?.seconds ?? 0,
         albums: stat?.albumCount ?? 0,
@@ -69,15 +71,8 @@ export function DailyListensChart({ byDay, measure }: Props) {
     [days, measure]
   );
 
-  const scrollRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<HTMLDivElement>(null);
   const [hover, setHover] = useState<HoverState | null>(null);
-
-  // Pin the initial scroll to the right so today is in view.
-  useLayoutEffect(() => {
-    const el = scrollRef.current;
-    if (el) el.scrollLeft = el.scrollWidth;
-  }, [days.length]);
 
   if (!days.length) return null;
 
@@ -87,61 +82,66 @@ export function DailyListensChart({ byDay, measure }: Props) {
       ? formatRuntimeCompact(hovered.seconds)
       : `${hovered.albums} ${hovered.albums === 1 ? "album" : "albums"}`
     : "";
+  const hoveredDate = hovered
+    ? `${hovered.date.getMonth() + 1}/${hovered.date.getDate()}`
+    : "";
 
   return (
-    <div className={styles.chart} ref={chartRef}>
+    <div className={styles.chart} ref={chartRef} style={{ height: CHART_H }}>
+      <div className={styles.track}>
+        {days.map((day, i) => {
+          const value = measure === "time" ? day.seconds : day.albums;
+          const barPx = max > 0 ? (value / max) * MAX_BAR : 0;
+          return (
+            <div
+              key={day.key}
+              className={`${styles.col}${day.monthStart ? ` ${styles.monthStart}` : ""}`}
+              onMouseEnter={(e) => {
+                if (value <= 0) {
+                  setHover(null);
+                  return;
+                }
+                const col = e.currentTarget.getBoundingClientRect();
+                const box = chartRef.current?.getBoundingClientRect();
+                const center = box ? col.left - box.left + col.width / 2 : 0;
+                // Keep the tooltip inside the chart at the left/right edges.
+                const half = 46;
+                const left = box
+                  ? Math.max(half, Math.min(center, box.width - half))
+                  : center;
+                setHover({ i, left, barPx });
+              }}
+              onMouseLeave={() => setHover(null)}
+            >
+              {day.monthStart && (
+                <span className={styles.monthLabel}>
+                  {day.date.toLocaleDateString("en-US", { month: "short" })}
+                </span>
+              )}
+              {value > 0 && (
+                <div
+                  className={styles.bar}
+                  style={{
+                    height: barPx,
+                    background: dayColor(
+                      days.length > 1 ? i / (days.length - 1) : 0
+                    ),
+                  }}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
       {hovered && (
         <div
           className={styles.tooltip}
-          style={{ left: hover!.left }}
-          aria-hidden
+          style={{ left: hover!.left, bottom: hover!.barPx + 8 }}
         >
           <span className={styles.tooltipValue}>{hoveredValue}</span>
-          <span className={styles.tooltipMeta}>
-            {hovered.date.toLocaleDateString("en-US", {
-              weekday: "short",
-              month: "short",
-              day: "numeric",
-            })}
-          </span>
+          <span className={styles.tooltipMeta}>{hoveredDate}</span>
         </div>
       )}
-      <div className={styles.scroll} ref={scrollRef}>
-        <div className={styles.track} style={{ width: days.length * DAY_SLOT }}>
-          {days.map((day, i) => {
-            const value = measure === "time" ? day.seconds : day.albums;
-            const h = max > 0 ? (value / max) * 100 : 0;
-            return (
-              <div
-                key={day.key}
-                className={`${styles.col}${day.monthStart ? ` ${styles.monthStart}` : ""}`}
-                style={{ width: DAY_SLOT }}
-                onMouseEnter={(e) => {
-                  const col = e.currentTarget.getBoundingClientRect();
-                  const box = chartRef.current?.getBoundingClientRect();
-                  setHover({
-                    i,
-                    left: box ? col.left - box.left + col.width / 2 : 0,
-                  });
-                }}
-                onMouseLeave={() => setHover(null)}
-              >
-                {value > 0 && (
-                  <div
-                    className={styles.bar}
-                    style={{
-                      height: `${h}%`,
-                      background: dayColor(
-                        days.length > 1 ? i / (days.length - 1) : 0
-                      ),
-                    }}
-                  />
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
     </div>
   );
 }
