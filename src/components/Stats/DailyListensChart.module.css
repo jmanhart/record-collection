@@ -89,7 +89,7 @@
 .centerLine {
   position: absolute;
   left: 50%;
-  top: 40px;
+  top: 56%;
   bottom: 0;
   width: 1px;
   transform: translateX(-50%);
@@ -104,26 +104,34 @@
   transition: opacity 0.25s ease;
 }
 
-.tooltip {
+/* Centered day metric, lined up above the center bar; always visible. */
+.metric {
   position: absolute;
-  top: 2px;
   left: 50%;
-  transform: translateX(-50%);
+  top: 36%;
+  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.05rem;
-  padding: 0.3rem 0.55rem;
-  background: rgba(20, 18, 31, 0.92);
-  border: 1px solid var(--hero-line);
-  border-radius: 0.5rem;
-  white-space: nowrap;
+  gap: 0.3rem;
+  text-align: center;
   pointer-events: none;
   z-index: 3;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.55);
 }
 
-.tooltipDate {
-  font-size: 0.8rem;
-  font-weight: 600;
+.metricDate {
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--hero-text);
+  white-space: nowrap;
+}
+
+.metricStats {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--hero-text);
+  opacity: 0.85;
+  white-space: nowrap;
 }

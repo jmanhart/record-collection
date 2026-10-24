@@ -8,6 +8,7 @@ import {
 } from "react";
 import type { DayStats } from "../../hooks/useActivity";
 import styles from "./DailyListensChart.module.css";
+import { formatRuntimeCompact } from "../../utils/formatDuration";
 
 export interface DayFocus {
   date: Date;
@@ -32,8 +33,8 @@ interface Props {
 // fixed center line, and the bar under that line drives the tooltip.
 const SLOT = 25;
 const BAR_W = 21;
-const CHART_H = 250;
-const MAX_BAR = 185;
+const CHART_H = 300;
+const MAX_BAR = 130;
 // Days with no listens still get a short gray stub so the timeline reads as
 // continuous.
 const EMPTY_H = 3;
@@ -57,6 +58,20 @@ function dayColor(t: number): string {
 const pad = (n: number) => String(n).padStart(2, "0");
 const keyOf = (d: Date) =>
   `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+// Relative day label: Today / Yesterday / full date.
+const relativeDate = (d: Date) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const diff = Math.round((today.getTime() - d.getTime()) / 86400000);
+  if (diff === 0) return "Today";
+  if (diff === 1) return "Yesterday";
+  return d.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+};
 
 interface DayDatum {
   key: string;
@@ -210,7 +225,7 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
       requestAnimationFrame(step);
     };
 
-    // Center today on mount and mark it active (silently — no emit).
+    // Center the most recent listened day on mount (silently — no emit).
     useLayoutEffect(() => {
       const sc = scrollRef.current;
       const chart = chartRef.current;
@@ -220,10 +235,17 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
       const chartCenter = rect.left + rect.width / 2;
       const firstCenter =
         first.getBoundingClientRect().left + first.offsetWidth / 2;
-      const todayCenter = firstCenter + (days.length - 1) * SLOT;
+      // Open on the most recent day with listens so it matches the diary's top.
+      let startIdx = days.length - 1;
+      for (let i = days.length - 1; i >= 0; i--) {
+        if (days[i].seconds > 0) {
+          startIdx = i;
+          break;
+        }
+      }
       programmatic.current = true;
-      sc.scrollLeft += todayCenter - chartCenter;
-      setActive(days.length - 1);
+      sc.scrollLeft += firstCenter + startIdx * SLOT - chartCenter;
+      setActive(startIdx);
       window.setTimeout(() => {
         programmatic.current = false;
       }, 80);
@@ -250,11 +272,13 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
     if (!days.length) return null;
 
     const activeDay = days[active];
-    const activeDate = activeDay.date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
+    const activeLabel = relativeDate(activeDay.date);
+    const activeStats =
+      activeDay.albums > 0
+        ? `${formatRuntimeCompact(activeDay.seconds)} · ${activeDay.albums} ${
+            activeDay.albums === 1 ? "album" : "albums"
+          }`
+        : "No listens";
 
     return (
       <div className={styles.chart} ref={chartRef} style={{ height: CHART_H }}>
@@ -301,13 +325,14 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
             })}
           </div>
         </div>
-        {/* Fixed center line; the tooltip above it shows the centered day. */}
+        {/* Centered day metric: the focused day's date, listening time, and
+            album count, lined up above the center bar. Always visible. */}
+        <div className={styles.metric}>
+          <span className={styles.metricDate}>{activeLabel}</span>
+          <span className={styles.metricStats}>{activeStats}</span>
+        </div>
+        {/* Center line connects the metric down to the bar under it. */}
         <span className={styles.centerLine} />
-        {scrubbing && (
-          <div className={styles.tooltip}>
-            <span className={styles.tooltipDate}>{activeDate}</span>
-          </div>
-        )}
       </div>
     );
   }
