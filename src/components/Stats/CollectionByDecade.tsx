@@ -1,14 +1,11 @@
 import { useMemo } from "react";
 import type { Record } from "../../types/Record";
+import { releaseYear } from "../../utils/releaseDate";
 import styles from "./CollectionBreakdown.module.css";
 
 interface Props {
   records: Record[];
 }
-
-// Cap covers per decade so dense decades (2010s/2020s) scroll instead of
-// loading hundreds of images; the row scrolls horizontally for the rest.
-const MAX_COVERS = 30;
 
 interface DecadeRow {
   decade: number;
@@ -20,9 +17,12 @@ export function CollectionByDecade({ records }: Props) {
   const decades = useMemo<DecadeRow[]>(() => {
     const map = new Map<number, Record[]>();
     for (const r of records) {
-      if (typeof r.year !== "number" || r.year <= 0) continue;
-      const d = Math.floor(r.year / 10) * 10;
-      (map.get(d) ?? map.set(d, []).get(d)!).push(r);
+      const year = releaseYear(r);
+      if (!year) continue;
+      const d = Math.floor(year / 10) * 10;
+      const bucket = map.get(d);
+      if (bucket) bucket.push(r);
+      else map.set(d, [r]);
     }
     return [...map.entries()]
       .sort((a, b) => b[0] - a[0]) // newest decade first
@@ -31,8 +31,7 @@ export function CollectionByDecade({ records }: Props) {
         count: recs.length,
         covers: recs
           .slice()
-          .sort((a, b) => (a.year ?? 0) - (b.year ?? 0))
-          .slice(0, MAX_COVERS)
+          .sort((a, b) => (releaseYear(a) ?? 0) - (releaseYear(b) ?? 0))
           .map((r) => ({
             id: r.id,
             src: r.supabase_image_url || r.coverImage,

@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import type { Record } from "../../types/Record";
+import { releaseYear } from "../../utils/releaseDate";
 import styles from "./CollectionBreakdown.module.css";
 
 interface Props {
@@ -44,7 +45,7 @@ function ByYearTooltip({
 export function CollectionByYear({ records }: Props) {
   const { data, min, max } = useMemo(() => {
     const years = records
-      .map((r) => r.year)
+      .map((r) => releaseYear(r))
       .filter((y): y is number => typeof y === "number" && y > 0);
     if (!years.length) return { data: [] as YearDatum[], min: 0, max: 0 };
     const min = Math.min(...years);
