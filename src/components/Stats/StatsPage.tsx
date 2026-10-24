@@ -235,6 +235,33 @@ export default function StatsPage() {
     [diary, claim, applyFocus]
   );
 
+  // Gently reveal each row as it scrolls into view (once). The observer is
+  // created lazily on the first row so it exists before the ref callbacks run.
+  const revealObs = useRef<IntersectionObserver | null>(null);
+  const observeRow = useCallback((el: HTMLDivElement | null) => {
+    if (!el) return;
+    if (!revealObs.current) {
+      revealObs.current = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) {
+              e.target.classList.add(styles.rowVisible);
+              revealObs.current?.unobserve(e.target);
+            }
+          }
+        },
+        { rootMargin: "0px 0px -8% 0px", threshold: 0.01 }
+      );
+    }
+    revealObs.current.observe(el);
+  }, []);
+  useEffect(() => () => revealObs.current?.disconnect(), []);
+
+  // Covers fade in once decoded (handles cache hits via the complete check).
+  const markCoverLoaded = useCallback((el: HTMLImageElement | null) => {
+    if (el?.complete) el.classList.add(styles.coverLoaded);
+  }, []);
+
   return (
     <div className={styles.page}>
       <ViewNav />
@@ -268,6 +295,7 @@ export default function StatsPage() {
                   <div
                     className={`${styles.row} ${styles.dayHeaderRow}`}
                     data-day-key={day.key}
+                    ref={observeRow}
                   >
                     <span className={styles.rail}>
                       <span className={styles.ring} />
@@ -292,7 +320,11 @@ export default function StatsPage() {
                         ? `${fmtTime(album.first)} — ${fmtTime(album.last)}`
                         : fmtTime(album.first);
                     return (
-                      <div key={`${day.key}-${album.id}`} className={styles.row}>
+                      <div
+                        key={`${day.key}-${album.id}`}
+                        className={styles.row}
+                        ref={observeRow}
+                      >
                         <span className={styles.rail}>
                           <span className={styles.dot} />
                         </span>
@@ -300,8 +332,12 @@ export default function StatsPage() {
                           <img
                             src={cover}
                             alt=""
-                            className={styles.cover}
+                            className={`${styles.cover} ${styles.coverFade}`}
                             loading="lazy"
+                            ref={markCoverLoaded}
+                            onLoad={(e) =>
+                              e.currentTarget.classList.add(styles.coverLoaded)
+                            }
                           />
                         ) : (
                           <span
