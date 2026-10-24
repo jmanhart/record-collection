@@ -1,4 +1,11 @@
-import { useMemo, useRef, useState, useLayoutEffect, useEffect } from "react";
+import {
+  useMemo,
+  useRef,
+  useState,
+  useLayoutEffect,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import type { DayStats } from "../../hooks/useActivity";
 import styles from "./DailyListensChart.module.css";
 
@@ -9,11 +16,15 @@ export interface DayFocus {
   listens: number;
 }
 
+/** Imperative API: center a given day's column under the line without emitting
+ *  a center-change (used when the diary list drives the chart). */
+export interface ChartHandle {
+  centerKey: (dateKey: string) => void;
+}
+
 interface Props {
   byDay: Map<string, DayStats>;
-  /** Called with the day under the scrubber while focused, null when idle. */
-  onFocus?: (focus: DayFocus | null) => void;
-  /** Called with the dateKey of the day under the center line, always. */
+  /** Called with the dateKey under the center line on a *user* scrub only. */
   onCenterChange?: (dateKey: string) => void;
 }
 
@@ -21,8 +32,8 @@ interface Props {
 // fixed center line, and the bar under that line drives the tooltip.
 const SLOT = 20;
 const BAR_W = 16;
-const CHART_H = 190;
-const MAX_BAR = 140;
+const CHART_H = 250;
+const MAX_BAR = 185;
 // Days with no listens still get a short gray stub so the timeline reads as
 // continuous.
 const EMPTY_H = 3;
@@ -37,8 +48,10 @@ const MIN_OPACITY = 0.28;
 const FROM = [94, 234, 212];
 const TO = [96, 165, 250];
 function dayColor(t: number): string {
-  const c = FROM.map((v, i) => Math.round(v + (TO[i] - v) * t));
-  return `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
+  const r = Math.round(FROM[0] + (TO[0] - FROM[0]) * t);
+  const g = Math.round(FROM[1] + (TO[1] - FROM[1]) * t);
+  const b = Math.round(FROM[2] + (TO[2] - FROM[2]) * t);
+  return `rgb(${r}, ${g}, ${b})`;
 }
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -57,199 +70,225 @@ interface DayDatum {
 const barHeight = (seconds: number, max: number) =>
   seconds > 0 ? (max > 0 ? (seconds / max) * MAX_BAR : 0) : EMPTY_H;
 
-export function DailyListensChart({ byDay, onFocus, onCenterChange }: Props) {
-  const days = useMemo<DayDatum[]>(() => {
-    const keys = [...byDay.keys()].sort();
-    if (!keys.length) return [];
-    // Start at the first of the earliest listen's month so that month's leading
-    // empty days (and its month line) are shown.
-    const first = new Date(`${keys[0]}T00:00:00`);
-    const start = new Date(first.getFullYear(), first.getMonth(), 1);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const out: DayDatum[] = [];
-    for (let d = new Date(start); d <= today; d.setDate(d.getDate() + 1)) {
-      const stat = byDay.get(keyOf(d));
-      out.push({
-        key: keyOf(d),
-        date: new Date(d),
-        seconds: stat?.seconds ?? 0,
-        albums: stat?.albumCount ?? 0,
-        listens: stat?.listenCount ?? 0,
-        monthStart: d.getDate() === 1,
-      });
-    }
-    return out;
-  }, [byDay]);
+export const DailyListensChart = forwardRef<ChartHandle, Props>(
+  function DailyListensChart({ byDay, onCenterChange }, ref) {
+    const days = useMemo<DayDatum[]>(() => {
+      const keys = [...byDay.keys()].sort();
+      if (!keys.length) return [];
+      // Start at the first of the earliest listen's month so that month's
+      // leading empty days (and its month line) are shown.
+      const first = new Date(`${keys[0]}T00:00:00`);
+      const start = new Date(first.getFullYear(), first.getMonth(), 1);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const out: DayDatum[] = [];
+      for (let d = new Date(start); d <= today; d.setDate(d.getDate() + 1)) {
+        const stat = byDay.get(keyOf(d));
+        out.push({
+          key: keyOf(d),
+          date: new Date(d),
+          seconds: stat?.seconds ?? 0,
+          albums: stat?.albumCount ?? 0,
+          listens: stat?.listenCount ?? 0,
+          monthStart: d.getDate() === 1,
+        });
+      }
+      return out;
+    }, [byDay]);
 
-  const max = useMemo(
-    () => days.reduce((m, d) => Math.max(m, d.seconds), 0),
-    [days]
-  );
-
-  const chartRef = useRef<HTMLDivElement>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const firstColRef = useRef<HTMLDivElement>(null);
-  const rafRef = useRef<number | null>(null);
-  const [active, setActive] = useState(0);
-  // The tooltip only shows while the pointer is over the header, or briefly
-  // while scrubbing by scroll (so touch still surfaces values).
-  const [hovered, setHovered] = useState(false);
-  const [scrubbing, setScrubbing] = useState(false);
-  const scrubTimeout = useRef<number | null>(null);
-
-  // Index of the day whose column is under the fixed center line.
-  const computeActive = () => {
-    const chart = chartRef.current;
-    const first = firstColRef.current;
-    if (!chart || !first || !days.length) return;
-    const cr = chart.getBoundingClientRect();
-    const centerX = cr.left + cr.width / 2;
-    const firstCenter = first.getBoundingClientRect().left + first.offsetWidth / 2;
-    const idx = Math.round((centerX - firstCenter) / SLOT);
-    const clamped = Math.max(0, Math.min(idx, days.length - 1));
-    setActive((prev) => (prev === clamped ? prev : clamped));
-  };
-
-  // Gently animate the scroll so the clicked day eases to the center line.
-  // (Native smooth scrollTo is a no-op under scroll-snap, so animate by hand
-  // with snap momentarily off to avoid it fighting each frame.)
-  const centerIndex = (i: number) => {
-    const sc = scrollRef.current;
-    const chart = chartRef.current;
-    const first = firstColRef.current;
-    if (!sc || !chart || !first) return;
-    const chartCenter =
-      chart.getBoundingClientRect().left + chart.getBoundingClientRect().width / 2;
-    const firstCenter =
-      first.getBoundingClientRect().left + first.offsetWidth / 2;
-    const start = sc.scrollLeft;
-    const dist = firstCenter + i * SLOT - chartCenter;
-    if (Math.abs(dist) < 1) return;
-    sc.style.scrollSnapType = "none";
-    const t0 = performance.now();
-    const step = (now: number) => {
-      const p = Math.min(1, (now - t0) / 420);
-      sc.scrollLeft = start + dist * (1 - Math.pow(1 - p, 3));
-      if (p < 1) requestAnimationFrame(step);
-      else sc.style.scrollSnapType = "";
-    };
-    requestAnimationFrame(step);
-  };
-
-  // Center today on mount and mark it active.
-  useLayoutEffect(() => {
-    const sc = scrollRef.current;
-    const chart = chartRef.current;
-    const first = firstColRef.current;
-    if (!sc || !chart || !first || !days.length) return;
-    const chartCenter =
-      chart.getBoundingClientRect().left + chart.getBoundingClientRect().width / 2;
-    const firstCenter =
-      first.getBoundingClientRect().left + first.offsetWidth / 2;
-    const todayCenter = firstCenter + (days.length - 1) * SLOT;
-    sc.scrollLeft += todayCenter - chartCenter;
-    setActive(days.length - 1);
-  }, [days.length]);
-
-  // Report the day under the scrubber (while focused) so the stats band can
-  // reflect it; null when idle.
-  useEffect(() => {
-    if (!onFocus) return;
-    const day = days[active];
-    onFocus(
-      (hovered || scrubbing) && day
-        ? {
-            date: day.date,
-            seconds: day.seconds,
-            albums: day.albums,
-            listens: day.listens,
-          }
-        : null
+    const max = useMemo(
+      () => days.reduce((m, d) => Math.max(m, d.seconds), 0),
+      [days]
     );
-  }, [onFocus, hovered, scrubbing, active, days]);
 
-  // Report the centered day's dateKey continuously (drives the day's play list).
-  useEffect(() => {
-    const key = days[active]?.key;
-    if (key) onCenterChange?.(key);
-  }, [onCenterChange, active, days]);
+    const chartRef = useRef<HTMLDivElement>(null);
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const firstColRef = useRef<HTMLDivElement>(null);
+    const rafRef = useRef<number | null>(null);
+    // Set while the scroll position is being driven by code (mount-center or the
+    // diary list) so onScroll doesn't echo a center-change back out.
+    const programmatic = useRef(false);
+    const [active, setActive] = useState(0);
+    // The tooltip only shows while scrubbing by hand (so touch surfaces values);
+    // programmatic centering from the list stays silent.
+    const [scrubbing, setScrubbing] = useState(false);
+    const scrubTimeout = useRef<number | null>(null);
 
-  const onScroll = () => {
-    setScrubbing(true);
-    if (scrubTimeout.current != null) window.clearTimeout(scrubTimeout.current);
-    scrubTimeout.current = window.setTimeout(() => setScrubbing(false), 1200);
-    if (rafRef.current != null) return;
-    rafRef.current = requestAnimationFrame(() => {
-      rafRef.current = null;
-      computeActive();
+    // Index of the day whose column is under the fixed center line. Emits the
+    // centered key only when `emit` (a genuine user scrub).
+    const computeActive = (emit: boolean) => {
+      const chart = chartRef.current;
+      const first = firstColRef.current;
+      if (!chart || !first || !days.length) return;
+      const cr = chart.getBoundingClientRect();
+      const centerX = cr.left + cr.width / 2;
+      const firstCenter =
+        first.getBoundingClientRect().left + first.offsetWidth / 2;
+      const idx = Math.round((centerX - firstCenter) / SLOT);
+      const clamped = Math.max(0, Math.min(idx, days.length - 1));
+      setActive((prev) => (prev === clamped ? prev : clamped));
+      if (emit) onCenterChange?.(days[clamped].key);
+    };
+
+    // Instantly center a given column (no animation, no emit). Used by the diary
+    // list to keep the chart in sync as it scrolls.
+    const centerColumn = (idx: number) => {
+      const sc = scrollRef.current;
+      const chart = chartRef.current;
+      const first = firstColRef.current;
+      if (!sc || !chart || !first) return;
+      const rect = chart.getBoundingClientRect();
+      const chartCenter = rect.left + rect.width / 2;
+      const firstCenter =
+        first.getBoundingClientRect().left + first.offsetWidth / 2;
+      const dist = firstCenter + idx * SLOT - chartCenter;
+      if (Math.abs(dist) < 1) {
+        setActive(idx);
+        return;
+      }
+      programmatic.current = true;
+      sc.scrollLeft += dist;
+      setActive(idx);
+    };
+
+    useImperativeHandle(
+      ref,
+      () => ({
+        centerKey(dateKey: string) {
+          const idx = days.findIndex((d) => d.key === dateKey);
+          if (idx >= 0) centerColumn(idx);
+        },
+      }),
+      [days]
+    );
+
+    // Ease the clicked day to the center line (snap off during the tween so it
+    // doesn't fight each frame), emitting as it goes so the diary follows.
+    const centerIndex = (i: number) => {
+      const sc = scrollRef.current;
+      const chart = chartRef.current;
+      const first = firstColRef.current;
+      if (!sc || !chart || !first) return;
+      const rect = chart.getBoundingClientRect();
+      const chartCenter = rect.left + rect.width / 2;
+      const firstCenter =
+        first.getBoundingClientRect().left + first.offsetWidth / 2;
+      const start = sc.scrollLeft;
+      const dist = firstCenter + i * SLOT - chartCenter;
+      if (Math.abs(dist) < 1) return;
+      setScrubbing(true);
+      sc.style.scrollSnapType = "none";
+      const t0 = performance.now();
+      const step = (now: number) => {
+        const p = Math.min(1, (now - t0) / 420);
+        sc.scrollLeft = start + dist * (1 - Math.pow(1 - p, 3));
+        if (p < 1) requestAnimationFrame(step);
+        else {
+          sc.style.scrollSnapType = "";
+          computeActive(true);
+          window.setTimeout(() => setScrubbing(false), 300);
+        }
+      };
+      requestAnimationFrame(step);
+    };
+
+    // Center today on mount and mark it active (silently — no emit).
+    useLayoutEffect(() => {
+      const sc = scrollRef.current;
+      const chart = chartRef.current;
+      const first = firstColRef.current;
+      if (!sc || !chart || !first || !days.length) return;
+      const rect = chart.getBoundingClientRect();
+      const chartCenter = rect.left + rect.width / 2;
+      const firstCenter =
+        first.getBoundingClientRect().left + first.offsetWidth / 2;
+      const todayCenter = firstCenter + (days.length - 1) * SLOT;
+      programmatic.current = true;
+      sc.scrollLeft += todayCenter - chartCenter;
+      setActive(days.length - 1);
+    }, [days.length]);
+
+    const onScroll = () => {
+      const prog = programmatic.current;
+      if (!prog) {
+        setScrubbing(true);
+        if (scrubTimeout.current != null)
+          window.clearTimeout(scrubTimeout.current);
+        scrubTimeout.current = window.setTimeout(
+          () => setScrubbing(false),
+          1200
+        );
+      }
+      if (rafRef.current != null) return;
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null;
+        computeActive(!prog);
+        if (prog) programmatic.current = false;
+      });
+    };
+
+    if (!days.length) return null;
+
+    const activeDay = days[active];
+    const activeDate = activeDay.date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
-  };
 
-  if (!days.length) return null;
-
-  const activeDay = days[active];
-  const activeDate = activeDay.date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-
-  return (
-    <div
-      className={styles.chart}
-      ref={chartRef}
-      style={{ height: CHART_H }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <div className={styles.scroll} ref={scrollRef} onScroll={onScroll}>
-        <div className={styles.track}>
-          {days.map((day, i) => {
-            // Month line passes through normally but hides as it crosses center.
-            const showMonth = day.monthStart && Math.abs(i - active) > 1;
-            // The focus falloff (center bright, others dim) only engages while
-            // the scrubber is active — same rule as the center metric below.
-            const dist = Math.abs(i - active);
-            const opacity =
-              hovered || scrubbing ? Math.max(MIN_OPACITY, 1 - dist / FADE_RANGE) : 1;
-            return (
-              <div
-                key={day.key}
-                ref={i === 0 ? firstColRef : undefined}
-                className={`${styles.col}${showMonth ? ` ${styles.monthStart}` : ""}`}
-                style={{ width: SLOT }}
-                onClick={() => centerIndex(i)}
-              >
-                {showMonth && (
-                  <span className={styles.monthLabel}>
-                    {day.date.toLocaleDateString("en-US", { month: "short" })}
-                  </span>
-                )}
+    return (
+      <div className={styles.chart} ref={chartRef} style={{ height: CHART_H }}>
+        <div className={styles.scroll} ref={scrollRef} onScroll={onScroll}>
+          <div className={styles.track}>
+            {days.map((day, i) => {
+              // Month line passes through normally but hides as it crosses center.
+              const showMonth = day.monthStart && Math.abs(i - active) > 1;
+              const dist = Math.abs(i - active);
+              const opacity = scrubbing
+                ? Math.max(MIN_OPACITY, 1 - dist / FADE_RANGE)
+                : 1;
+              return (
                 <div
-                  className={styles.bar}
-                  style={{
-                    width: BAR_W,
-                    height: barHeight(day.seconds, max),
-                    opacity,
-                    background:
-                      day.seconds > 0
-                        ? dayColor(days.length > 1 ? i / (days.length - 1) : 0)
-                        : EMPTY_COLOR,
-                  }}
-                />
-              </div>
-            );
-          })}
+                  key={day.key}
+                  ref={i === 0 ? firstColRef : undefined}
+                  className={`${styles.col}${
+                    showMonth ? ` ${styles.monthStart}` : ""
+                  }`}
+                  style={{ width: SLOT }}
+                  onClick={() => centerIndex(i)}
+                >
+                  {showMonth && (
+                    <span className={styles.monthLabel}>
+                      {day.date.toLocaleDateString("en-US", { month: "short" })}
+                    </span>
+                  )}
+                  <div
+                    className={styles.bar}
+                    style={{
+                      width: BAR_W,
+                      height: barHeight(day.seconds, max),
+                      opacity,
+                      background:
+                        day.seconds > 0
+                          ? dayColor(
+                              days.length > 1 ? i / (days.length - 1) : 0
+                            )
+                          : EMPTY_COLOR,
+                    }}
+                  />
+                </div>
+              );
+            })}
+          </div>
         </div>
+        {/* Fixed center line; the tooltip above it shows the centered day. */}
+        <span className={styles.centerLine} />
+        {scrubbing && (
+          <div className={styles.tooltip}>
+            <span className={styles.tooltipDate}>{activeDate}</span>
+          </div>
+        )}
       </div>
-      {/* Fixed center line; the tooltip above it shows the centered day. */}
-      <span className={styles.centerLine} />
-      {(hovered || scrubbing) && (
-        <div className={styles.tooltip}>
-          <span className={styles.tooltipDate}>{activeDate}</span>
-        </div>
-      )}
-    </div>
-  );
-}
+    );
+  }
+);
