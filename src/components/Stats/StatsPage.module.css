@@ -192,8 +192,8 @@
 
 .statsBandInner {
   --grid-left: max(2rem, calc((100vw - 1280px) / 2 + 2rem));
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  justify-content: center;
   padding: 0 var(--grid-left);
 }
 

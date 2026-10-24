@@ -139,14 +139,6 @@ export default function StatsPage() {
         <div className={styles.statsBandInner}>
           <div className={styles.bandItem}>
             <span className={styles.bandValue}>
-              {focusedDay ? focusedDay.listens : totals.listens}
-            </span>
-            <span className={styles.bandLabel}>
-              listens · {focusedDay ? focusedDay.albums : totals.albums} albums
-            </span>
-          </div>
-          <div className={styles.bandItem}>
-            <span className={styles.bandValue}>
               {formatRuntimeCompact(
                 focusedDay ? focusedDay.seconds : totals.seconds
               )}
@@ -161,10 +153,6 @@ export default function StatsPage() {
                   })}`
                 : "all time"}
             </span>
-          </div>
-          <div className={styles.bandItem}>
-            <span className={styles.bandValue}>{records.length}</span>
-            <span className={styles.bandLabel}>in collection</span>
           </div>
         </div>
       </section>
