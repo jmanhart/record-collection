@@ -182,10 +182,7 @@ export default function StatsPage() {
               {focusedDay
                 ? `${focusedDay.albums} ${
                     focusedDay.albums === 1 ? "album" : "albums"
-                  } · ${focusedDay.date.toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  })}`
+                  }`
                 : "all time"}
             </span>
           </div>
