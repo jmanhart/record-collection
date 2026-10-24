@@ -13,6 +13,8 @@ interface Props {
   byDay: Map<string, DayStats>;
   /** Called with the day under the scrubber while focused, null when idle. */
   onFocus?: (focus: DayFocus | null) => void;
+  /** Called with the dateKey of the day under the center line, always. */
+  onCenterChange?: (dateKey: string) => void;
 }
 
 // Fixed per-day geometry so the chart scrolls; today starts centered under the
@@ -55,7 +57,7 @@ interface DayDatum {
 const barHeight = (seconds: number, max: number) =>
   seconds > 0 ? (max > 0 ? (seconds / max) * MAX_BAR : 0) : EMPTY_H;
 
-export function DailyListensChart({ byDay, onFocus }: Props) {
+export function DailyListensChart({ byDay, onFocus, onCenterChange }: Props) {
   const days = useMemo<DayDatum[]>(() => {
     const keys = [...byDay.keys()].sort();
     if (!keys.length) return [];
@@ -140,6 +142,12 @@ export function DailyListensChart({ byDay, onFocus }: Props) {
         : null
     );
   }, [onFocus, hovered, scrubbing, active, days]);
+
+  // Report the centered day's dateKey continuously (drives the day's play list).
+  useEffect(() => {
+    const key = days[active]?.key;
+    if (key) onCenterChange?.(key);
+  }, [onCenterChange, active, days]);
 
   const onScroll = () => {
     setScrubbing(true);
