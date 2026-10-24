@@ -13,10 +13,10 @@
   flex-direction: column;
   gap: clamp(1.25rem, 3vh, 2rem);
   width: 100vw;
-  height: 64vh;
-  min-height: 440px;
+  height: auto;
+  min-height: 0;
   margin-left: calc(50% - 50vw);
-  padding: 1rem var(--grid-left) clamp(1.5rem, 4vh, 2.5rem);
+  padding: 1rem var(--grid-left) 0;
   box-sizing: border-box;
   color: #f5f5f5;
   overflow: hidden;
@@ -28,9 +28,16 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  flex-shrink: 0;
+  gap: 1rem;
+}
+
+.heroHeading {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--hero-text);
+  white-space: nowrap;
 }
 
 /* Glassy segmented controls that read on the gradient. */
@@ -341,7 +348,8 @@
 
 @media (max-width: 768px) {
   .hero {
-    min-height: 70vh;
+    /* Push the controls below the fixed ViewNav cluster on narrow screens. */
+    padding-top: 4rem;
   }
 
   .lists {

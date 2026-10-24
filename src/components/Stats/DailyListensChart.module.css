@@ -1,0 +1,132 @@
+/* Continuous per-day listening chart in the stats hero: one bar per day, pinned
+   to the bottom edge so bars grow out of it. A fixed center line acts as a
+   scrubber — the day scrolled under it drives the tooltip above. The strip
+   scrolls either direction (stopping at the first month on the left). Faint
+   full-height line + month label at each month boundary (hidden as they cross
+   the center). Rendered light-on-dark over the album mosaic. */
+.chart {
+  position: relative;
+  /* Break out of the hero's gutter so the strip spans the whole header width. */
+  width: 100vw;
+  margin-left: calc(-1 * var(--grid-left));
+}
+
+.scroll {
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  /* Horizontal swipes pan the strip; vertical swipes still scroll the page. */
+  touch-action: pan-x;
+  /* Gently settle a day under the center line. */
+  scroll-snap-type: x proximity;
+  /* Wider, more prominent fade at the left/right edges as bars scroll past. */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 12%,
+    #000 88%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 12%,
+    #000 88%,
+    transparent 100%
+  );
+}
+
+.scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.track {
+  display: flex;
+  align-items: flex-end;
+  height: 100%;
+  width: max-content;
+  /* Half-viewport runway each side so the first day (July) and the last day
+     (today) can both scroll under the center line, and scrolling stops there. */
+  padding: 0 50vw;
+  box-sizing: content-box;
+}
+
+.col {
+  flex: 0 0 auto;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  position: relative;
+  box-sizing: border-box;
+  scroll-snap-align: center;
+}
+
+/* Full-height faint line marking the first day of a month. */
+.monthStart {
+  border-left: 1px solid var(--hero-line);
+}
+
+.monthLabel {
+  position: absolute;
+  top: 4px;
+  left: 5px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(245, 245, 245, 0.5);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Fixed center-line scrubber. */
+.centerLine {
+  position: absolute;
+  left: 50%;
+  top: 40px;
+  bottom: 0;
+  width: 1px;
+  transform: translateX(-50%);
+  background: rgba(245, 245, 245, 0.6);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.bar {
+  min-height: 2px;
+  border-radius: 1px 1px 0 0;
+}
+
+.tooltip {
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.05rem;
+  padding: 0.3rem 0.55rem;
+  background: rgba(20, 18, 31, 0.92);
+  border: 1px solid var(--hero-line);
+  border-radius: 0.5rem;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.tooltipValue {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--hero-text);
+}
+
+.tooltipMeta {
+  font-size: 0.72rem;
+  color: rgba(245, 245, 245, 0.6);
+}
