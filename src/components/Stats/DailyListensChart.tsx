@@ -5,6 +5,7 @@ import {
   useLayoutEffect,
   forwardRef,
   useImperativeHandle,
+  type PointerEvent as ReactPointerEvent,
 } from "react";
 import type { DayStats } from "../../hooks/useActivity";
 import styles from "./DailyListensChart.module.css";
@@ -121,6 +122,8 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
     const firstColRef = useRef<HTMLDivElement>(null);
     const rafRef = useRef<number | null>(null);
     const animRef = useRef<number | null>(null);
+    const axisScrollRef = useRef<HTMLDivElement>(null);
+    const dragRef = useRef<{ x: number; left: number } | null>(null);
     // Set while the scroll position is being driven by code (mount-center or the
     // diary list) so onScroll doesn't echo a center-change back out.
     const programmatic = useRef(false);
@@ -252,21 +255,50 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
     }, [days.length]);
 
     const onScroll = () => {
+      const sc = scrollRef.current;
       const prog = programmatic.current;
+      // Mirror the hash-mark axis to the bars so they stay aligned.
+      if (
+        sc &&
+        axisScrollRef.current &&
+        axisScrollRef.current.scrollLeft !== sc.scrollLeft
+      ) {
+        axisScrollRef.current.scrollLeft = sc.scrollLeft;
+      }
       if (!prog) {
         setScrubbing(true);
         if (scrubTimeout.current != null)
           window.clearTimeout(scrubTimeout.current);
-        scrubTimeout.current = window.setTimeout(
-          () => setScrubbing(false),
-          1200
-        );
+        scrubTimeout.current = window.setTimeout(() => setScrubbing(false), 1200);
       }
       if (rafRef.current != null) return;
       rafRef.current = requestAnimationFrame(() => {
         rafRef.current = null;
         computeActive(!prog);
       });
+    };
+
+    // Dragging/scrubbing the axis drives the bars (which drive the list).
+    const onAxisScroll = () => {
+      const sc = scrollRef.current;
+      const ax = axisScrollRef.current;
+      if (sc && ax && sc.scrollLeft !== ax.scrollLeft) sc.scrollLeft = ax.scrollLeft;
+    };
+    const onAxisPointerDown = (e: ReactPointerEvent) => {
+      if (e.pointerType !== "mouse") return; // touch uses native scroll
+      const ax = axisScrollRef.current;
+      if (!ax) return;
+      dragRef.current = { x: e.clientX, left: ax.scrollLeft };
+      ax.setPointerCapture(e.pointerId);
+    };
+    const onAxisPointerMove = (e: ReactPointerEvent) => {
+      const ax = axisScrollRef.current;
+      if (!ax || !dragRef.current) return;
+      ax.scrollLeft = dragRef.current.left - (e.clientX - dragRef.current.x);
+    };
+    const onAxisPointerUp = (e: ReactPointerEvent) => {
+      dragRef.current = null;
+      axisScrollRef.current?.releasePointerCapture?.(e.pointerId);
     };
 
     if (!days.length) return null;
@@ -281,58 +313,89 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
         : "No listens";
 
     return (
-      <div className={styles.chart} ref={chartRef} style={{ height: CHART_H }}>
-        <div className={styles.scroll} ref={scrollRef} onScroll={onScroll}>
-          <div className={styles.track}>
-            {days.map((day, i) => {
-              // Month line passes through normally but hides as it crosses center.
-              const showMonth = day.monthStart && Math.abs(i - active) > 1;
-              const dist = Math.abs(i - active);
-              const opacity = scrubbing
-                ? Math.max(MIN_OPACITY, 1 - dist / FADE_RANGE)
-                : 1;
-              return (
+      <div className={styles.chartWrap}>
+        <div className={styles.chart} ref={chartRef} style={{ height: CHART_H }}>
+          <div className={styles.scroll} ref={scrollRef} onScroll={onScroll}>
+            <div className={styles.track}>
+              {days.map((day, i) => {
+                // Month line passes through normally but hides as it crosses center.
+                const showMonth = day.monthStart && Math.abs(i - active) > 1;
+                const dist = Math.abs(i - active);
+                const opacity = scrubbing
+                  ? Math.max(MIN_OPACITY, 1 - dist / FADE_RANGE)
+                  : 1;
+                return (
+                  <div
+                    key={day.key}
+                    ref={i === 0 ? firstColRef : undefined}
+                    className={`${styles.col}${
+                      showMonth ? ` ${styles.monthStart}` : ""
+                    }`}
+                    style={{ width: SLOT }}
+                    onClick={() => centerIndex(i)}
+                  >
+                    {showMonth && (
+                      <span className={styles.monthLabel}>
+                        {day.date.toLocaleDateString("en-US", { month: "short" })}
+                      </span>
+                    )}
+                    <div
+                      className={styles.bar}
+                      style={{
+                        width: BAR_W,
+                        height: barHeight(day.seconds, max),
+                        opacity,
+                        background:
+                          day.seconds > 0
+                            ? dayColor(days.length > 1 ? i / (days.length - 1) : 0)
+                            : EMPTY_COLOR,
+                      }}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          {/* Centered day metric: the focused day's date, listening time, and
+              album count, lined up above the center bar. Always visible. */}
+          <div className={styles.metric}>
+            <span className={styles.metricDate}>{activeLabel}</span>
+            <span className={styles.metricStats}>{activeStats}</span>
+          </div>
+          {/* Center line connects the metric down to the bar under it. */}
+          <span className={styles.centerLine} />
+        </div>
+        {/* Hash-mark x-axis: dashes aligned under the bars; drag or swipe to
+            scrub. Edge-faded, light-gray bordered panel — editable later. */}
+        <div className={styles.axis}>
+          <div
+            className={styles.axisScroll}
+            ref={axisScrollRef}
+            onScroll={onAxisScroll}
+            onPointerDown={onAxisPointerDown}
+            onPointerMove={onAxisPointerMove}
+            onPointerUp={onAxisPointerUp}
+            onPointerCancel={onAxisPointerUp}
+          >
+            <div className={styles.axisTrack}>
+              {days.map((day, i) => (
                 <div
                   key={day.key}
-                  ref={i === 0 ? firstColRef : undefined}
-                  className={`${styles.col}${
-                    showMonth ? ` ${styles.monthStart}` : ""
-                  }`}
+                  className={styles.tickCol}
                   style={{ width: SLOT }}
                   onClick={() => centerIndex(i)}
                 >
-                  {showMonth && (
-                    <span className={styles.monthLabel}>
-                      {day.date.toLocaleDateString("en-US", { month: "short" })}
-                    </span>
-                  )}
-                  <div
-                    className={styles.bar}
-                    style={{
-                      width: BAR_W,
-                      height: barHeight(day.seconds, max),
-                      opacity,
-                      background:
-                        day.seconds > 0
-                          ? dayColor(
-                              days.length > 1 ? i / (days.length - 1) : 0
-                            )
-                          : EMPTY_COLOR,
-                    }}
+                  <span
+                    className={`${styles.tick}${
+                      i === active ? ` ${styles.tickActive}` : ""
+                    }`}
                   />
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
+          <span className={styles.axisCenter} />
         </div>
-        {/* Centered day metric: the focused day's date, listening time, and
-            album count, lined up above the center bar. Always visible. */}
-        <div className={styles.metric}>
-          <span className={styles.metricDate}>{activeLabel}</span>
-          <span className={styles.metricStats}>{activeStats}</span>
-        </div>
-        {/* Center line connects the metric down to the bar under it. */}
-        <span className={styles.centerLine} />
       </div>
     );
   }

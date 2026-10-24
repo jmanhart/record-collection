@@ -135,3 +135,101 @@
   opacity: 0.85;
   white-space: nowrap;
 }
+
+/* Wrapper so the hash-mark axis hugs the bars (no hero gap between them). */
+.chartWrap {
+  position: relative;
+}
+
+/* Hash-mark x-axis panel below the bars: a short, draggable, edge-faded strip
+   with light-gray top/bottom borders. Dashes align 1:1 with the bars. */
+.axis {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(-1 * var(--grid-left));
+  height: 30px;
+  border-top: 1px solid var(--divider);
+  border-bottom: 1px solid var(--divider);
+  background: rgba(20, 18, 31, 0.35);
+}
+
+.axisScroll {
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  /* Horizontal swipes/drag scrub the axis; vertical swipes scroll the page. */
+  touch-action: pan-x;
+  cursor: grab;
+  /* Bleed off at the edges as marks scroll past. */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 8%,
+    #000 92%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 8%,
+    #000 92%,
+    transparent 100%
+  );
+}
+
+.axisScroll:active {
+  cursor: grabbing;
+}
+
+.axisScroll::-webkit-scrollbar {
+  display: none;
+}
+
+.axisTrack {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: max-content;
+  /* Half-viewport runway each side, matching the bar track so marks align. */
+  padding: 0 50vw;
+  box-sizing: content-box;
+}
+
+.tickCol {
+  flex: 0 0 auto;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.tick {
+  width: 1px;
+  height: 8px;
+  background: rgba(245, 245, 245, 0.3);
+  transition: height 0.15s ease, background 0.15s ease;
+}
+
+.tickActive {
+  height: 16px;
+  width: 2px;
+  background: var(--hero-text);
+}
+
+/* Center marker on the axis, lined up with the chart's center line. */
+.axisCenter {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  transform: translateX(-50%);
+  background: rgba(245, 245, 245, 0.45);
+  pointer-events: none;
+  z-index: 2;
+}
