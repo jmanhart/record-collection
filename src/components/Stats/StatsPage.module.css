@@ -506,34 +506,10 @@
   color: var(--text-tertiary);
 }
 
-/* Skeleton while scrubbing fast. */
-.skeleton,
-.skelBar {
-  background: var(--surface200);
-  animation: pulse 1.2s ease-in-out infinite;
-}
-
-.skelBar {
-  height: 0.8rem;
-  border-radius: 0.25rem;
-}
-
-.skelDay {
-  width: 40%;
-  height: 1.2rem;
-}
-
-.skelTime {
-  width: 30%;
-}
-
-.skelTitle {
-  width: 65%;
-  height: 1rem;
-}
-
-.skelArtist {
-  width: 45%;
+/* Skeleton shown while the list settles (cover placeholders only). */
+.skeleton {
+  background: var(--surface400);
+  animation: pulse 1.4s ease-in-out infinite;
 }
 
 @keyframes rowIn {
@@ -550,10 +526,10 @@
 @keyframes pulse {
   0%,
   100% {
-    opacity: 0.45;
+    opacity: 0.3;
   }
   50% {
-    opacity: 0.8;
+    opacity: 0.55;
   }
 }
 
