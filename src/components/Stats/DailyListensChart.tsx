@@ -17,6 +17,10 @@ const MAX_BAR = 140;
 // continuous.
 const EMPTY_H = 3;
 const EMPTY_COLOR = "rgba(245, 245, 245, 0.26)";
+// Focus falloff: the centered bar is full brightness; others dim with distance
+// down to MIN_OPACITY over FADE_RANGE days.
+const FADE_RANGE = 32;
+const MIN_OPACITY = 0.28;
 
 // teal #5eead4 -> blue #60a5fa across the whole timeline, left (oldest) to
 // right (today) — same spectrum as the By Year chart.
@@ -142,6 +146,10 @@ export function DailyListensChart({ byDay }: Props) {
           {days.map((day, i) => {
             // Month line passes through normally but hides as it crosses center.
             const showMonth = day.monthStart && Math.abs(i - active) > 1;
+            // The bar under the center line is full brightness; others fade out
+            // gradually with distance from it.
+            const dist = Math.abs(i - active);
+            const opacity = Math.max(MIN_OPACITY, 1 - dist / FADE_RANGE);
             return (
               <div
                 key={day.key}
@@ -159,6 +167,7 @@ export function DailyListensChart({ byDay }: Props) {
                   style={{
                     width: BAR_W,
                     height: barHeight(day.seconds, max),
+                    opacity,
                     background:
                       day.seconds > 0
                         ? dayColor(days.length > 1 ? i / (days.length - 1) : 0)
