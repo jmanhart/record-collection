@@ -174,10 +174,11 @@ export function DailyListensChart({ byDay, onFocus }: Props) {
           {days.map((day, i) => {
             // Month line passes through normally but hides as it crosses center.
             const showMonth = day.monthStart && Math.abs(i - active) > 1;
-            // The bar under the center line is full brightness; others fade out
-            // gradually with distance from it.
+            // The focus falloff (center bright, others dim) only engages while
+            // the scrubber is active — same rule as the center metric below.
             const dist = Math.abs(i - active);
-            const opacity = Math.max(MIN_OPACITY, 1 - dist / FADE_RANGE);
+            const opacity =
+              hovered || scrubbing ? Math.max(MIN_OPACITY, 1 - dist / FADE_RANGE) : 1;
             return (
               <div
                 key={day.key}
