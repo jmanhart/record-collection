@@ -1,9 +1,16 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useCallback,
+  Fragment,
+} from "react";
 import { useActivity } from "../../hooks/useActivity";
 import { useRecords } from "../../hooks/useRecords";
 import { ViewNav } from "../ViewNav/ViewNav";
 import { StatsHeroBackground } from "./StatsHeroBackground";
-import { DailyListensChart, type DayFocus } from "./DailyListensChart";
+import { DailyListensChart, type ChartHandle } from "./DailyListensChart";
 import { CollectionByYear } from "./CollectionByYear";
 import { CollectionByDecade } from "./CollectionByDecade";
 import { formatRuntimeCompact } from "../../utils/formatDuration";
@@ -17,16 +24,30 @@ const HERO_VARS: Record<string, string> = {
   "--hero-fill": "rgba(245, 245, 245, 0.16)",
 };
 
+// Human label for a day key, relative where it reads naturally.
+function dayLabel(key: string): string {
+  const d = new Date(`${key}T00:00:00`);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const diff = Math.round((today.getTime() - d.getTime()) / 86400000);
+  if (diff === 0) return "Today";
+  if (diff === 1) return "Yesterday";
+  return d.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+const fmtTime = (iso: string) =>
+  new Date(iso).toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+
 export default function StatsPage() {
   const { events, byDay, isLoading } = useActivity();
   const { records } = useRecords();
-  const [focusedDay, setFocusedDay] = useState<DayFocus | null>(null);
-  // Day-plays list: follows the centered day, but settles (debounced) so it
-  // doesn't thrash while scrubbing fast.
-  const [centerKey, setCenterKey] = useState<string | null>(null);
-  const [settledKey, setSettledKey] = useState<string | null>(null);
-  const settleTimer = useRef<number | null>(null);
-  const settleStart = useRef<number | null>(null);
 
   // All-time roll-ups from the full listen stream.
   const totals = useMemo(() => {
@@ -54,6 +75,37 @@ export default function StatsPage() {
     }
     return map;
   }, [events]);
+
+  // The continuous diary: every day with listens, newest-first, each day's
+  // plays grouped by album (count + first/last listen time).
+  const diary = useMemo(() => {
+    const keys = [...playsByDay.keys()].sort().reverse();
+    return keys.map((key) => {
+      const plays = playsByDay.get(key)!;
+      const groups = new Map<
+        number,
+        { record: (typeof events)[number]["record"]; times: string[] }
+      >();
+      for (const p of plays) {
+        const g = groups.get(p.releaseId);
+        if (g) g.times.push(p.timestamp);
+        else groups.set(p.releaseId, { record: p.record, times: [p.timestamp] });
+      }
+      const albums = [...groups.entries()]
+        .map(([id, g]) => {
+          const sorted = g.times.slice().sort();
+          return {
+            id,
+            record: g.record,
+            count: g.times.length,
+            first: sorted[0],
+            last: sorted[sorted.length - 1],
+          };
+        })
+        .sort((a, b) => b.last.localeCompare(a.last));
+      return { key, stat: byDay.get(key), albums };
+    });
+  }, [playsByDay, byDay, events]);
 
   // Mosaic background: the most recently listened albums (cover + dominant
   // color), falling back to a slice of the collection when nothing's tracked.
@@ -89,214 +141,219 @@ export default function StatsPage() {
     };
   }, []);
 
-  // Settle the list on the centered day. The first one lands immediately; after
-  // that the list skeletons out and only loads once scrubbing pauses (~300ms of
-  // stillness), and always shows the skeleton for a visible minimum (~450ms) so
-  // the load-in reads as a deliberate state, not a flash.
+  // --- Two-way sync between the diary list and the chart -------------------
+  // The day at the anchor (just under the sticky header) is the focus. Scrolling
+  // the list centers that day in the chart; scrubbing the chart scrolls the list
+  // to the nearest listened day. A short driver lock stops the two from echoing.
+  const chartApi = useRef<ChartHandle>(null);
+  const diaryRef = useRef<HTMLDivElement>(null);
+  const stickyRef = useRef<HTMLDivElement>(null);
+  const driver = useRef<"list" | "chart" | null>(null);
+  const driverTimer = useRef<number | null>(null);
+  const focusedKeyRef = useRef<string | null>(null);
+  const [focusedKey, setFocusedKey] = useState<string | null>(null);
+
+  const claim = useCallback((who: "list" | "chart") => {
+    driver.current = who;
+    if (driverTimer.current != null) window.clearTimeout(driverTimer.current);
+    driverTimer.current = window.setTimeout(() => {
+      driver.current = null;
+    }, 180);
+  }, []);
+
+  const applyFocus = useCallback((key: string) => {
+    if (focusedKeyRef.current === key) return;
+    focusedKeyRef.current = key;
+    setFocusedKey(key);
+  }, []);
+
+  const anchorY = () =>
+    stickyRef.current?.getBoundingClientRect().bottom ?? 0;
+
+  // Seed the focus on today (the top of the diary) once data is in.
   useEffect(() => {
-    if (centerKey == null || centerKey === settledKey) {
-      settleStart.current = null;
-      return;
+    if (diary.length && focusedKeyRef.current == null) {
+      focusedKeyRef.current = diary[0].key;
+      setFocusedKey(diary[0].key);
     }
-    if (settledKey == null) {
-      setSettledKey(centerKey);
-      return;
-    }
-    if (settleStart.current == null) settleStart.current = performance.now();
-    if (settleTimer.current != null) window.clearTimeout(settleTimer.current);
-    const shownFor = performance.now() - settleStart.current;
-    const delay = Math.max(300, 450 - shownFor);
-    settleTimer.current = window.setTimeout(() => {
-      settleStart.current = null;
-      setSettledKey(centerKey);
-    }, delay);
-    return () => {
-      if (settleTimer.current != null) window.clearTimeout(settleTimer.current);
+  }, [diary]);
+
+  // Diary -> chart: on page scroll, find the day crossing the anchor and center
+  // the chart on it (silently).
+  useEffect(() => {
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        if (driver.current === "chart") return;
+        const headers = diaryRef.current?.querySelectorAll<HTMLElement>(
+          "[data-day-key]"
+        );
+        if (!headers || !headers.length) return;
+        const y = anchorY();
+        let cur = headers[0].dataset.dayKey!;
+        for (const h of headers) {
+          if (h.getBoundingClientRect().top - y <= 1) cur = h.dataset.dayKey!;
+          else break;
+        }
+        if (cur !== focusedKeyRef.current) {
+          claim("list");
+          applyFocus(cur);
+          chartApi.current?.centerKey(cur);
+        }
+      });
     };
-  }, [centerKey, settledKey]);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [claim, applyFocus]);
 
-  const isSettling = centerKey != null && centerKey !== settledKey;
+  // Chart -> diary: a user scrub reports the centered day; scroll the list to
+  // the nearest listened day at or before it.
+  const handleCenter = useCallback(
+    (key: string) => {
+      if (driver.current === "list") return;
+      // Nearest diary day at or before the centered key (diary is newest-first).
+      let dKey: string | null = null;
+      for (const d of diary) {
+        if (d.key <= key) {
+          dKey = d.key;
+          break;
+        }
+      }
+      if (dKey == null) dKey = diary.length ? diary[diary.length - 1].key : null;
+      if (dKey == null) return;
+      claim("chart");
+      applyFocus(dKey);
+      const h = diaryRef.current?.querySelector<HTMLElement>(
+        `[data-day-key="${CSS.escape(dKey)}"]`
+      );
+      if (h) {
+        const top = window.scrollY + h.getBoundingClientRect().top - anchorY();
+        window.scrollTo({ top, behavior: "auto" });
+      }
+    },
+    [diary, claim, applyFocus]
+  );
 
-  // The centered day's plays grouped by album (count + first/last listen time),
-  // most recently played first.
-  const dayAlbums = useMemo(() => {
-    const plays = settledKey ? playsByDay.get(settledKey) ?? [] : [];
-    const groups = new Map<
-      number,
-      { record: (typeof events)[number]["record"]; times: string[] }
-    >();
-    for (const p of plays) {
-      const g = groups.get(p.releaseId);
-      if (g) g.times.push(p.timestamp);
-      else groups.set(p.releaseId, { record: p.record, times: [p.timestamp] });
-    }
-    return [...groups.entries()]
-      .map(([id, g]) => {
-        const sorted = g.times.slice().sort();
-        return {
-          id,
-          record: g.record,
-          count: g.times.length,
-          first: sorted[0],
-          last: sorted[sorted.length - 1],
-        };
-      })
-      .sort((a, b) => b.last.localeCompare(a.last));
-  }, [settledKey, playsByDay, events]);
-
-  const dayStat = settledKey ? byDay.get(settledKey) : undefined;
-  const dayLabel = useMemo(() => {
-    if (!settledKey) return "";
-    const d = new Date(`${settledKey}T00:00:00`);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const diff = Math.round((today.getTime() - d.getTime()) / 86400000);
-    if (diff === 0) return "Today";
-    if (diff === 1) return "Yesterday";
-    return d.toLocaleDateString("en-US", {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    });
-  }, [settledKey]);
+  const focusedStat = focusedKey ? byDay.get(focusedKey) : undefined;
 
   return (
     <div className={styles.page}>
       <ViewNav />
 
-      <section className={styles.hero} data-stats-hero>
-        <StatsHeroBackground albums={heroAlbums} seed={0} />
-        <div className={styles.controls}>
-          <span className={styles.heroHeading}>Listens</span>
-        </div>
-        {isLoading ? (
-          <p className={styles.status}>Loading…</p>
-        ) : totals.listens === 0 ? (
-          <p className={styles.status}>No listens tracked yet.</p>
-        ) : (
-          <DailyListensChart
-            byDay={byDay}
-            onFocus={setFocusedDay}
-            onCenterChange={setCenterKey}
-          />
-        )}
-      </section>
-
-      <section className={styles.statsBand}>
-        <div className={styles.statsBandInner}>
-          <div className={styles.bandItem}>
-            <span className={styles.bandValue}>
-              {formatRuntimeCompact(
-                focusedDay ? focusedDay.seconds : totals.seconds
-              )}
-            </span>
-            <span className={styles.bandLabel}>
-              {focusedDay
-                ? `${focusedDay.albums} ${
-                    focusedDay.albums === 1 ? "album" : "albums"
-                  }`
-                : "all time"}
-            </span>
+      <div className={styles.stickyHeader} ref={stickyRef}>
+        <section className={styles.hero} data-stats-hero>
+          <StatsHeroBackground albums={heroAlbums} seed={0} />
+          <div className={styles.controls}>
+            <span className={styles.heroHeading}>Listens</span>
           </div>
-        </div>
-      </section>
+          {isLoading ? (
+            <p className={styles.status}>Loading…</p>
+          ) : totals.listens === 0 ? (
+            <p className={styles.status}>No listens tracked yet.</p>
+          ) : (
+            <DailyListensChart
+              ref={chartApi}
+              byDay={byDay}
+              onCenterChange={handleCenter}
+            />
+          )}
+        </section>
+
+        <section className={styles.statsBand}>
+          <div className={styles.statsBandInner}>
+            <div className={styles.bandItem}>
+              <span className={styles.bandValue}>
+                {formatRuntimeCompact(
+                  focusedStat ? focusedStat.seconds : totals.seconds
+                )}
+              </span>
+              <span className={styles.bandLabel}>
+                {focusedStat
+                  ? `${focusedStat.albumCount} ${
+                      focusedStat.albumCount === 1 ? "album" : "albums"
+                    }`
+                  : "all time"}
+              </span>
+            </div>
+          </div>
+        </section>
+      </div>
 
       <section className={styles.dayList}>
         <div className={styles.dayListInner}>
-          {isSettling ? (
-            <div className={styles.timeline}>
-              <div className={`${styles.row} ${styles.dayHeaderRow}`}>
-                <span className={styles.rail}>
-                  <span className={styles.ring} />
-                </span>
-                <span className={`${styles.skelBar} ${styles.skelDay}`} />
-              </div>
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className={styles.row}>
-                  <span className={styles.rail}>
-                    <span className={styles.dot} />
-                  </span>
-                  <span className={`${styles.cover} ${styles.skeleton}`} />
-                  <span className={styles.entryMeta}>
-                    <span className={`${styles.skelBar} ${styles.skelTime}`} />
-                    <span className={`${styles.skelBar} ${styles.skelTitle}`} />
-                    <span className={`${styles.skelBar} ${styles.skelArtist}`} />
-                  </span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className={styles.timeline} key={settledKey ?? ""}>
-              <div className={`${styles.row} ${styles.dayHeaderRow}`}>
-                <span className={styles.rail}>
-                  <span className={styles.ring} />
-                </span>
-                <span className={styles.dayHeader}>
-                  <span className={styles.dayName}>{dayLabel}</span>
-                  {dayStat && (
-                    <span className={styles.dayMeta}>
-                      {dayStat.albumCount}{" "}
-                      {dayStat.albumCount === 1 ? "album" : "albums"} ·{" "}
-                      {formatRuntimeCompact(dayStat.seconds)}
+          {!isLoading && totals.listens > 0 && (
+            <div className={styles.timeline} ref={diaryRef}>
+              {diary.map((day) => (
+                <Fragment key={day.key}>
+                  <div
+                    className={`${styles.row} ${styles.dayHeaderRow}`}
+                    data-day-key={day.key}
+                  >
+                    <span className={styles.rail}>
+                      <span className={styles.ring} />
                     </span>
-                  )}
-                </span>
-              </div>
-              {dayAlbums.length === 0 ? (
-                <p className={styles.dayEmpty}>No listens on {dayLabel}.</p>
-              ) : (
-                dayAlbums.map((album, idx) => {
-                  const cover =
-                    album.record?.supabase_image_url ||
-                    album.record?.coverImage;
-                  const fmt = (iso: string) =>
-                    new Date(iso).toLocaleTimeString("en-US", {
-                      hour: "numeric",
-                      minute: "2-digit",
-                    });
-                  const range =
-                    album.count > 1
-                      ? `${fmt(album.first)} — ${fmt(album.last)}`
-                      : fmt(album.first);
-                  return (
-                    <div
-                      key={album.id}
-                      className={styles.row}
-                      style={{ animationDelay: `${(idx + 1) * 70}ms` }}
-                    >
-                      <span className={styles.rail}>
-                        <span className={styles.dot} />
-                      </span>
-                      {cover ? (
-                        <img
-                          src={cover}
-                          alt=""
-                          className={styles.cover}
-                          loading="lazy"
-                        />
-                      ) : (
-                        <span className={`${styles.cover} ${styles.coverPlaceholder}`}>
-                          {album.record?.title[0]}
+                    <span className={styles.dayHeader}>
+                      <span className={styles.dayName}>{dayLabel(day.key)}</span>
+                      {day.stat && (
+                        <span className={styles.dayMeta}>
+                          {day.stat.albumCount}{" "}
+                          {day.stat.albumCount === 1 ? "album" : "albums"} ·{" "}
+                          {formatRuntimeCompact(day.stat.seconds)}
                         </span>
                       )}
-                      <span className={styles.entryMeta}>
-                        <span className={styles.entryTime}>{range}</span>
-                        <span className={styles.entryTitle}>
-                          {album.record?.title}
+                    </span>
+                  </div>
+                  {day.albums.map((album) => {
+                    const cover =
+                      album.record?.supabase_image_url ||
+                      album.record?.coverImage;
+                    const range =
+                      album.count > 1
+                        ? `${fmtTime(album.first)} — ${fmtTime(album.last)}`
+                        : fmtTime(album.first);
+                    return (
+                      <div key={`${day.key}-${album.id}`} className={styles.row}>
+                        <span className={styles.rail}>
+                          <span className={styles.dot} />
                         </span>
-                        <span className={styles.entryArtist}>
-                          {album.record?.artist}
+                        {cover ? (
+                          <img
+                            src={cover}
+                            alt=""
+                            className={styles.cover}
+                            loading="lazy"
+                          />
+                        ) : (
+                          <span
+                            className={`${styles.cover} ${styles.coverPlaceholder}`}
+                          >
+                            {album.record?.title[0]}
+                          </span>
+                        )}
+                        <span className={styles.entryMeta}>
+                          <span className={styles.entryTime}>{range}</span>
+                          <span className={styles.entryTitle}>
+                            {album.record?.title}
+                          </span>
+                          <span className={styles.entryArtist}>
+                            {album.record?.artist}
+                          </span>
+                          <span className={styles.entryCount}>
+                            {album.count === 1
+                              ? "Played once"
+                              : `Played ${album.count} times`}
+                          </span>
                         </span>
-                        <span className={styles.entryCount}>
-                          {album.count === 1
-                            ? "Played once"
-                            : `Played ${album.count} times`}
-                        </span>
-                      </span>
-                    </div>
-                  );
-                })
-              )}
+                      </div>
+                    );
+                  })}
+                </Fragment>
+              ))}
             </div>
           )}
         </div>
