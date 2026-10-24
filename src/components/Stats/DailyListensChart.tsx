@@ -1,10 +1,19 @@
-import { useMemo, useRef, useState, useLayoutEffect } from "react";
+import { useMemo, useRef, useState, useLayoutEffect, useEffect } from "react";
 import type { DayStats } from "../../hooks/useActivity";
 import { formatRuntimeCompact } from "../../utils/formatDuration";
 import styles from "./DailyListensChart.module.css";
 
+export interface DayFocus {
+  date: Date;
+  seconds: number;
+  albums: number;
+  listens: number;
+}
+
 interface Props {
   byDay: Map<string, DayStats>;
+  /** Called with the day under the scrubber while focused, null when idle. */
+  onFocus?: (focus: DayFocus | null) => void;
 }
 
 // Fixed per-day geometry so the chart scrolls; today starts centered under the
@@ -40,13 +49,14 @@ interface DayDatum {
   date: Date;
   seconds: number;
   albums: number;
+  listens: number;
   monthStart: boolean;
 }
 
 const barHeight = (seconds: number, max: number) =>
   seconds > 0 ? (max > 0 ? (seconds / max) * MAX_BAR : 0) : EMPTY_H;
 
-export function DailyListensChart({ byDay }: Props) {
+export function DailyListensChart({ byDay, onFocus }: Props) {
   const days = useMemo<DayDatum[]>(() => {
     const keys = [...byDay.keys()].sort();
     if (!keys.length) return [];
@@ -64,6 +74,7 @@ export function DailyListensChart({ byDay }: Props) {
         date: new Date(d),
         seconds: stat?.seconds ?? 0,
         albums: stat?.albumCount ?? 0,
+        listens: stat?.listenCount ?? 0,
         monthStart: d.getDate() === 1,
       });
     }
@@ -113,6 +124,23 @@ export function DailyListensChart({ byDay }: Props) {
     sc.scrollLeft += todayCenter - chartCenter;
     setActive(days.length - 1);
   }, [days.length]);
+
+  // Report the day under the scrubber (while focused) so the stats band can
+  // reflect it; null when idle.
+  useEffect(() => {
+    if (!onFocus) return;
+    const day = days[active];
+    onFocus(
+      (hovered || scrubbing) && day
+        ? {
+            date: day.date,
+            seconds: day.seconds,
+            albums: day.albums,
+            listens: day.listens,
+          }
+        : null
+    );
+  }, [onFocus, hovered, scrubbing, active, days]);
 
   const onScroll = () => {
     setScrubbing(true);

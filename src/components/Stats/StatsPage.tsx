@@ -1,9 +1,9 @@
-import { useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useActivity } from "../../hooks/useActivity";
 import { useRecords } from "../../hooks/useRecords";
 import { ViewNav } from "../ViewNav/ViewNav";
 import { StatsHeroBackground } from "./StatsHeroBackground";
-import { DailyListensChart } from "./DailyListensChart";
+import { DailyListensChart, type DayFocus } from "./DailyListensChart";
 import { CollectionByYear } from "./CollectionByYear";
 import { CollectionByDecade } from "./CollectionByDecade";
 import { formatRuntimeCompact } from "../../utils/formatDuration";
@@ -20,6 +20,7 @@ const HERO_VARS: Record<string, string> = {
 export default function StatsPage() {
   const { events, byDay, isLoading } = useActivity();
   const { records } = useRecords();
+  const [focusedDay, setFocusedDay] = useState<DayFocus | null>(null);
 
   // All-time roll-ups from the full listen stream.
   const totals = useMemo(() => {
@@ -118,23 +119,34 @@ export default function StatsPage() {
         ) : totals.listens === 0 ? (
           <p className={styles.status}>No listens tracked yet.</p>
         ) : (
-          <DailyListensChart byDay={byDay} />
+          <DailyListensChart byDay={byDay} onFocus={setFocusedDay} />
         )}
       </section>
 
       <section className={styles.statsBand}>
         <div className={styles.statsBandInner}>
           <div className={styles.bandItem}>
-            <span className={styles.bandValue}>{totals.listens}</span>
+            <span className={styles.bandValue}>
+              {focusedDay ? focusedDay.listens : totals.listens}
+            </span>
             <span className={styles.bandLabel}>
-              listens · {totals.albums} albums
+              listens · {focusedDay ? focusedDay.albums : totals.albums} albums
             </span>
           </div>
           <div className={styles.bandItem}>
             <span className={styles.bandValue}>
-              {formatRuntimeCompact(totals.seconds)}
+              {formatRuntimeCompact(
+                focusedDay ? focusedDay.seconds : totals.seconds
+              )}
             </span>
-            <span className={styles.bandLabel}>all time</span>
+            <span className={styles.bandLabel}>
+              {focusedDay
+                ? focusedDay.date.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  })
+                : "all time"}
+            </span>
           </div>
           <div className={styles.bandItem}>
             <span className={styles.bandValue}>{records.length}</span>
