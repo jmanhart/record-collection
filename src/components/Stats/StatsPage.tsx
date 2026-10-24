@@ -86,17 +86,23 @@ export default function StatsPage() {
     [records, stats.startKey, stats.endKey]
   );
 
-  // Mosaic background palette: the period's album colors, falling back to a
-  // slice of the whole collection when nothing was listened to.
-  const heroColors = useMemo(() => {
+  // Mosaic background: the period's albums (cover + dominant color), falling
+  // back to a slice of the whole collection when nothing was listened to.
+  const heroAlbums = useMemo(() => {
     const fromPeriod = topAlbums
-      .map((album) => album.color)
-      .filter((color): color is string => !!color);
+      .filter((album) => album.coverImage || album.color)
+      .map((album) => ({
+        color: album.color ?? undefined,
+        cover: album.coverImage,
+      }));
     if (fromPeriod.length) return fromPeriod;
     return records
-      .map((record) => record.dominant_color)
-      .filter((color): color is string => !!color)
-      .slice(0, 48);
+      .filter((r) => r.dominant_color || r.supabase_image_url || r.coverImage)
+      .slice(0, 48)
+      .map((r) => ({
+        color: r.dominant_color ?? undefined,
+        cover: r.supabase_image_url || r.coverImage,
+      }));
   }, [topAlbums, records]);
   const heroSeed = useMemo(
     () =>
@@ -157,7 +163,7 @@ export default function StatsPage() {
       <ViewNav />
 
       <section className={styles.hero} data-stats-hero>
-        <StatsHeroBackground colors={heroColors} seed={heroSeed} />
+        <StatsHeroBackground albums={heroAlbums} seed={heroSeed} />
         <div className={styles.controls}>
           <div className={styles.toggle} role="group" aria-label="Chart range">
             {RANGE_OPTIONS.map(({ value, label }) => (

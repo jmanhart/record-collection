@@ -7,11 +7,22 @@ const COLS = 8;
 const ROWS = 6;
 const CELLS = COLS * ROWS;
 
-const FALLBACK = ["#4c1d95", "#3b1d80", "#1e1b4b", "#6d28d9", "#312e81"];
+interface Album {
+  color?: string;
+  cover?: string;
+}
+
+const FALLBACK: Album[] = [
+  { color: "#4c1d95" },
+  { color: "#3b1d80" },
+  { color: "#1e1b4b" },
+  { color: "#6d28d9" },
+  { color: "#312e81" },
+];
 
 // Deterministic shuffle so a given seed (the viewed period) yields a stable
 // tile layout — it only reshuffles when you change periods.
-function seededShuffle(input: string[], seed: number): string[] {
+function seededShuffle<T>(input: T[], seed: number): T[] {
   const out = [...input];
   let s = seed || 1;
   for (let i = out.length - 1; i > 0; i--) {
@@ -20,13 +31,6 @@ function seededShuffle(input: string[], seed: number): string[] {
     [out[i], out[j]] = [out[j], out[i]];
   }
   return out;
-}
-
-interface StatsHeroBackgroundProps {
-  /** Dominant hex colors of the period's albums (raw). */
-  colors: string[];
-  /** Stable per period so the mosaic only re-lays-out on period change. */
-  seed: number;
 }
 
 const WASH_POSITIONS = [
@@ -38,18 +42,24 @@ const WASH_POSITIONS = [
   [58, 44],
 ];
 
-export function StatsHeroBackground({ colors, seed }: StatsHeroBackgroundProps) {
-  const source = colors.length ? colors : FALLBACK;
+interface StatsHeroBackgroundProps {
+  /** The period's albums (cover art + dominant color). */
+  albums: Album[];
+  /** Stable per period so the mosaic only re-lays-out on period change. */
+  seed: number;
+}
+
+export function StatsHeroBackground({ albums, seed }: StatsHeroBackgroundProps) {
+  const source = albums.length ? albums : FALLBACK;
 
   const tiles = useMemo(() => {
-    const muted = source.map((c) => muteColor(c));
-    const shuffled = seededShuffle(muted, seed);
+    const shuffled = seededShuffle(source, seed);
     return Array.from({ length: CELLS }, (_, i) => shuffled[i % shuffled.length]);
   }, [source, seed]);
 
-  // Soft mesh of a few deeper tones — the atmospheric wash under the quilt.
+  // Soft mesh of a few deeper tones — the atmospheric wash beneath the covers.
   const wash = useMemo(() => {
-    const deep = source.map((c) => muteColor(c, { minL: 0.18, maxL: 0.4 }));
+    const deep = source.map((a) => muteColor(a.color ?? "#3b1d80", { minL: 0.18, maxL: 0.4 }));
     const shuffled = seededShuffle(deep, seed + 7);
     return WASH_POSITIONS.map(
       ([x, y], i) =>
@@ -70,11 +80,14 @@ export function StatsHeroBackground({ colors, seed }: StatsHeroBackgroundProps) 
         >
           <div className={styles.wash} style={{ backgroundImage: wash }} />
           <div className={styles.quilt}>
-            {tiles.map((color, i) => (
+            {tiles.map((album, i) => (
               <span
                 key={i}
                 className={styles.tile}
-                style={{ backgroundColor: color }}
+                style={{
+                  backgroundColor: muteColor(album.color ?? "#2a2440"),
+                  backgroundImage: album.cover ? `url(${album.cover})` : undefined,
+                }}
               />
             ))}
           </div>
