@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useActivity } from "../../hooks/useActivity";
 import { useRecords } from "../../hooks/useRecords";
 import { ViewNav } from "../ViewNav/ViewNav";
@@ -21,6 +21,11 @@ export default function StatsPage() {
   const { events, byDay, isLoading } = useActivity();
   const { records } = useRecords();
   const [focusedDay, setFocusedDay] = useState<DayFocus | null>(null);
+  // Day-plays list: follows the centered day, but settles (debounced) so it
+  // doesn't thrash while scrubbing fast.
+  const [centerKey, setCenterKey] = useState<string | null>(null);
+  const [settledKey, setSettledKey] = useState<string | null>(null);
+  const settleTimer = useRef<number | null>(null);
 
   // All-time roll-ups from the full listen stream.
   const totals = useMemo(() => {
@@ -36,40 +41,18 @@ export default function StatsPage() {
     return { listens, seconds, albums: albums.size };
   }, [events]);
 
-  const topAlbums = useMemo(() => {
-    const counts = new Map<number, number>();
-    const rec = new Map<number, (typeof events)[number]["record"]>();
+  // Listens grouped by day, newest-first within each day (events already come
+  // sorted newest-first).
+  const playsByDay = useMemo(() => {
+    const map = new Map<string, typeof events>();
     for (const e of events) {
-      if (e.type !== "listen" || !e.record) continue;
-      counts.set(e.releaseId, (counts.get(e.releaseId) ?? 0) + 1);
-      if (!rec.has(e.releaseId)) rec.set(e.releaseId, e.record);
+      if (e.type !== "listen") continue;
+      const arr = map.get(e.dateKey);
+      if (arr) arr.push(e);
+      else map.set(e.dateKey, [e]);
     }
-    return [...counts.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 10)
-      .map(([id, count]) => ({ id, count, record: rec.get(id)! }));
+    return map;
   }, [events]);
-
-  const topArtists = useMemo(() => {
-    const map = new Map<string, number>();
-    for (const e of events) {
-      if (e.type !== "listen" || !e.record?.artist) continue;
-      map.set(
-        e.record.artist,
-        (map.get(e.record.artist) ?? 0) + (e.record.duration_seconds ?? 0)
-      );
-    }
-    return [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
-  }, [events]);
-
-  const newRecords = useMemo(
-    () =>
-      records
-        .filter((r) => r.acquired_at)
-        .sort((a, b) => (b.acquired_at ?? "").localeCompare(a.acquired_at ?? ""))
-        .slice(0, 10),
-    [records]
-  );
 
   // Mosaic background: the most recently listened albums (cover + dominant
   // color), falling back to a slice of the collection when nothing's tracked.
@@ -105,6 +88,31 @@ export default function StatsPage() {
     };
   }, []);
 
+  // Settle the list on the centered day: first one immediately, later changes
+  // after a short pause so fast scrubbing shows a skeleton instead of thrashing.
+  useEffect(() => {
+    if (centerKey == null || centerKey === settledKey) return;
+    if (settledKey == null) {
+      setSettledKey(centerKey);
+      return;
+    }
+    if (settleTimer.current != null) window.clearTimeout(settleTimer.current);
+    settleTimer.current = window.setTimeout(() => setSettledKey(centerKey), 300);
+    return () => {
+      if (settleTimer.current != null) window.clearTimeout(settleTimer.current);
+    };
+  }, [centerKey, settledKey]);
+
+  const isSettling = centerKey != null && centerKey !== settledKey;
+  const dayPlays = settledKey ? playsByDay.get(settledKey) ?? [] : [];
+  const dayLabel = settledKey
+    ? new Date(`${settledKey}T00:00:00`).toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+      })
+    : "";
+
   return (
     <div className={styles.page}>
       <ViewNav />
@@ -119,7 +127,11 @@ export default function StatsPage() {
         ) : totals.listens === 0 ? (
           <p className={styles.status}>No listens tracked yet.</p>
         ) : (
-          <DailyListensChart byDay={byDay} onFocus={setFocusedDay} />
+          <DailyListensChart
+            byDay={byDay}
+            onFocus={setFocusedDay}
+            onCenterChange={setCenterKey}
+          />
         )}
       </section>
 
@@ -157,99 +169,66 @@ export default function StatsPage() {
         </div>
       </section>
 
-      <section className={styles.lists}>
-        <div className={styles.listCol}>
-          <span className={styles.listLabel}>Top albums</span>
-          <div className={styles.list}>
-            {topAlbums.length === 0 ? (
-              <p className={styles.listEmpty}>No listens yet.</p>
-            ) : (
-              topAlbums.map((album, index) => {
-                const cover =
-                  album.record?.supabase_image_url || album.record?.coverImage;
-                return (
-                  <div key={album.id} className={styles.albumRow}>
-                    <span className={styles.rank}>{index + 1}</span>
-                    {cover ? (
-                      <img
-                        src={cover}
-                        alt=""
-                        className={styles.cover}
-                        loading="lazy"
-                      />
-                    ) : (
-                      <span className={styles.coverPlaceholder}>
-                        {album.record?.title[0]}
-                      </span>
-                    )}
-                    <span className={styles.albumMeta}>
-                      <span className={styles.albumTitle}>
-                        {album.record?.title}
-                      </span>
-                      <span className={styles.albumArtist}>
-                        {album.record?.artist}
-                      </span>
-                    </span>
-                    <span className={styles.count}>
-                      {album.count} {album.count === 1 ? "listen" : "listens"}
-                    </span>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </div>
-
-        <div className={styles.listCol}>
-          <span className={styles.listLabel}>Top artists</span>
-          <div className={styles.list}>
-            {topArtists.length === 0 ? (
-              <p className={styles.listEmpty}>No listens yet.</p>
-            ) : (
-              topArtists.map(([artist, seconds], index) => (
-                <div key={artist} className={styles.artistRow}>
-                  <span className={styles.rank}>{index + 1}</span>
-                  <span className={styles.artistName}>{artist}</span>
-                  <span className={styles.count}>
-                    {formatRuntimeCompact(seconds)}
+      <section className={styles.dayList}>
+        <div className={styles.dayListInner}>
+          <span className={styles.dayListLabel}>{dayLabel}</span>
+          {isSettling ? (
+            <div className={styles.timeline}>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className={styles.playRow}>
+                  <span className={styles.rail}>
+                    <span className={styles.dot} />
+                  </span>
+                  <span className={`${styles.playCover} ${styles.skeleton}`} />
+                  <span className={styles.playMeta}>
+                    <span className={`${styles.skelBar} ${styles.skelTitle}`} />
+                    <span className={`${styles.skelBar} ${styles.skelArtist}`} />
                   </span>
                 </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        <div className={styles.listCol}>
-          <span className={styles.listLabel}>Recently added</span>
-          <div className={styles.list}>
-            {newRecords.length === 0 ? (
-              <p className={styles.listEmpty}>No records yet.</p>
-            ) : (
-              newRecords.map((record) => {
-                const cover = record.supabase_image_url || record.coverImage;
+              ))}
+            </div>
+          ) : dayPlays.length === 0 ? (
+            <p className={styles.dayEmpty}>No listens on {dayLabel}.</p>
+          ) : (
+            <div className={styles.timeline}>
+              {dayPlays.map((play) => {
+                const cover =
+                  play.record?.supabase_image_url || play.record?.coverImage;
+                const time = new Date(play.timestamp).toLocaleTimeString(
+                  "en-US",
+                  { hour: "numeric", minute: "2-digit" }
+                );
                 return (
-                  <div key={record.id} className={styles.albumRow}>
+                  <div key={play.id} className={styles.playRow}>
+                    <span className={styles.rail}>
+                      <span className={styles.dot} />
+                    </span>
                     {cover ? (
                       <img
                         src={cover}
                         alt=""
-                        className={styles.cover}
+                        className={styles.playCover}
                         loading="lazy"
                       />
                     ) : (
-                      <span className={styles.coverPlaceholder}>
-                        {record.title[0]}
+                      <span className={styles.playCoverPlaceholder}>
+                        {play.record?.title[0]}
                       </span>
                     )}
-                    <span className={styles.albumMeta}>
-                      <span className={styles.albumTitle}>{record.title}</span>
-                      <span className={styles.albumArtist}>{record.artist}</span>
+                    <span className={styles.playMeta}>
+                      <span className={styles.playTitle}>
+                        {play.record?.title}
+                      </span>
+                      <span className={styles.playArtist}>
+                        {play.record?.artist}
+                      </span>
                     </span>
+                    <span className={styles.playTime}>{time}</span>
                   </div>
                 );
-              })
-            )}
-          </div>
+              })}
+            </div>
+          )}
         </div>
       </section>
 

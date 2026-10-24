@@ -348,6 +348,167 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Day timeline: the records played on the centered day, newest first, as a
+   single centered column with a left rail. */
+.dayList {
+  padding: clamp(1.75rem, 4vh, 3rem) 1.5rem 3.5rem;
+  animation: rise 0.55s ease-out 0.24s both;
+}
+
+.dayListInner {
+  max-width: 32rem;
+  margin: 0 auto;
+}
+
+.dayListLabel {
+  display: block;
+  margin-bottom: 1rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.dayEmpty {
+  margin: 0;
+  padding: 1rem 0;
+  font-size: 0.9rem;
+  color: var(--text-tertiary);
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.playRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+}
+
+/* Left rail: a continuous line with a dot centered on each row. */
+.rail {
+  position: relative;
+  flex-shrink: 0;
+  align-self: stretch;
+  width: 14px;
+}
+
+.rail::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  transform: translateX(-50%);
+  background: var(--divider);
+}
+
+.playRow:first-child .rail::before {
+  top: 50%;
+}
+
+.playRow:last-child .rail::before {
+  bottom: 50%;
+}
+
+.dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--text-tertiary);
+  z-index: 1;
+}
+
+.playCover,
+.playCoverPlaceholder {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.25rem;
+  object-fit: cover;
+  background: var(--surface200);
+}
+
+.playCoverPlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+
+.playMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.playTitle {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.playArtist {
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.playTime {
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Skeleton shown while scrubbing fast, before the day settles. */
+.skeleton,
+.skelBar {
+  background: var(--surface200);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.skelBar {
+  height: 0.72rem;
+  border-radius: 0.25rem;
+}
+
+.skelTitle {
+  width: 60%;
+}
+
+.skelArtist {
+  width: 40%;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
 @media (max-width: 768px) {
   .hero {
     /* Push the controls below the fixed ViewNav cluster on narrow screens. */
