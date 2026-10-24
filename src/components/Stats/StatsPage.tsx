@@ -26,6 +26,7 @@ export default function StatsPage() {
   const [centerKey, setCenterKey] = useState<string | null>(null);
   const [settledKey, setSettledKey] = useState<string | null>(null);
   const settleTimer = useRef<number | null>(null);
+  const settleStart = useRef<number | null>(null);
 
   // All-time roll-ups from the full listen stream.
   const totals = useMemo(() => {
@@ -88,16 +89,27 @@ export default function StatsPage() {
     };
   }, []);
 
-  // Settle the list on the centered day: first one immediately, later changes
-  // after a short pause so fast scrubbing shows a skeleton instead of thrashing.
+  // Settle the list on the centered day. The first one lands immediately; after
+  // that the list skeletons out and only loads once scrubbing pauses (~300ms of
+  // stillness), and always shows the skeleton for a visible minimum (~450ms) so
+  // the load-in reads as a deliberate state, not a flash.
   useEffect(() => {
-    if (centerKey == null || centerKey === settledKey) return;
+    if (centerKey == null || centerKey === settledKey) {
+      settleStart.current = null;
+      return;
+    }
     if (settledKey == null) {
       setSettledKey(centerKey);
       return;
     }
+    if (settleStart.current == null) settleStart.current = performance.now();
     if (settleTimer.current != null) window.clearTimeout(settleTimer.current);
-    settleTimer.current = window.setTimeout(() => setSettledKey(centerKey), 300);
+    const shownFor = performance.now() - settleStart.current;
+    const delay = Math.max(300, 450 - shownFor);
+    settleTimer.current = window.setTimeout(() => {
+      settleStart.current = null;
+      setSettledKey(centerKey);
+    }, delay);
     return () => {
       if (settleTimer.current != null) window.clearTimeout(settleTimer.current);
     };
@@ -193,12 +205,23 @@ export default function StatsPage() {
         <div className={styles.dayListInner}>
           {isSettling ? (
             <div className={styles.timeline}>
+              <div className={`${styles.row} ${styles.dayHeaderRow}`}>
+                <span className={styles.rail}>
+                  <span className={styles.ring} />
+                </span>
+                <span className={`${styles.skelBar} ${styles.skelDay}`} />
+              </div>
               {Array.from({ length: 5 }).map((_, i) => (
                 <div key={i} className={styles.row}>
                   <span className={styles.rail}>
                     <span className={styles.dot} />
                   </span>
                   <span className={`${styles.cover} ${styles.skeleton}`} />
+                  <span className={styles.entryMeta}>
+                    <span className={`${styles.skelBar} ${styles.skelTime}`} />
+                    <span className={`${styles.skelBar} ${styles.skelTitle}`} />
+                    <span className={`${styles.skelBar} ${styles.skelArtist}`} />
+                  </span>
                 </div>
               ))}
             </div>

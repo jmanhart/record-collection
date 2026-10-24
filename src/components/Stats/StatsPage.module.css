@@ -507,10 +507,36 @@
   color: var(--text-tertiary);
 }
 
-/* Skeleton shown while the list settles (cover placeholders only). */
-.skeleton {
+/* Skeleton shown while the list settles: cover + title/artist/time bars. */
+.skeleton,
+.skelBar {
   background: var(--surface400);
+  border-radius: 0.25rem;
   animation: pulse 1.4s ease-in-out infinite;
+}
+
+.entryMeta .skelBar:not(:last-child) {
+  margin-bottom: 0.55rem;
+}
+
+.skelDay {
+  width: 9rem;
+  height: 1.3rem;
+}
+
+.skelTime {
+  width: 3.5rem;
+  height: 0.72rem;
+}
+
+.skelTitle {
+  width: 70%;
+  height: 1rem;
+}
+
+.skelArtist {
+  width: 45%;
+  height: 0.85rem;
 }
 
 @keyframes rowIn {
