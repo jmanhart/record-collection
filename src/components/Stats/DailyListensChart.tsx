@@ -19,8 +19,8 @@ interface Props {
 
 // Fixed per-day geometry so the chart scrolls; today starts centered under the
 // fixed center line, and the bar under that line drives the tooltip.
-const SLOT = 16;
-const BAR_W = 12;
+const SLOT = 20;
+const BAR_W = 16;
 const CHART_H = 190;
 const MAX_BAR = 140;
 // Days with no listens still get a short gray stub so the timeline reads as
@@ -111,6 +111,19 @@ export function DailyListensChart({ byDay, onFocus, onCenterChange }: Props) {
     setActive((prev) => (prev === clamped ? prev : clamped));
   };
 
+  // Scroll so the given day centers under the line (click a bar to navigate).
+  const centerIndex = (i: number) => {
+    const sc = scrollRef.current;
+    const chart = chartRef.current;
+    const first = firstColRef.current;
+    if (!sc || !chart || !first) return;
+    const chartCenter =
+      chart.getBoundingClientRect().left + chart.getBoundingClientRect().width / 2;
+    const firstCenter =
+      first.getBoundingClientRect().left + first.offsetWidth / 2;
+    sc.scrollLeft += firstCenter + i * SLOT - chartCenter;
+  };
+
   // Center today on mount and mark it active.
   useLayoutEffect(() => {
     const sc = scrollRef.current;
@@ -193,6 +206,7 @@ export function DailyListensChart({ byDay, onFocus, onCenterChange }: Props) {
                 ref={i === 0 ? firstColRef : undefined}
                 className={`${styles.col}${showMonth ? ` ${styles.monthStart}` : ""}`}
                 style={{ width: SLOT }}
+                onClick={() => centerIndex(i)}
               >
                 {showMonth && (
                   <span className={styles.monthLabel}>

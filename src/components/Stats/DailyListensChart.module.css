@@ -64,6 +64,7 @@
   position: relative;
   box-sizing: border-box;
   scroll-snap-align: center;
+  cursor: pointer;
 }
 
 /* Full-height faint line marking the first day of a month. */
