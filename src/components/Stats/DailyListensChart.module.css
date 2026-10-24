@@ -49,9 +49,9 @@
   align-items: flex-end;
   height: 100%;
   width: max-content;
-  /* Half-viewport runway on the right lets today center; the left stops at the
-     first month with a little breathing room. */
-  padding: 0 50vw 0 1.5rem;
+  /* Half-viewport runway each side so the first day (July) and the last day
+     (today) can both scroll under the center line, and scrolling stops there. */
+  padding: 0 50vw;
   box-sizing: content-box;
 }
 
@@ -88,7 +88,7 @@
 .centerLine {
   position: absolute;
   left: 50%;
-  top: 8px;
+  top: 40px;
   bottom: 0;
   width: 1px;
   transform: translateX(-50%);
@@ -104,6 +104,7 @@
 
 .tooltip {
   position: absolute;
+  top: 2px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;

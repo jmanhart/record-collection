@@ -116,7 +116,6 @@ export function DailyListensChart({ byDay }: Props) {
   if (!days.length) return null;
 
   const activeDay = days[active];
-  const activeBarH = barHeight(activeDay.seconds, max);
   const activeTime = formatRuntimeCompact(activeDay.seconds);
   const activeMeta = `${activeDay.albums} ${
     activeDay.albums === 1 ? "album" : "albums"
@@ -159,7 +158,7 @@ export function DailyListensChart({ byDay }: Props) {
       </div>
       {/* Fixed center line; the tooltip above it shows the centered day. */}
       <span className={styles.centerLine} />
-      <div className={styles.tooltip} style={{ bottom: activeBarH + 8 }}>
+      <div className={styles.tooltip}>
         <span className={styles.tooltipValue}>{activeTime}</span>
         <span className={styles.tooltipMeta}>{activeMeta}</span>
       </div>
