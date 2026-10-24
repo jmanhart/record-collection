@@ -1,0 +1,62 @@
+/* Generative mosaic behind the stats hero: a quilt of the period's album
+   colors, blurred into a soft field (crisp tiles + blur = the mix), under a
+   scrim so the chart and text stay legible. Sits behind the hero content. */
+.frame {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: #14121f;
+}
+
+/* Each color field is its own layer so period changes crossfade between them. */
+.bg {
+  position: absolute;
+  inset: 0;
+}
+
+/* Soft atmospheric mesh under the crisp quilt. */
+.wash {
+  position: absolute;
+  inset: -10%;
+  background-color: #14121f;
+  filter: blur(24px) saturate(1.1);
+  transform: scale(1.14);
+}
+
+.quilt {
+  position: absolute;
+  inset: -3%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  align-content: start;
+  /* Light blur keeps the covers recognizable; brightness darkens them so the
+     white bars and text stay legible over the artwork. */
+  filter: blur(3px) saturate(1.05) brightness(0.64);
+  opacity: 0.95;
+}
+
+.tile {
+  /* Square so the square covers show in full — no landscape cropping. */
+  aspect-ratio: 1;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(12, 10, 22, 0.12) 0%,
+    rgba(12, 10, 22, 0.28) 55%,
+    rgba(12, 10, 22, 0.55) 100%
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quilt {
+    transition: none;
+  }
+}

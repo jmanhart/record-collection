@@ -28,6 +28,7 @@ export interface TopAlbum {
   title: string;
   artist: string;
   coverImage?: string;
+  color?: string | null;
   count: number;
 }
 
@@ -295,6 +296,7 @@ export function useListeningStats(
           title: e.record?.title ?? `Release ${e.releaseId}`,
           artist: e.record?.artist ?? "Unknown artist",
           coverImage: e.record?.supabase_image_url || e.record?.coverImage,
+          color: e.record?.dominant_color,
           count: 1,
         });
       }
