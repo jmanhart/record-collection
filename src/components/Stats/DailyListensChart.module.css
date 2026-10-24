@@ -1,24 +1,39 @@
-/* Continuous per-day listening chart in the stats hero: one bar per day filling
-   the full header width, pinned to the bottom edge so bars grow out of it,
-   today on the far right. Faint full-height line + month label at each month
-   boundary, no axis labels. Rendered light-on-dark over the album mosaic. */
+/* Continuous per-day listening chart in the stats hero: one bar per day, pinned
+   to the bottom edge so bars grow out of it. Today starts centered with a
+   "Today" marker, and the strip scrolls either direction. Faint full-height
+   line + month label at each month boundary, no axis labels. Rendered
+   light-on-dark over the album mosaic. */
 .chart {
   position: relative;
-  /* Break out of the hero's gutter so the bars fill the whole header width. */
+  /* Break out of the hero's gutter so the strip spans the whole header width. */
   width: 100vw;
   margin-left: calc(-1 * var(--grid-left));
+}
+
+.scroll {
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.scroll::-webkit-scrollbar {
+  display: none;
 }
 
 .track {
   display: flex;
   align-items: flex-end;
-  width: 100%;
   height: 100%;
+  width: max-content;
+  /* Half-viewport runway each side so the first day and today can center. */
+  padding: 0 50vw;
+  box-sizing: content-box;
 }
 
 .col {
-  flex: 1 1 0;
-  min-width: 0;
+  flex: 0 0 auto;
   height: 100%;
   display: flex;
   align-items: flex-end;
@@ -45,10 +60,33 @@
   pointer-events: none;
 }
 
+/* Today marker: a line up through the chart from the bar, labelled "Today". */
+.todayLine {
+  position: absolute;
+  left: 50%;
+  top: 16px;
+  bottom: 0;
+  width: 1px;
+  transform: translateX(-50%);
+  background: rgba(245, 245, 245, 0.55);
+  pointer-events: none;
+}
+
+.todayLabel {
+  position: absolute;
+  left: 50%;
+  top: 1px;
+  transform: translateX(-50%);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--hero-text);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 .bar {
-  /* Keep the current bar:gap ratio while filling the width (~62% bar, 38% gap). */
-  width: 62%;
-  max-width: 10px;
   min-height: 2px;
   border-radius: 1px 1px 0 0;
 }

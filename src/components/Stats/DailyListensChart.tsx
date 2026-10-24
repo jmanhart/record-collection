@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useLayoutEffect } from "react";
 import type { DayStats } from "../../hooks/useActivity";
 import type { Measure } from "../../hooks/useListeningStats";
 import { formatRuntimeCompact } from "../../utils/formatDuration";
@@ -9,8 +9,11 @@ interface Props {
   measure: Measure;
 }
 
-// Chart box height and the tallest a bar may grow — the gap leaves headroom at
-// the top for the month labels and the hover tooltip.
+// Fixed per-day geometry so the chart scrolls; today starts centered and the
+// user can scroll either direction. Bar + gap keep roughly the previous ratio,
+// just ~25% wider bars.
+const SLOT = 13;
+const BAR_W = 9;
 const CHART_H = 190;
 const MAX_BAR = 140;
 // Days with no listens still get a short gray stub so the timeline reads as
@@ -76,7 +79,20 @@ export function DailyListensChart({ byDay, measure }: Props) {
   );
 
   const chartRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const todayRef = useRef<HTMLDivElement>(null);
   const [hover, setHover] = useState<HoverState | null>(null);
+
+  // Start with today centered in the header.
+  useLayoutEffect(() => {
+    const sc = scrollRef.current;
+    const t = todayRef.current;
+    if (!sc || !t) return;
+    sc.scrollLeft +=
+      t.getBoundingClientRect().left -
+      sc.getBoundingClientRect().left -
+      (sc.clientWidth - t.offsetWidth) / 2;
+  }, [days.length]);
 
   if (!days.length) return null;
 
@@ -92,45 +108,57 @@ export function DailyListensChart({ byDay, measure }: Props) {
 
   return (
     <div className={styles.chart} ref={chartRef} style={{ height: CHART_H }}>
-      <div className={styles.track}>
-        {days.map((day, i) => {
-          const value = measure === "time" ? day.seconds : day.albums;
-          const barH = value > 0 ? (max > 0 ? (value / max) * MAX_BAR : 0) : EMPTY_H;
-          return (
-            <div
-              key={day.key}
-              className={`${styles.col}${day.monthStart ? ` ${styles.monthStart}` : ""}`}
-              onMouseEnter={(e) => {
-                const col = e.currentTarget.getBoundingClientRect();
-                const box = chartRef.current?.getBoundingClientRect();
-                const center = box ? col.left - box.left + col.width / 2 : 0;
-                // Keep the tooltip inside the chart at the left/right edges.
-                const half = 46;
-                const left = box
-                  ? Math.max(half, Math.min(center, box.width - half))
-                  : center;
-                setHover({ i, left, barPx: barH });
-              }}
-              onMouseLeave={() => setHover(null)}
-            >
-              {day.monthStart && (
-                <span className={styles.monthLabel}>
-                  {day.date.toLocaleDateString("en-US", { month: "short" })}
-                </span>
-              )}
+      <div className={styles.scroll} ref={scrollRef}>
+        <div className={styles.track}>
+          {days.map((day, i) => {
+            const value = measure === "time" ? day.seconds : day.albums;
+            const barH =
+              value > 0 ? (max > 0 ? (value / max) * MAX_BAR : 0) : EMPTY_H;
+            const isToday = i === days.length - 1;
+            return (
               <div
-                className={styles.bar}
-                style={{
-                  height: barH,
-                  background:
-                    value > 0
-                      ? dayColor(days.length > 1 ? i / (days.length - 1) : 0)
-                      : EMPTY_COLOR,
+                key={day.key}
+                ref={isToday ? todayRef : undefined}
+                className={`${styles.col}${day.monthStart ? ` ${styles.monthStart}` : ""}`}
+                style={{ width: SLOT }}
+                onMouseEnter={(e) => {
+                  const col = e.currentTarget.getBoundingClientRect();
+                  const box = chartRef.current?.getBoundingClientRect();
+                  const center = box ? col.left - box.left + col.width / 2 : 0;
+                  const half = 46;
+                  const left = box
+                    ? Math.max(half, Math.min(center, box.width - half))
+                    : center;
+                  setHover({ i, left, barPx: barH });
                 }}
-              />
-            </div>
-          );
-        })}
+                onMouseLeave={() => setHover(null)}
+              >
+                {day.monthStart && (
+                  <span className={styles.monthLabel}>
+                    {day.date.toLocaleDateString("en-US", { month: "short" })}
+                  </span>
+                )}
+                {isToday && (
+                  <>
+                    <span className={styles.todayLabel}>Today</span>
+                    <span className={styles.todayLine} />
+                  </>
+                )}
+                <div
+                  className={styles.bar}
+                  style={{
+                    width: BAR_W,
+                    height: barH,
+                    background:
+                      value > 0
+                        ? dayColor(days.length > 1 ? i / (days.length - 1) : 0)
+                        : EMPTY_COLOR,
+                  }}
+                />
+              </div>
+            );
+          })}
+        </div>
       </div>
       {hovered && (
         <div
