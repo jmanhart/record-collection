@@ -1,5 +1,4 @@
 import {
-  useState,
   useEffect,
   useMemo,
   useRef,
@@ -151,7 +150,6 @@ export default function StatsPage() {
   const driver = useRef<"list" | "chart" | null>(null);
   const driverTimer = useRef<number | null>(null);
   const focusedKeyRef = useRef<string | null>(null);
-  const [focusedKey, setFocusedKey] = useState<string | null>(null);
 
   const claim = useCallback((who: "list" | "chart") => {
     driver.current = who;
@@ -164,7 +162,6 @@ export default function StatsPage() {
   const applyFocus = useCallback((key: string) => {
     if (focusedKeyRef.current === key) return;
     focusedKeyRef.current = key;
-    setFocusedKey(key);
   }, []);
 
   const anchorY = () =>
@@ -174,7 +171,6 @@ export default function StatsPage() {
   useEffect(() => {
     if (diary.length && focusedKeyRef.current == null) {
       focusedKeyRef.current = diary[0].key;
-      setFocusedKey(diary[0].key);
     }
   }, [diary]);
 
@@ -239,8 +235,6 @@ export default function StatsPage() {
     [diary, claim, applyFocus]
   );
 
-  const focusedStat = focusedKey ? byDay.get(focusedKey) : undefined;
-
   return (
     <div className={styles.page}>
       <ViewNav />
@@ -262,25 +256,6 @@ export default function StatsPage() {
               onCenterChange={handleCenter}
             />
           )}
-        </section>
-
-        <section className={styles.statsBand}>
-          <div className={styles.statsBandInner}>
-            <div className={styles.bandItem}>
-              <span className={styles.bandValue}>
-                {formatRuntimeCompact(
-                  focusedStat ? focusedStat.seconds : totals.seconds
-                )}
-              </span>
-              <span className={styles.bandLabel}>
-                {focusedStat
-                  ? `${focusedStat.albumCount} ${
-                      focusedStat.albumCount === 1 ? "album" : "albums"
-                    }`
-                  : "all time"}
-              </span>
-            </div>
-          </div>
         </section>
       </div>
 
