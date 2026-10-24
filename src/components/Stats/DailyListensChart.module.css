@@ -120,13 +120,8 @@
   z-index: 3;
 }
 
-.tooltipValue {
-  font-size: 0.82rem;
+.tooltipDate {
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--hero-text);
-}
-
-.tooltipMeta {
-  font-size: 0.72rem;
-  color: rgba(245, 245, 245, 0.6);
 }

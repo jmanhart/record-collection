@@ -1,6 +1,5 @@
 import { useMemo, useRef, useState, useLayoutEffect, useEffect } from "react";
 import type { DayStats } from "../../hooks/useActivity";
-import { formatRuntimeCompact } from "../../utils/formatDuration";
 import styles from "./DailyListensChart.module.css";
 
 export interface DayFocus {
@@ -156,10 +155,11 @@ export function DailyListensChart({ byDay, onFocus }: Props) {
   if (!days.length) return null;
 
   const activeDay = days[active];
-  const activeTime = formatRuntimeCompact(activeDay.seconds);
-  const activeMeta = `${activeDay.albums} ${
-    activeDay.albums === 1 ? "album" : "albums"
-  } · ${activeDay.date.getMonth() + 1}/${activeDay.date.getDate()}`;
+  const activeDate = activeDay.date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 
   return (
     <div
@@ -211,8 +211,7 @@ export function DailyListensChart({ byDay, onFocus }: Props) {
       <span className={styles.centerLine} />
       {(hovered || scrubbing) && (
         <div className={styles.tooltip}>
-          <span className={styles.tooltipValue}>{activeTime}</span>
-          <span className={styles.tooltipMeta}>{activeMeta}</span>
+          <span className={styles.tooltipDate}>{activeDate}</span>
         </div>
       )}
     </div>
