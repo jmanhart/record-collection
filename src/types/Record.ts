@@ -20,6 +20,13 @@ export interface Record {
   genres?: string[];
   styles?: string[];
   year?: number;
+  /**
+   * Original release date of the album (ISO 8601, variable precision:
+   * "1959-08-17", "1972-03", or "1959"), sourced from MusicBrainz/Discogs.
+   * Unlike `year` (the owned pressing's year) this reflects the album's real
+   * era, so the collection is grouped by year/decade on this.
+   */
+  original_release_date?: string | null;
   duration_seconds?: number;
   acquired_at?: string | null;
   purchase_location?: string | null;

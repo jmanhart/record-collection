@@ -1,0 +1,139 @@
+/* Collection-wide breakdowns below the period lists: owned records by year
+   and by decade. Matches the app's light content area + text tokens. */
+.section {
+  --grid-left: max(2rem, calc((100vw - 1280px) / 2 + 2rem));
+  padding: clamp(1.5rem, 4vh, 2.5rem) var(--grid-left);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.rule {
+  flex: 1;
+  height: 1px;
+  background: var(--divider);
+}
+
+/* --- By year --- */
+.yearChart {
+  width: 100%;
+  height: 150px;
+}
+
+.yearAxis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-tertiary);
+}
+
+.tooltip {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.4rem 0.6rem;
+  background: var(--surface100);
+  border: 1px solid var(--divider);
+  border-radius: 0.5rem;
+  box-shadow: var(--card-shadow);
+}
+
+.tooltipValue {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tooltipMeta {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+/* --- By decade --- */
+.decades {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 4vh, 2.5rem);
+}
+
+.decadeRow {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.decadeMeta {
+  flex-shrink: 0;
+  width: 8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding-top: 0.25rem;
+}
+
+.decadeLabel {
+  font-size: 2rem;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.decadeCount {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+}
+
+.coverRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.decadeCover {
+  flex-shrink: 0;
+  width: 7rem;
+  height: 7rem;
+  border-radius: 0.3rem;
+  object-fit: cover;
+  background: var(--surface200);
+  box-shadow: var(--card-shadow);
+}
+
+@media (max-width: 768px) {
+  .decadeRow {
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .decadeMeta {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.5rem;
+    width: auto;
+    padding-top: 0;
+  }
+  .decadeLabel {
+    font-size: 1.6rem;
+  }
+  .decadeCover {
+    width: 5.5rem;
+    height: 5.5rem;
+  }
+}
