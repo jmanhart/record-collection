@@ -2,6 +2,13 @@
   min-height: 100vh;
 }
 
+/* The chart + metric stay pinned while the diary scrolls beneath them. */
+.stickyHeader {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
 /* Full-bleed hero mirroring the timeline's now-playing block — same proportions
    and full-width breakout, but a defined gradient color world instead of a
    cover tint. Content is padded to the page grid; the fixed ViewNav floats over
@@ -428,6 +435,16 @@
   /* A little extra breathing room before the first entry; the rail stays
      continuous because this grows the row's content box (not margin/padding). */
   padding-bottom: 0.4rem;
+}
+
+/* Space before each new day in the continuous diary; padding (not margin) keeps
+   the rail line unbroken, and the ring is nudged down to match the day name. */
+.dayHeaderRow:not(:first-child) {
+  padding-top: 1.5rem;
+}
+
+.dayHeaderRow:not(:first-child) .ring {
+  top: calc(1.5rem + 0.9rem);
 }
 
 .dayHeader {
