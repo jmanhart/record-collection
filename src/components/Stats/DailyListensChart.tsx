@@ -1,23 +1,20 @@
 import { useMemo, useRef, useState, useLayoutEffect } from "react";
 import type { DayStats } from "../../hooks/useActivity";
-import type { Measure } from "../../hooks/useListeningStats";
 import { formatRuntimeCompact } from "../../utils/formatDuration";
 import styles from "./DailyListensChart.module.css";
 
 interface Props {
   byDay: Map<string, DayStats>;
-  measure: Measure;
 }
 
-// Fixed per-day geometry so the chart scrolls; today starts centered and the
-// user can scroll either direction. Bar + gap keep roughly the previous ratio,
-// just ~25% wider bars.
+// Fixed per-day geometry so the chart scrolls; today starts centered under the
+// fixed center line, and the bar under that line drives the tooltip.
 const SLOT = 13;
 const BAR_W = 9;
 const CHART_H = 190;
 const MAX_BAR = 140;
 // Days with no listens still get a short gray stub so the timeline reads as
-// continuous; it still shows a "0" tooltip on hover.
+// continuous.
 const EMPTY_H = 3;
 const EMPTY_COLOR = "rgba(245, 245, 245, 0.26)";
 
@@ -42,13 +39,10 @@ interface DayDatum {
   monthStart: boolean;
 }
 
-interface HoverState {
-  i: number;
-  left: number;
-  barPx: number;
-}
+const barHeight = (seconds: number, max: number) =>
+  seconds > 0 ? (max > 0 ? (seconds / max) * MAX_BAR : 0) : EMPTY_H;
 
-export function DailyListensChart({ byDay, measure }: Props) {
+export function DailyListensChart({ byDay }: Props) {
   const days = useMemo<DayDatum[]>(() => {
     const keys = [...byDay.keys()].sort();
     if (!keys.length) return [];
@@ -73,87 +67,87 @@ export function DailyListensChart({ byDay, measure }: Props) {
   }, [byDay]);
 
   const max = useMemo(
-    () =>
-      days.reduce(
-        (m, d) => Math.max(m, measure === "time" ? d.seconds : d.albums),
-        0
-      ),
-    [days, measure]
+    () => days.reduce((m, d) => Math.max(m, d.seconds), 0),
+    [days]
   );
 
   const chartRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const todayRef = useRef<HTMLDivElement>(null);
-  const [hover, setHover] = useState<HoverState | null>(null);
+  const firstColRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
+  const [active, setActive] = useState(0);
 
-  // Start with today centered in the header.
+  // Index of the day whose column is under the fixed center line.
+  const computeActive = () => {
+    const chart = chartRef.current;
+    const first = firstColRef.current;
+    if (!chart || !first || !days.length) return;
+    const cr = chart.getBoundingClientRect();
+    const centerX = cr.left + cr.width / 2;
+    const firstCenter = first.getBoundingClientRect().left + first.offsetWidth / 2;
+    const idx = Math.round((centerX - firstCenter) / SLOT);
+    const clamped = Math.max(0, Math.min(idx, days.length - 1));
+    setActive((prev) => (prev === clamped ? prev : clamped));
+  };
+
+  // Center today on mount and mark it active.
   useLayoutEffect(() => {
     const sc = scrollRef.current;
-    const t = todayRef.current;
-    if (!sc || !t) return;
-    sc.scrollLeft +=
-      t.getBoundingClientRect().left -
-      sc.getBoundingClientRect().left -
-      (sc.clientWidth - t.offsetWidth) / 2;
+    const chart = chartRef.current;
+    const first = firstColRef.current;
+    if (!sc || !chart || !first || !days.length) return;
+    const chartCenter =
+      chart.getBoundingClientRect().left + chart.getBoundingClientRect().width / 2;
+    const firstCenter =
+      first.getBoundingClientRect().left + first.offsetWidth / 2;
+    const todayCenter = firstCenter + (days.length - 1) * SLOT;
+    sc.scrollLeft += todayCenter - chartCenter;
+    setActive(days.length - 1);
   }, [days.length]);
+
+  const onScroll = () => {
+    if (rafRef.current != null) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+      computeActive();
+    });
+  };
 
   if (!days.length) return null;
 
-  const hovered = hover ? days[hover.i] : null;
-  const hoveredValue = hovered
-    ? measure === "time"
-      ? formatRuntimeCompact(hovered.seconds)
-      : `${hovered.albums} ${hovered.albums === 1 ? "album" : "albums"}`
-    : "";
-  const hoveredDate = hovered
-    ? `${hovered.date.getMonth() + 1}/${hovered.date.getDate()}`
-    : "";
+  const activeDay = days[active];
+  const activeBarH = barHeight(activeDay.seconds, max);
+  const activeTime = formatRuntimeCompact(activeDay.seconds);
+  const activeMeta = `${activeDay.albums} ${
+    activeDay.albums === 1 ? "album" : "albums"
+  } · ${activeDay.date.getMonth() + 1}/${activeDay.date.getDate()}`;
 
   return (
     <div className={styles.chart} ref={chartRef} style={{ height: CHART_H }}>
-      <div className={styles.scroll} ref={scrollRef}>
+      <div className={styles.scroll} ref={scrollRef} onScroll={onScroll}>
         <div className={styles.track}>
           {days.map((day, i) => {
-            const value = measure === "time" ? day.seconds : day.albums;
-            const barH =
-              value > 0 ? (max > 0 ? (value / max) * MAX_BAR : 0) : EMPTY_H;
-            const isToday = i === days.length - 1;
+            // Month line passes through normally but hides as it crosses center.
+            const showMonth = day.monthStart && Math.abs(i - active) > 1;
             return (
               <div
                 key={day.key}
-                ref={isToday ? todayRef : undefined}
-                className={`${styles.col}${day.monthStart ? ` ${styles.monthStart}` : ""}`}
+                ref={i === 0 ? firstColRef : undefined}
+                className={`${styles.col}${showMonth ? ` ${styles.monthStart}` : ""}`}
                 style={{ width: SLOT }}
-                onMouseEnter={(e) => {
-                  const col = e.currentTarget.getBoundingClientRect();
-                  const box = chartRef.current?.getBoundingClientRect();
-                  const center = box ? col.left - box.left + col.width / 2 : 0;
-                  const half = 46;
-                  const left = box
-                    ? Math.max(half, Math.min(center, box.width - half))
-                    : center;
-                  setHover({ i, left, barPx: barH });
-                }}
-                onMouseLeave={() => setHover(null)}
               >
-                {day.monthStart && (
+                {showMonth && (
                   <span className={styles.monthLabel}>
                     {day.date.toLocaleDateString("en-US", { month: "short" })}
                   </span>
-                )}
-                {isToday && (
-                  <>
-                    <span className={styles.todayLabel}>Today</span>
-                    <span className={styles.todayLine} />
-                  </>
                 )}
                 <div
                   className={styles.bar}
                   style={{
                     width: BAR_W,
-                    height: barH,
+                    height: barHeight(day.seconds, max),
                     background:
-                      value > 0
+                      day.seconds > 0
                         ? dayColor(days.length > 1 ? i / (days.length - 1) : 0)
                         : EMPTY_COLOR,
                   }}
@@ -163,15 +157,12 @@ export function DailyListensChart({ byDay, measure }: Props) {
           })}
         </div>
       </div>
-      {hovered && (
-        <div
-          className={styles.tooltip}
-          style={{ left: hover!.left, bottom: hover!.barPx + 8 }}
-        >
-          <span className={styles.tooltipValue}>{hoveredValue}</span>
-          <span className={styles.tooltipMeta}>{hoveredDate}</span>
-        </div>
-      )}
+      {/* Fixed center line; the tooltip above it shows the centered day. */}
+      <span className={styles.centerLine} />
+      <div className={styles.tooltip} style={{ bottom: activeBarH + 8 }}>
+        <span className={styles.tooltipValue}>{activeTime}</span>
+        <span className={styles.tooltipMeta}>{activeMeta}</span>
+      </div>
     </div>
   );
 }

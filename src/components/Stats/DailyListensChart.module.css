@@ -1,8 +1,9 @@
 /* Continuous per-day listening chart in the stats hero: one bar per day, pinned
-   to the bottom edge so bars grow out of it. Today starts centered with a
-   "Today" marker, and the strip scrolls either direction (stopping at the first
-   month on the left). Faint full-height line + month label at each month
-   boundary, no axis labels. Rendered light-on-dark over the album mosaic. */
+   to the bottom edge so bars grow out of it. A fixed center line acts as a
+   scrubber — the day scrolled under it drives the tooltip above. The strip
+   scrolls either direction (stopping at the first month on the left). Faint
+   full-height line + month label at each month boundary (hidden as they cross
+   the center). Rendered light-on-dark over the album mosaic. */
 .chart {
   position: relative;
   /* Break out of the hero's gutter so the strip spans the whole header width. */
@@ -20,6 +21,8 @@
   overscroll-behavior-x: contain;
   /* Horizontal swipes pan the strip; vertical swipes still scroll the page. */
   touch-action: pan-x;
+  /* Gently settle a day under the center line. */
+  scroll-snap-type: x proximity;
   /* Gentle fade at the left/right edges as bars scroll past. */
   -webkit-mask-image: linear-gradient(
     to right,
@@ -46,8 +49,8 @@
   align-items: flex-end;
   height: 100%;
   width: max-content;
-  /* Right runway lets today sit centered; the left stops at the first month
-     with just a little breathing room. */
+  /* Half-viewport runway on the right lets today center; the left stops at the
+     first month with a little breathing room. */
   padding: 0 50vw 0 1.5rem;
   box-sizing: content-box;
 }
@@ -60,6 +63,7 @@
   justify-content: center;
   position: relative;
   box-sizing: border-box;
+  scroll-snap-align: center;
 }
 
 /* Full-height faint line marking the first day of a month. */
@@ -80,30 +84,17 @@
   pointer-events: none;
 }
 
-/* Today marker: a line up through the chart from the bar, labelled "Today". */
-.todayLine {
+/* Fixed center-line scrubber. */
+.centerLine {
   position: absolute;
   left: 50%;
-  top: 16px;
+  top: 8px;
   bottom: 0;
   width: 1px;
   transform: translateX(-50%);
-  background: rgba(245, 245, 245, 0.55);
+  background: rgba(245, 245, 245, 0.6);
   pointer-events: none;
-}
-
-.todayLabel {
-  position: absolute;
-  left: 50%;
-  top: 1px;
-  transform: translateX(-50%);
-  font-size: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--hero-text);
-  white-space: nowrap;
-  pointer-events: none;
+  z-index: 2;
 }
 
 .bar {
@@ -113,6 +104,7 @@
 
 .tooltip {
   position: absolute;
+  left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;

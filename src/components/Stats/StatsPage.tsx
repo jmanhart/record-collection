@@ -1,7 +1,6 @@
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useActivity } from "../../hooks/useActivity";
 import { useRecords } from "../../hooks/useRecords";
-import type { Measure } from "../../hooks/useListeningStats";
 import { ViewNav } from "../ViewNav/ViewNav";
 import { StatsHeroBackground } from "./StatsHeroBackground";
 import { DailyListensChart } from "./DailyListensChart";
@@ -21,7 +20,6 @@ const HERO_VARS: Record<string, string> = {
 export default function StatsPage() {
   const { events, byDay, isLoading } = useActivity();
   const { records } = useRecords();
-  const [measure, setMeasure] = useState<Measure>("time");
 
   // All-time roll-ups from the full listen stream.
   const totals = useMemo(() => {
@@ -114,29 +112,13 @@ export default function StatsPage() {
         <StatsHeroBackground albums={heroAlbums} seed={0} />
         <div className={styles.controls}>
           <span className={styles.heroHeading}>Listens</span>
-          <div className={styles.toggle} role="group" aria-label="Chart measure">
-            <button
-              className={`${styles.toggleButton} ${measure === "time" ? styles.toggleActive : ""}`}
-              onClick={() => setMeasure("time")}
-              aria-pressed={measure === "time"}
-            >
-              Time
-            </button>
-            <button
-              className={`${styles.toggleButton} ${measure === "albums" ? styles.toggleActive : ""}`}
-              onClick={() => setMeasure("albums")}
-              aria-pressed={measure === "albums"}
-            >
-              Albums
-            </button>
-          </div>
         </div>
         {isLoading ? (
           <p className={styles.status}>Loading…</p>
         ) : totals.listens === 0 ? (
           <p className={styles.status}>No listens tracked yet.</p>
         ) : (
-          <DailyListensChart byDay={byDay} measure={measure} />
+          <DailyListensChart byDay={byDay} />
         )}
       </section>
 
