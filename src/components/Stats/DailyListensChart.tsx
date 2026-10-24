@@ -9,8 +9,8 @@ interface Props {
 
 // Fixed per-day geometry so the chart scrolls; today starts centered under the
 // fixed center line, and the bar under that line drives the tooltip.
-const SLOT = 13;
-const BAR_W = 9;
+const SLOT = 16;
+const BAR_W = 12;
 const CHART_H = 190;
 const MAX_BAR = 140;
 // Days with no listens still get a short gray stub so the timeline reads as
@@ -76,6 +76,11 @@ export function DailyListensChart({ byDay }: Props) {
   const firstColRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
   const [active, setActive] = useState(0);
+  // The tooltip only shows while the pointer is over the header, or briefly
+  // while scrubbing by scroll (so touch still surfaces values).
+  const [hovered, setHovered] = useState(false);
+  const [scrubbing, setScrubbing] = useState(false);
+  const scrubTimeout = useRef<number | null>(null);
 
   // Index of the day whose column is under the fixed center line.
   const computeActive = () => {
@@ -106,6 +111,9 @@ export function DailyListensChart({ byDay }: Props) {
   }, [days.length]);
 
   const onScroll = () => {
+    setScrubbing(true);
+    if (scrubTimeout.current != null) window.clearTimeout(scrubTimeout.current);
+    scrubTimeout.current = window.setTimeout(() => setScrubbing(false), 1200);
     if (rafRef.current != null) return;
     rafRef.current = requestAnimationFrame(() => {
       rafRef.current = null;
@@ -122,7 +130,13 @@ export function DailyListensChart({ byDay }: Props) {
   } · ${activeDay.date.getMonth() + 1}/${activeDay.date.getDate()}`;
 
   return (
-    <div className={styles.chart} ref={chartRef} style={{ height: CHART_H }}>
+    <div
+      className={styles.chart}
+      ref={chartRef}
+      style={{ height: CHART_H }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       <div className={styles.scroll} ref={scrollRef} onScroll={onScroll}>
         <div className={styles.track}>
           {days.map((day, i) => {
@@ -158,10 +172,12 @@ export function DailyListensChart({ byDay }: Props) {
       </div>
       {/* Fixed center line; the tooltip above it shows the centered day. */}
       <span className={styles.centerLine} />
-      <div className={styles.tooltip}>
-        <span className={styles.tooltipValue}>{activeTime}</span>
-        <span className={styles.tooltipMeta}>{activeMeta}</span>
-      </div>
+      {(hovered || scrubbing) && (
+        <div className={styles.tooltip}>
+          <span className={styles.tooltipValue}>{activeTime}</span>
+          <span className={styles.tooltipMeta}>{activeMeta}</span>
+        </div>
+      )}
     </div>
   );
 }

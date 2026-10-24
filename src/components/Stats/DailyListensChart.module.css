@@ -23,19 +23,19 @@
   touch-action: pan-x;
   /* Gently settle a day under the center line. */
   scroll-snap-type: x proximity;
-  /* Gentle fade at the left/right edges as bars scroll past. */
+  /* Wider, more prominent fade at the left/right edges as bars scroll past. */
   -webkit-mask-image: linear-gradient(
     to right,
     transparent 0,
-    #000 52px,
-    #000 calc(100% - 52px),
+    #000 12%,
+    #000 88%,
     transparent 100%
   );
   mask-image: linear-gradient(
     to right,
     transparent 0,
-    #000 52px,
-    #000 calc(100% - 52px),
+    #000 12%,
+    #000 88%,
     transparent 100%
   );
 }
