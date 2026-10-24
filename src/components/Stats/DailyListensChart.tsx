@@ -124,6 +124,8 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
     const animRef = useRef<number | null>(null);
     const axisScrollRef = useRef<HTMLDivElement>(null);
     const dragRef = useRef<{ x: number; left: number } | null>(null);
+    const barsSyncing = useRef(false);
+    const axisSyncing = useRef(false);
     // Set while the scroll position is being driven by code (mount-center or the
     // diary list) so onScroll doesn't echo a center-change back out.
     const programmatic = useRef(false);
@@ -257,12 +259,15 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
     const onScroll = () => {
       const sc = scrollRef.current;
       const prog = programmatic.current;
-      // Mirror the hash-mark axis to the bars so they stay aligned.
-      if (
+      // Mirror to the axis, unless this scroll is the axis syncing into the bars.
+      if (barsSyncing.current) {
+        barsSyncing.current = false;
+      } else if (
         sc &&
         axisScrollRef.current &&
         axisScrollRef.current.scrollLeft !== sc.scrollLeft
       ) {
+        axisSyncing.current = true;
         axisScrollRef.current.scrollLeft = sc.scrollLeft;
       }
       if (!prog) {
@@ -282,7 +287,15 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
     const onAxisScroll = () => {
       const sc = scrollRef.current;
       const ax = axisScrollRef.current;
-      if (sc && ax && sc.scrollLeft !== ax.scrollLeft) sc.scrollLeft = ax.scrollLeft;
+      // Ignore the scroll we caused by mirroring the bars into the axis.
+      if (axisSyncing.current) {
+        axisSyncing.current = false;
+        return;
+      }
+      if (sc && ax && sc.scrollLeft !== ax.scrollLeft) {
+        barsSyncing.current = true;
+        sc.scrollLeft = ax.scrollLeft;
+      }
     };
     const onAxisPointerDown = (e: ReactPointerEvent) => {
       if (e.pointerType !== "mouse") return; // touch uses native scroll
