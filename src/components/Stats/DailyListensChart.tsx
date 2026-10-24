@@ -13,6 +13,10 @@ interface Props {
 // the top for the month labels and the hover tooltip.
 const CHART_H = 190;
 const MAX_BAR = 140;
+// Days with no listens still get a short gray stub so the timeline reads as
+// continuous; it still shows a "0" tooltip on hover.
+const EMPTY_H = 3;
+const EMPTY_COLOR = "rgba(245, 245, 245, 0.26)";
 
 // teal #5eead4 -> blue #60a5fa across the whole timeline, left (oldest) to
 // right (today) — same spectrum as the By Year chart.
@@ -91,16 +95,12 @@ export function DailyListensChart({ byDay, measure }: Props) {
       <div className={styles.track}>
         {days.map((day, i) => {
           const value = measure === "time" ? day.seconds : day.albums;
-          const barPx = max > 0 ? (value / max) * MAX_BAR : 0;
+          const barH = value > 0 ? (max > 0 ? (value / max) * MAX_BAR : 0) : EMPTY_H;
           return (
             <div
               key={day.key}
               className={`${styles.col}${day.monthStart ? ` ${styles.monthStart}` : ""}`}
               onMouseEnter={(e) => {
-                if (value <= 0) {
-                  setHover(null);
-                  return;
-                }
                 const col = e.currentTarget.getBoundingClientRect();
                 const box = chartRef.current?.getBoundingClientRect();
                 const center = box ? col.left - box.left + col.width / 2 : 0;
@@ -109,7 +109,7 @@ export function DailyListensChart({ byDay, measure }: Props) {
                 const left = box
                   ? Math.max(half, Math.min(center, box.width - half))
                   : center;
-                setHover({ i, left, barPx });
+                setHover({ i, left, barPx: barH });
               }}
               onMouseLeave={() => setHover(null)}
             >
@@ -118,17 +118,16 @@ export function DailyListensChart({ byDay, measure }: Props) {
                   {day.date.toLocaleDateString("en-US", { month: "short" })}
                 </span>
               )}
-              {value > 0 && (
-                <div
-                  className={styles.bar}
-                  style={{
-                    height: barPx,
-                    background: dayColor(
-                      days.length > 1 ? i / (days.length - 1) : 0
-                    ),
-                  }}
-                />
-              )}
+              <div
+                className={styles.bar}
+                style={{
+                  height: barH,
+                  background:
+                    value > 0
+                      ? dayColor(days.length > 1 ? i / (days.length - 1) : 0)
+                      : EMPTY_COLOR,
+                }}
+              />
             </div>
           );
         })}
