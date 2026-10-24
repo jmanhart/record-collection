@@ -1,0 +1,65 @@
+/* Collection-wide breakdowns below the period lists: owned records by year
+   and by decade. Matches the app's light content area + text tokens. */
+.section {
+  --grid-left: max(2rem, calc((100vw - 1280px) / 2 + 2rem));
+  padding: clamp(1.5rem, 4vh, 2.5rem) var(--grid-left);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.rule {
+  flex: 1;
+  height: 1px;
+  background: var(--divider);
+}
+
+/* --- By year --- */
+.yearChart {
+  width: 100%;
+  height: 150px;
+}
+
+.yearAxis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-tertiary);
+}
+
+.tooltip {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.4rem 0.6rem;
+  background: var(--surface100);
+  border: 1px solid var(--divider);
+  border-radius: 0.5rem;
+  box-shadow: var(--card-shadow);
+}
+
+.tooltipValue {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tooltipMeta {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}

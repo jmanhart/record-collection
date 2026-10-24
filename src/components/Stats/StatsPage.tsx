@@ -20,6 +20,7 @@ import {
 } from "../../hooks/useListeningStats";
 import { ViewNav } from "../ViewNav/ViewNav";
 import { StatsHeroBackground } from "./StatsHeroBackground";
+import { CollectionByYear } from "./CollectionByYear";
 import { formatRuntimeCompact } from "../../utils/formatDuration";
 import styles from "./StatsPage.module.css";
 
@@ -434,6 +435,8 @@ export default function StatsPage() {
           </div>
         </div>
       </section>
+
+      <CollectionByYear records={records} />
     </div>
   );
 }
