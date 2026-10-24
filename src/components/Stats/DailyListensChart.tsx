@@ -111,7 +111,9 @@ export function DailyListensChart({ byDay, onFocus, onCenterChange }: Props) {
     setActive((prev) => (prev === clamped ? prev : clamped));
   };
 
-  // Scroll so the given day centers under the line (click a bar to navigate).
+  // Gently animate the scroll so the clicked day eases to the center line.
+  // (Native smooth scrollTo is a no-op under scroll-snap, so animate by hand
+  // with snap momentarily off to avoid it fighting each frame.)
   const centerIndex = (i: number) => {
     const sc = scrollRef.current;
     const chart = chartRef.current;
@@ -121,7 +123,18 @@ export function DailyListensChart({ byDay, onFocus, onCenterChange }: Props) {
       chart.getBoundingClientRect().left + chart.getBoundingClientRect().width / 2;
     const firstCenter =
       first.getBoundingClientRect().left + first.offsetWidth / 2;
-    sc.scrollLeft += firstCenter + i * SLOT - chartCenter;
+    const start = sc.scrollLeft;
+    const dist = firstCenter + i * SLOT - chartCenter;
+    if (Math.abs(dist) < 1) return;
+    sc.style.scrollSnapType = "none";
+    const t0 = performance.now();
+    const step = (now: number) => {
+      const p = Math.min(1, (now - t0) / 420);
+      sc.scrollLeft = start + dist * (1 - Math.pow(1 - p, 3));
+      if (p < 1) requestAnimationFrame(step);
+      else sc.style.scrollSnapType = "";
+    };
+    requestAnimationFrame(step);
   };
 
   // Center today on mount and mark it active.
