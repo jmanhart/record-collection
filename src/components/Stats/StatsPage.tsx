@@ -196,23 +196,12 @@ export default function StatsPage() {
         <div className={styles.dayListInner}>
           {isSettling ? (
             <div className={styles.timeline}>
-              <div className={`${styles.row} ${styles.dayHeaderRow}`}>
-                <span className={styles.rail}>
-                  <span className={styles.ring} />
-                </span>
-                <span className={`${styles.skelBar} ${styles.skelDay}`} />
-              </div>
-              {Array.from({ length: 4 }).map((_, i) => (
+              {Array.from({ length: 5 }).map((_, i) => (
                 <div key={i} className={styles.row}>
                   <span className={styles.rail}>
                     <span className={styles.dot} />
                   </span>
                   <span className={`${styles.cover} ${styles.skeleton}`} />
-                  <span className={styles.entryMeta}>
-                    <span className={`${styles.skelBar} ${styles.skelTime}`} />
-                    <span className={`${styles.skelBar} ${styles.skelTitle}`} />
-                    <span className={`${styles.skelBar} ${styles.skelArtist}`} />
-                  </span>
                 </div>
               ))}
             </div>
