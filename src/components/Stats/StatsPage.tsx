@@ -19,6 +19,7 @@ import {
   type Measure,
 } from "../../hooks/useListeningStats";
 import { ViewNav } from "../ViewNav/ViewNav";
+import { StatsHeroBackground } from "./StatsHeroBackground";
 import { formatRuntimeCompact } from "../../utils/formatDuration";
 import styles from "./StatsPage.module.css";
 
@@ -85,6 +86,26 @@ export default function StatsPage() {
     [records, stats.startKey, stats.endKey]
   );
 
+  // Mosaic background palette: the period's album colors, falling back to a
+  // slice of the whole collection when nothing was listened to.
+  const heroColors = useMemo(() => {
+    const fromPeriod = topAlbums
+      .map((album) => album.color)
+      .filter((color): color is string => !!color);
+    if (fromPeriod.length) return fromPeriod;
+    return records
+      .map((record) => record.dominant_color)
+      .filter((color): color is string => !!color)
+      .slice(0, 48);
+  }, [topAlbums, records]);
+  const heroSeed = useMemo(
+    () =>
+      stats.anchor
+        .split("")
+        .reduce((sum, ch) => sum + ch.charCodeAt(0), 0),
+    [stats.anchor]
+  );
+
   useEffect(() => {
     const root = document.documentElement;
     for (const [k, v] of Object.entries(HERO_VARS)) root.style.setProperty(k, v);
@@ -136,6 +157,7 @@ export default function StatsPage() {
       <ViewNav />
 
       <section className={styles.hero} data-stats-hero>
+        <StatsHeroBackground colors={heroColors} seed={heroSeed} />
         <div className={styles.controls}>
           <div className={styles.toggle} role="group" aria-label="Chart range">
             {RANGE_OPTIONS.map(({ value, label }) => (
