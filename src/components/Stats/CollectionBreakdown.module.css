@@ -63,3 +63,79 @@
   font-size: 0.75rem;
   color: var(--text-tertiary);
 }
+
+/* --- By decade --- */
+.decades {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 4vh, 2.5rem);
+}
+
+.decadeRow {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.decadeMeta {
+  flex-shrink: 0;
+  width: 8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding-top: 0.25rem;
+}
+
+.decadeLabel {
+  font-size: 2rem;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.decadeCount {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+}
+
+.coverRow {
+  display: flex;
+  gap: 0.6rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scrollbar-width: thin;
+}
+
+.decadeCover {
+  flex-shrink: 0;
+  width: 7rem;
+  height: 7rem;
+  border-radius: 0.3rem;
+  object-fit: cover;
+  background: var(--surface200);
+  box-shadow: var(--card-shadow);
+}
+
+@media (max-width: 768px) {
+  .decadeRow {
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .decadeMeta {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.5rem;
+    width: auto;
+    padding-top: 0;
+  }
+  .decadeLabel {
+    font-size: 1.6rem;
+  }
+  .decadeCover {
+    width: 5.5rem;
+    height: 5.5rem;
+  }
+}
