@@ -425,7 +425,8 @@
 }
 
 .dayHeaderRow {
-  margin-bottom: 0.25rem;
+  /* Spacing via padding (not margin) so the rail line stays unbroken. */
+  padding-bottom: 1rem;
 }
 
 .dayHeader {
