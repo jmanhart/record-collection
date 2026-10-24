@@ -30,8 +30,8 @@ interface Props {
 
 // Fixed per-day geometry so the chart scrolls; today starts centered under the
 // fixed center line, and the bar under that line drives the tooltip.
-const SLOT = 20;
-const BAR_W = 16;
+const SLOT = 25;
+const BAR_W = 21;
 const CHART_H = 250;
 const MAX_BAR = 185;
 // Days with no listens still get a short gray stub so the timeline reads as
@@ -105,6 +105,7 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
     const scrollRef = useRef<HTMLDivElement>(null);
     const firstColRef = useRef<HTMLDivElement>(null);
     const rafRef = useRef<number | null>(null);
+    const animRef = useRef<number | null>(null);
     // Set while the scroll position is being driven by code (mount-center or the
     // diary list) so onScroll doesn't echo a center-change back out.
     const programmatic = useRef(false);
@@ -130,8 +131,32 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
       if (emit) onCenterChange?.(days[clamped].key);
     };
 
-    // Instantly center a given column (no animation, no emit). Used by the diary
-    // list to keep the chart in sync as it scrolls.
+    // Smoothly animate the chart to a target scrollLeft (snap off during the
+    // tween). No emit — used by the diary list to keep the chart in sync.
+    const animateScroll = (target: number) => {
+      const sc = scrollRef.current;
+      if (!sc) return;
+      if (animRef.current != null) cancelAnimationFrame(animRef.current);
+      const start = sc.scrollLeft;
+      const dist = target - start;
+      if (Math.abs(dist) < 1) return;
+      programmatic.current = true;
+      sc.style.scrollSnapType = "none";
+      const t0 = performance.now();
+      const step = (now: number) => {
+        const p = Math.min(1, (now - t0) / 240);
+        sc.scrollLeft = start + dist * (1 - Math.pow(1 - p, 3));
+        if (p < 1) animRef.current = requestAnimationFrame(step);
+        else {
+          animRef.current = null;
+          sc.style.scrollSnapType = "";
+          programmatic.current = false;
+        }
+      };
+      animRef.current = requestAnimationFrame(step);
+    };
+
+    // Center a given column, easing into place (no emit). Used by the diary list.
     const centerColumn = (idx: number) => {
       const sc = scrollRef.current;
       const chart = chartRef.current;
@@ -141,14 +166,7 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
       const chartCenter = rect.left + rect.width / 2;
       const firstCenter =
         first.getBoundingClientRect().left + first.offsetWidth / 2;
-      const dist = firstCenter + idx * SLOT - chartCenter;
-      if (Math.abs(dist) < 1) {
-        setActive(idx);
-        return;
-      }
-      programmatic.current = true;
-      sc.scrollLeft += dist;
-      setActive(idx);
+      animateScroll(sc.scrollLeft + (firstCenter + idx * SLOT - chartCenter));
     };
 
     useImperativeHandle(
@@ -206,6 +224,9 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
       programmatic.current = true;
       sc.scrollLeft += todayCenter - chartCenter;
       setActive(days.length - 1);
+      window.setTimeout(() => {
+        programmatic.current = false;
+      }, 80);
     }, [days.length]);
 
     const onScroll = () => {
@@ -223,7 +244,6 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
       rafRef.current = requestAnimationFrame(() => {
         rafRef.current = null;
         computeActive(!prog);
-        if (prog) programmatic.current = false;
       });
     };
 
