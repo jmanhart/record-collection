@@ -348,7 +348,8 @@
 
 @media (max-width: 768px) {
   .hero {
-    min-height: 70vh;
+    /* Push the controls below the fixed ViewNav cluster on narrow screens. */
+    padding-top: 4rem;
   }
 
   .lists {
