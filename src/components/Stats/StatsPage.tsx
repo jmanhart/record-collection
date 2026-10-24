@@ -104,14 +104,49 @@ export default function StatsPage() {
   }, [centerKey, settledKey]);
 
   const isSettling = centerKey != null && centerKey !== settledKey;
-  const dayPlays = settledKey ? playsByDay.get(settledKey) ?? [] : [];
-  const dayLabel = settledKey
-    ? new Date(`${settledKey}T00:00:00`).toLocaleDateString("en-US", {
-        weekday: "long",
-        month: "long",
-        day: "numeric",
+
+  // The centered day's plays grouped by album (count + first/last listen time),
+  // most recently played first.
+  const dayAlbums = useMemo(() => {
+    const plays = settledKey ? playsByDay.get(settledKey) ?? [] : [];
+    const groups = new Map<
+      number,
+      { record: (typeof events)[number]["record"]; times: string[] }
+    >();
+    for (const p of plays) {
+      const g = groups.get(p.releaseId);
+      if (g) g.times.push(p.timestamp);
+      else groups.set(p.releaseId, { record: p.record, times: [p.timestamp] });
+    }
+    return [...groups.entries()]
+      .map(([id, g]) => {
+        const sorted = g.times.slice().sort();
+        return {
+          id,
+          record: g.record,
+          count: g.times.length,
+          first: sorted[0],
+          last: sorted[sorted.length - 1],
+        };
       })
-    : "";
+      .sort((a, b) => b.last.localeCompare(a.last));
+  }, [settledKey, playsByDay, events]);
+
+  const dayStat = settledKey ? byDay.get(settledKey) : undefined;
+  const dayLabel = useMemo(() => {
+    if (!settledKey) return "";
+    const d = new Date(`${settledKey}T00:00:00`);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const diff = Math.round((today.getTime() - d.getTime()) / 86400000);
+    if (diff === 0) return "Today";
+    if (diff === 1) return "Yesterday";
+    return d.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+  }, [settledKey]);
 
   return (
     <div className={styles.page}>
@@ -159,62 +194,100 @@ export default function StatsPage() {
 
       <section className={styles.dayList}>
         <div className={styles.dayListInner}>
-          <span className={styles.dayListLabel}>{dayLabel}</span>
           {isSettling ? (
             <div className={styles.timeline}>
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className={styles.playRow}>
+              <div className={`${styles.row} ${styles.dayHeaderRow}`}>
+                <span className={styles.rail}>
+                  <span className={styles.ring} />
+                </span>
+                <span className={`${styles.skelBar} ${styles.skelDay}`} />
+              </div>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className={styles.row}>
                   <span className={styles.rail}>
                     <span className={styles.dot} />
                   </span>
-                  <span className={`${styles.playCover} ${styles.skeleton}`} />
-                  <span className={styles.playMeta}>
+                  <span className={`${styles.cover} ${styles.skeleton}`} />
+                  <span className={styles.entryMeta}>
+                    <span className={`${styles.skelBar} ${styles.skelTime}`} />
                     <span className={`${styles.skelBar} ${styles.skelTitle}`} />
                     <span className={`${styles.skelBar} ${styles.skelArtist}`} />
                   </span>
                 </div>
               ))}
             </div>
-          ) : dayPlays.length === 0 ? (
-            <p className={styles.dayEmpty}>No listens on {dayLabel}.</p>
           ) : (
-            <div className={styles.timeline}>
-              {dayPlays.map((play) => {
-                const cover =
-                  play.record?.supabase_image_url || play.record?.coverImage;
-                const time = new Date(play.timestamp).toLocaleTimeString(
-                  "en-US",
-                  { hour: "numeric", minute: "2-digit" }
-                );
-                return (
-                  <div key={play.id} className={styles.playRow}>
-                    <span className={styles.rail}>
-                      <span className={styles.dot} />
+            <div className={styles.timeline} key={settledKey ?? ""}>
+              <div className={`${styles.row} ${styles.dayHeaderRow}`}>
+                <span className={styles.rail}>
+                  <span className={styles.ring} />
+                </span>
+                <span className={styles.dayHeader}>
+                  <span className={styles.dayName}>{dayLabel}</span>
+                  {dayStat && (
+                    <span className={styles.dayMeta}>
+                      {dayStat.albumCount}{" "}
+                      {dayStat.albumCount === 1 ? "album" : "albums"} ·{" "}
+                      {formatRuntimeCompact(dayStat.seconds)}
                     </span>
-                    {cover ? (
-                      <img
-                        src={cover}
-                        alt=""
-                        className={styles.playCover}
-                        loading="lazy"
-                      />
-                    ) : (
-                      <span className={styles.playCoverPlaceholder}>
-                        {play.record?.title[0]}
+                  )}
+                </span>
+              </div>
+              {dayAlbums.length === 0 ? (
+                <p className={styles.dayEmpty}>No listens on {dayLabel}.</p>
+              ) : (
+                dayAlbums.map((album, idx) => {
+                  const cover =
+                    album.record?.supabase_image_url ||
+                    album.record?.coverImage;
+                  const fmt = (iso: string) =>
+                    new Date(iso).toLocaleTimeString("en-US", {
+                      hour: "numeric",
+                      minute: "2-digit",
+                    });
+                  const range =
+                    album.count > 1
+                      ? `${fmt(album.first)} — ${fmt(album.last)}`
+                      : fmt(album.first);
+                  return (
+                    <div
+                      key={album.id}
+                      className={styles.row}
+                      style={{ animationDelay: `${(idx + 1) * 70}ms` }}
+                    >
+                      <span className={styles.rail}>
+                        <span className={styles.dot} />
                       </span>
-                    )}
-                    <span className={styles.playMeta}>
-                      <span className={styles.playTitle}>
-                        {play.record?.title}
+                      {cover ? (
+                        <img
+                          src={cover}
+                          alt=""
+                          className={styles.cover}
+                          loading="lazy"
+                        />
+                      ) : (
+                        <span className={`${styles.cover} ${styles.coverPlaceholder}`}>
+                          {album.record?.title[0]}
+                        </span>
+                      )}
+                      <span className={styles.entryMeta}>
+                        <span className={styles.entryTime}>{range}</span>
+                        <span className={styles.entryTitle}>
+                          {album.record?.title}
+                        </span>
+                        <span className={styles.entryArtist}>
+                          {album.record?.artist}
+                        </span>
+                        <span className={styles.entryCount}>
+                          {album.count === 1
+                            ? "Played once"
+                            : `Played ${album.count} times`}
+                        </span>
                       </span>
-                      <span className={styles.playArtist}>
-                        {play.record?.artist}
-                      </span>
-                    </span>
-                    <span className={styles.playTime}>{time}</span>
-                  </div>
-                );
-              })}
+                    </div>
+                  );
+                })
+              )}
             </div>
           )}
         </div>
