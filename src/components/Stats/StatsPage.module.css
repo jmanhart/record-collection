@@ -368,7 +368,7 @@
 .row {
   display: flex;
   gap: 1rem;
-  padding: 0.5rem 0;
+  padding: 0.6rem 0;
   position: relative;
   animation: rowIn 0.4s ease both;
 }
@@ -385,8 +385,8 @@
   content: "";
   position: absolute;
   left: 50%;
-  top: 0;
-  bottom: 0;
+  top: -0.6rem;
+  bottom: -0.6rem;
   width: 1px;
   transform: translateX(-50%);
   background: var(--divider);
@@ -397,7 +397,7 @@
 }
 
 .row:last-child .rail::before {
-  bottom: calc(100% - 1.3rem);
+  bottom: calc(100% - 1.1rem);
 }
 
 .dot,
@@ -424,9 +424,10 @@
   background: var(--surface000);
 }
 
-.dayHeaderRow {
-  /* Spacing via padding (not margin) so the rail line stays unbroken. */
-  padding-bottom: 1rem;
+.dayHeaderRow .dayHeader {
+  /* A little extra breathing room before the first entry; the rail stays
+     continuous because this grows the row's content box (not margin/padding). */
+  padding-bottom: 0.4rem;
 }
 
 .dayHeader {
