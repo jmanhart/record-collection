@@ -3,9 +3,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { muteColor } from "../../utils/color";
 import styles from "./StatsHeroBackground.module.css";
 
-const COLS = 8;
-const ROWS = 6;
-const CELLS = COLS * ROWS;
+// Square tiles flow into as many rows as needed to cover the hero; extra rows
+// are clipped. 60 is plenty for desktop and mobile alike.
+const CELLS = 60;
 
 interface Album {
   color?: string;

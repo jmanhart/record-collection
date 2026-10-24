@@ -26,20 +26,20 @@
 
 .quilt {
   position: absolute;
-  inset: -8%;
+  inset: -3%;
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  grid-template-rows: repeat(6, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  align-content: start;
   /* Light blur keeps the covers recognizable; brightness darkens them so the
      white bars and text stay legible over the artwork. */
-  filter: blur(4px) saturate(1.05) brightness(0.62);
+  filter: blur(3px) saturate(1.05) brightness(0.64);
   opacity: 0.95;
-  transform: scale(1.06);
 }
 
 .tile {
+  /* Square so the square covers show in full — no landscape cropping. */
+  aspect-ratio: 1;
   width: 100%;
-  height: 100%;
   background-size: cover;
   background-position: center;
 }
