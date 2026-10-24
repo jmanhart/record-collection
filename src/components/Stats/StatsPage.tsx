@@ -141,10 +141,12 @@ export default function StatsPage() {
             </span>
             <span className={styles.bandLabel}>
               {focusedDay
-                ? focusedDay.date.toLocaleDateString("en-US", {
+                ? `${focusedDay.albums} ${
+                    focusedDay.albums === 1 ? "album" : "albums"
+                  } · ${focusedDay.date.toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
-                  })
+                  })}`
                 : "all time"}
             </span>
           </div>
