@@ -8,6 +8,7 @@
     "sync:discography": "tsx src/syncDiscography.ts",
     "track-durations": "tsx src/fetchMusicBrainzDurations.ts",
     "backfill:colors": "tsx src/backfillColors.ts",
+    "backfill:release-dates": "tsx src/backfillReleaseDates.ts",
     "start": "node src/server.js"
   },
   "dependencies": {
