@@ -201,15 +201,17 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+  text-align: center;
   gap: 0.2rem;
   min-width: 0;
   /* Vertical padding lives on the items (not the grid container) so each
-     cell fills the band's full height and its divider spans top to bottom. */
-  padding: clamp(0.8rem, 2vh, 1.15rem) 0;
+     cell fills the band's full height and its divider spans top to bottom.
+     Symmetric horizontal padding keeps the centered text true to each column. */
+  padding: clamp(0.8rem, 2vh, 1.15rem) clamp(1rem, 4vw, 2.5rem);
 }
 
 .bandItem:not(:first-child) {
-  padding-left: clamp(1rem, 4vw, 2.5rem);
   border-left: 1px solid var(--divider);
 }
 
