@@ -128,6 +128,117 @@
   white-space: nowrap;
 }
 
+/* Now-playing banner: replaces the metric when the now slot is centered.
+   Small cover + status/title/artist, scaling with the header collapse. */
+.nowBanner {
+  position: absolute;
+  left: 50%;
+  top: 36%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: 90vw;
+  pointer-events: none;
+  z-index: 3;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.55);
+}
+
+.nowCover {
+  width: calc(3.5rem - 1rem * var(--stats-header-progress, 0));
+  height: calc(3.5rem - 1rem * var(--stats-header-progress, 0));
+  border-radius: 4px;
+  object-fit: cover;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+  flex-shrink: 0;
+}
+
+.nowText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.nowStatus {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--hero-text);
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+.nowStatusDetail {
+  opacity: 0.8;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.nowTitle {
+  font-size: calc(1.5rem - 0.5rem * var(--stats-header-progress, 0));
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--hero-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70vw;
+}
+
+.nowArtist {
+  font-size: calc(0.95rem - 0.15rem * var(--stats-header-progress, 0));
+  font-weight: 500;
+  color: var(--hero-text);
+  opacity: 0.85;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70vw;
+}
+
+/* Now slot marker in the chart: a live node at the right end, sitting on the
+   baseline like the bars. */
+.nowNode {
+  width: 12px;
+  height: 12px;
+  margin-bottom: 1px;
+  border-radius: 50%;
+  background: var(--bar-selected);
+  box-shadow: 0 0 10px var(--bar-selected);
+}
+
+.nowNodePlaying {
+  animation: nowPulse 1.6s ease-out infinite;
+}
+
+@keyframes nowPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(127, 186, 255, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(127, 186, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(127, 186, 255, 0);
+  }
+}
+
+/* Now slot marker on the axis. */
+.nowTick {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--bar-selected);
+}
+
+.nowTickPlaying {
+  box-shadow: 0 0 6px var(--bar-selected);
+}
+
 /* Wrapper so the hash-mark axis hugs the bars (no hero gap between them). */
 .chartWrap {
   position: relative;
