@@ -34,11 +34,11 @@ interface Props {
 // fixed center line, and the bar under that line drives the tooltip.
 const SLOT = 25;
 const BAR_W = 21;
-const CHART_H = 300;
-const MAX_BAR = 130;
+// Tallest bar as a % of the chart height, so bars scale as the header grows or
+// shrinks. Empty days fall back to .bar's min-height for a tiny stub.
+const MAX_BAR_PCT = 44;
 // Days with no listens still get a short gray stub so the timeline reads as
 // continuous.
-const EMPTY_H = 3;
 const EMPTY_COLOR = "rgba(245, 245, 245, 0.26)";
 // Focus falloff: the centered bar is full brightness; others dim with distance
 // down to MIN_OPACITY over FADE_RANGE days.
@@ -83,8 +83,8 @@ interface DayDatum {
   monthStart: boolean;
 }
 
-const barHeight = (seconds: number, max: number) =>
-  seconds > 0 ? (max > 0 ? (seconds / max) * MAX_BAR : 0) : EMPTY_H;
+const barPct = (seconds: number, max: number) =>
+  seconds > 0 && max > 0 ? (seconds / max) * MAX_BAR_PCT : 0;
 
 export const DailyListensChart = forwardRef<ChartHandle, Props>(
   function DailyListensChart({ byDay, onCenterChange }, ref) {
@@ -327,7 +327,7 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
 
     return (
       <div className={styles.chartWrap}>
-        <div className={styles.chart} ref={chartRef} style={{ height: CHART_H }}>
+        <div className={styles.chart} ref={chartRef}>
           <div className={styles.scroll} ref={scrollRef} onScroll={onScroll}>
             <div className={styles.track}>
               {days.map((day, i) => {
@@ -356,7 +356,7 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
                       className={styles.bar}
                       style={{
                         width: BAR_W,
-                        height: barHeight(day.seconds, max),
+                        height: `${barPct(day.seconds, max)}%`,
                         opacity,
                         background:
                           day.seconds > 0
