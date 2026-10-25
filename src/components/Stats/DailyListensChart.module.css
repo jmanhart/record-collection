@@ -21,7 +21,7 @@
   overflow-y: hidden;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior-x: contain;
+  overscroll-behavior-x: none;
   /* Horizontal swipes pan the strip; vertical swipes still scroll the page. */
   touch-action: pan-x;
   /* Gently settle a day under the center line. */
@@ -70,21 +70,16 @@
   cursor: pointer;
 }
 
-/* Full-height faint line marking the first day of a month. */
-.monthStart {
-  border-left: 1px solid var(--hero-line);
-}
-
-.monthLabel {
+/* Short month-boundary line at the top of the 1st-of-month column. */
+.monthStart::before {
+  content: "";
   position: absolute;
-  top: 4px;
-  left: 5px;
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: rgba(245, 245, 245, 0.5);
-  white-space: nowrap;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 2.5rem;
+  background: rgba(245, 245, 245, 0.5);
   pointer-events: none;
 }
 
@@ -168,7 +163,7 @@
   overflow-y: hidden;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior-x: contain;
+  overscroll-behavior-x: none;
   /* Horizontal swipes/drag scrub the axis; vertical swipes scroll the page. */
   touch-action: pan-x;
   cursor: grab;
@@ -227,6 +222,14 @@
   height: 16px;
   width: 2px;
   background: var(--hero-text);
+}
+
+.monthLetter {
+  font-size: 0.6rem;
+  font-weight: 600;
+  line-height: 1;
+  color: rgba(245, 245, 245, 0.75);
+  pointer-events: none;
 }
 
 /* Center marker on the axis, lined up with the chart's center line. */
