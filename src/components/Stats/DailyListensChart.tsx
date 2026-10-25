@@ -32,27 +32,24 @@ interface Props {
 
 // Fixed per-day geometry so the chart scrolls; today starts centered under the
 // fixed center line, and the bar under that line drives the tooltip.
-const SLOT = 25;
-const BAR_W = 21;
+const SLOT = 32;
+const BAR_W = 28;
 // Tallest bar as a % of the chart height, so bars scale as the header grows or
 // shrinks. Empty days fall back to .bar's min-height for a tiny stub.
 const MAX_BAR_PCT = 44;
 // Days with no listens still get a short gray stub so the timeline reads as
 // continuous.
 const EMPTY_COLOR = "rgba(245, 245, 245, 0.26)";
-// Focus falloff: the centered bar is full brightness; others dim with distance
-// down to MIN_OPACITY over FADE_RANGE days.
-const FADE_RANGE = 32;
-const MIN_OPACITY = 0.28;
-
-// teal #5eead4 -> blue #60a5fa across the whole timeline, left (oldest) to
-// right (today) — same spectrum as the By Year chart.
-const FROM = [94, 234, 212];
-const TO = [96, 165, 250];
-function dayColor(t: number): string {
-  const r = Math.round(FROM[0] + (TO[0] - FROM[0]) * t);
-  const g = Math.round(FROM[1] + (TO[1] - FROM[1]) * t);
-  const b = Math.round(FROM[2] + (TO[2] - FROM[2]) * t);
+// Focus by color (not opacity): the centered bar is the brightest blue and bars
+// fade to a dark blue with distance from it, over FOCUS_RANGE days.
+const FOCUS_RANGE = 18;
+const CENTER_BLUE = [122, 182, 255];
+const EDGE_BLUE = [38, 58, 104];
+function barColor(dist: number): string {
+  const t = Math.min(1, dist / FOCUS_RANGE);
+  const r = Math.round(CENTER_BLUE[0] + (EDGE_BLUE[0] - CENTER_BLUE[0]) * t);
+  const g = Math.round(CENTER_BLUE[1] + (EDGE_BLUE[1] - CENTER_BLUE[1]) * t);
+  const b = Math.round(CENTER_BLUE[2] + (EDGE_BLUE[2] - CENTER_BLUE[2]) * t);
   return `rgb(${r}, ${g}, ${b})`;
 }
 
@@ -130,10 +127,6 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
     // diary list) so onScroll doesn't echo a center-change back out.
     const programmatic = useRef(false);
     const [active, setActive] = useState(0);
-    // The tooltip only shows while scrubbing by hand (so touch surfaces values);
-    // programmatic centering from the list stays silent.
-    const [scrubbing, setScrubbing] = useState(false);
-    const scrubTimeout = useRef<number | null>(null);
 
     // Index of the day whose column is under the fixed center line. Emits the
     // centered key only when `emit` (a genuine user scrub).
@@ -214,7 +207,6 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
       const start = sc.scrollLeft;
       const dist = firstCenter + i * SLOT - chartCenter;
       if (Math.abs(dist) < 1) return;
-      setScrubbing(true);
       sc.style.scrollSnapType = "none";
       const t0 = performance.now();
       const step = (now: number) => {
@@ -224,7 +216,6 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
         else {
           sc.style.scrollSnapType = "";
           computeActive(true);
-          window.setTimeout(() => setScrubbing(false), 300);
         }
       };
       requestAnimationFrame(step);
@@ -269,12 +260,6 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
       ) {
         axisSyncing.current = true;
         axisScrollRef.current.scrollLeft = sc.scrollLeft;
-      }
-      if (!prog) {
-        setScrubbing(true);
-        if (scrubTimeout.current != null)
-          window.clearTimeout(scrubTimeout.current);
-        scrubTimeout.current = window.setTimeout(() => setScrubbing(false), 1200);
       }
       if (rafRef.current != null) return;
       rafRef.current = requestAnimationFrame(() => {
@@ -333,10 +318,6 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
               {days.map((day, i) => {
                 // Month line passes through normally but hides as it crosses center.
                 const showMonth = day.monthStart && Math.abs(i - active) > 1;
-                const dist = Math.abs(i - active);
-                const opacity = scrubbing
-                  ? Math.max(MIN_OPACITY, 1 - dist / FADE_RANGE)
-                  : 1;
                 return (
                   <div
                     key={day.key}
@@ -357,10 +338,9 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
                       style={{
                         width: BAR_W,
                         height: `${barPct(day.seconds, max)}%`,
-                        opacity,
                         background:
                           day.seconds > 0
-                            ? dayColor(days.length > 1 ? i / (days.length - 1) : 0)
+                            ? barColor(Math.abs(i - active))
                             : EMPTY_COLOR,
                       }}
                     />
