@@ -315,38 +315,29 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
         <div className={styles.chart} ref={chartRef}>
           <div className={styles.scroll} ref={scrollRef} onScroll={onScroll}>
             <div className={styles.track}>
-              {days.map((day, i) => {
-                // Month line passes through normally but hides as it crosses center.
-                const showMonth = day.monthStart && Math.abs(i - active) > 1;
-                return (
+              {days.map((day, i) => (
+                <div
+                  key={day.key}
+                  ref={i === 0 ? firstColRef : undefined}
+                  className={`${styles.col}${
+                    day.monthStart ? ` ${styles.monthStart}` : ""
+                  }`}
+                  style={{ width: SLOT }}
+                  onClick={() => centerIndex(i)}
+                >
                   <div
-                    key={day.key}
-                    ref={i === 0 ? firstColRef : undefined}
-                    className={`${styles.col}${
-                      showMonth ? ` ${styles.monthStart}` : ""
-                    }`}
-                    style={{ width: SLOT }}
-                    onClick={() => centerIndex(i)}
-                  >
-                    {showMonth && (
-                      <span className={styles.monthLabel}>
-                        {day.date.toLocaleDateString("en-US", { month: "short" })}
-                      </span>
-                    )}
-                    <div
-                      className={styles.bar}
-                      style={{
-                        width: BAR_W,
-                        height: `${barPct(day.seconds, max)}%`,
-                        background:
-                          day.seconds > 0
-                            ? barColor(Math.abs(i - active))
-                            : EMPTY_COLOR,
-                      }}
-                    />
-                  </div>
-                );
-              })}
+                    className={styles.bar}
+                    style={{
+                      width: BAR_W,
+                      height: `${barPct(day.seconds, max)}%`,
+                      background:
+                        day.seconds > 0
+                          ? barColor(Math.abs(i - active))
+                          : EMPTY_COLOR,
+                    }}
+                  />
+                </div>
+              ))}
             </div>
           </div>
           {/* Centered day metric: the focused day's date, listening time, and
@@ -378,11 +369,17 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
                   style={{ width: SLOT }}
                   onClick={() => centerIndex(i)}
                 >
-                  <span
-                    className={`${styles.tick}${
-                      i === active ? ` ${styles.tickActive}` : ""
-                    }`}
-                  />
+                  {day.monthStart ? (
+                    <span className={styles.monthLetter}>
+                      {day.date.toLocaleDateString("en-US", { month: "narrow" })}
+                    </span>
+                  ) : (
+                    <span
+                      className={`${styles.tick}${
+                        i === active ? ` ${styles.tickActive}` : ""
+                      }`}
+                    />
+                  )}
                 </div>
               ))}
             </div>
