@@ -96,7 +96,7 @@
   bottom: 0;
   width: 1px;
   transform: translateX(-50%);
-  background: rgba(245, 245, 245, 0.6);
+  background: var(--divider);
   pointer-events: none;
   z-index: 2;
 }
@@ -104,7 +104,7 @@
 .bar {
   min-height: 2px;
   border-radius: 1px 1px 0 0;
-  transition: opacity 0.25s ease;
+  transition: background 0.25s ease;
 }
 
 /* Centered day metric, lined up above the center bar; always visible. */
@@ -237,7 +237,7 @@
   bottom: 0;
   width: 1px;
   transform: translateX(-50%);
-  background: rgba(245, 245, 245, 0.45);
+  background: var(--divider);
   pointer-events: none;
   z-index: 2;
 }
