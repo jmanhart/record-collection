@@ -461,6 +461,8 @@
 }
 
 .dot {
+  /* Centered on the album cover (5rem) rather than the first text line. */
+  top: 2.5rem;
   width: 9px;
   height: 9px;
   background: var(--text-secondary);
@@ -480,14 +482,15 @@
   padding-bottom: 0.4rem;
 }
 
-/* Space before each new day in the continuous diary; padding (not margin) keeps
-   the rail line unbroken, and the ring is nudged down to match the day name. */
+/* Space before each new day. The rail already starts below this padding, so the
+   ring keeps its base offset (aligned to the day name) and the rail line is
+   extended up to bridge the padding, keeping the line unbroken. */
 .dayHeaderRow:not(:first-child) {
   padding-top: 1.5rem;
 }
 
-.dayHeaderRow:not(:first-child) .ring {
-  top: calc(1.5rem + 0.9rem);
+.dayHeaderRow:not(:first-child) .rail::before {
+  top: -1.5rem;
 }
 
 .dayHeader {
