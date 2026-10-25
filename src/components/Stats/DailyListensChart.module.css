@@ -12,6 +12,12 @@
   /* Break out of the hero's gutter so the strip spans the whole header width. */
   width: 100vw;
   margin-left: calc(-1 * var(--grid-left));
+  /* --- Bar palette (tweak freely): bars are colored by distance from the
+     selected day. .bar transitions animate changes as bars cross tiers. --- */
+  --bar-selected: #7fbaff;
+  --bar-near: #4f7cbb;
+  --bar-mid: #37507a;
+  --bar-far: #273a59;
 }
 
 .scroll {
@@ -86,7 +92,7 @@
 .bar {
   min-height: 2px;
   border-radius: 1px 1px 0 0;
-  transition: background 0.25s ease;
+  transition: background 0.3s ease;
 }
 
 /* Centered day metric, lined up above the center bar; always visible. */

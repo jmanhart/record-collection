@@ -40,17 +40,16 @@ const MAX_BAR_PCT = 44;
 // Days with no listens still get a short gray stub so the timeline reads as
 // continuous.
 const EMPTY_COLOR = "rgba(245, 245, 245, 0.26)";
-// Focus by color (not opacity): the centered bar is the brightest blue and bars
-// fade to a dark blue with distance from it, over FOCUS_RANGE days.
-const FOCUS_RANGE = 18;
-const CENTER_BLUE = [122, 182, 255];
-const EDGE_BLUE = [38, 58, 104];
+// Bars are colored in tiers by distance from the selected (centered) day, each
+// tier a CSS variable (see .chart) so the palette is easy to tweak. CSS
+// transitions animate a bar as it crosses between tiers.
+const NEAR_RANGE = 5; // the 5 bars either side of the selected one
+const MID_RANGE = 10; // the next 5 either side
 function barColor(dist: number): string {
-  const t = Math.min(1, dist / FOCUS_RANGE);
-  const r = Math.round(CENTER_BLUE[0] + (EDGE_BLUE[0] - CENTER_BLUE[0]) * t);
-  const g = Math.round(CENTER_BLUE[1] + (EDGE_BLUE[1] - CENTER_BLUE[1]) * t);
-  const b = Math.round(CENTER_BLUE[2] + (EDGE_BLUE[2] - CENTER_BLUE[2]) * t);
-  return `rgb(${r}, ${g}, ${b})`;
+  if (dist === 0) return "var(--bar-selected)";
+  if (dist <= NEAR_RANGE) return "var(--bar-near)";
+  if (dist <= MID_RANGE) return "var(--bar-mid)";
+  return "var(--bar-far)";
 }
 
 const pad = (n: number) => String(n).padStart(2, "0");
