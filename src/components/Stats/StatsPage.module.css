@@ -32,49 +32,6 @@
   z-index: 5;
 }
 
-/* Smooth the height only during an explicit tap toggle (class added/removed by
-   JS); scroll-driven resizing stays transition-free so it tracks 1:1. */
-.headerAnimating {
-  transition: height 0.32s ease;
-}
-
-/* Tap target that summons Overview / drops to Reading at any scroll position.
-   A drawer-pull chevron hanging at the header's bottom edge.
-   --- REVERT: remove .modeToggle + .modeToggleOpen (paired with the TSX
-       button) to restore the pure scroll-driven header. --- */
-.modeToggle {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  transform: translate(-50%, 50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 1.4rem;
-  padding: 0;
-  border: 1px solid var(--divider);
-  border-radius: 999px;
-  background: rgba(20, 18, 31, 0.72);
-  color: #f5f5f5;
-  cursor: pointer;
-  z-index: 6;
-  opacity: 0.75;
-  transition: opacity 0.2s ease;
-}
-
-.modeToggle:hover {
-  opacity: 1;
-}
-
-.modeToggle svg {
-  transition: transform 0.3s ease;
-}
-
-.modeToggleOpen svg {
-  transform: rotate(180deg);
-}
-
 /* Full-bleed hero mirroring the timeline's now-playing block — same proportions
    and full-width breakout, but a defined gradient color world instead of a
    cover tint. Content is padded to the page grid; the fixed ViewNav floats over

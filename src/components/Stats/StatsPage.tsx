@@ -1,5 +1,4 @@
 import {
-  useState,
   useEffect,
   useMemo,
   useRef,
@@ -152,28 +151,6 @@ export default function StatsPage() {
   const driverTimer = useRef<number | null>(null);
   const focusedKeyRef = useRef<string | null>(null);
   const pageRef = useRef<HTMLDivElement>(null);
-  const applyHeaderRef = useRef<(() => void) | null>(null);
-  // Header mode: Overview (big graph) vs Reading (collapses on scroll). A tap
-  // summons Overview for the current era at any scroll position.
-  // --- REVERT: delete this block, the overviewRef branch in the mode effect,
-  //     the chevron <button>, and the .modeToggle* CSS to restore pure
-  //     scroll-shrink (git revert of this commit does all of it). ---
-  const [overview, setOverview] = useState(true);
-  const overviewRef = useRef(true);
-  const toggleMode = useCallback(() => {
-    const next = !overviewRef.current;
-    overviewRef.current = next;
-    setOverview(next);
-    // Animate the height for this explicit toggle only (scroll stays crisp).
-    const sh = stickyRef.current;
-    if (sh) {
-      sh.classList.add(styles.headerAnimating);
-      window.setTimeout(
-        () => sh.classList.remove(styles.headerAnimating),
-        340
-      );
-    }
-  }, []);
 
   const claim = useCallback((who: "list" | "chart") => {
     driver.current = who;
@@ -286,9 +263,9 @@ export default function StatsPage() {
     if (el?.complete) el.classList.add(styles.coverLoaded);
   }, []);
 
-  // Header height: Overview pins the expanded height; otherwise it shrinks 1:1
-  // with scroll to the collapsed height. Reads the fractions from the CSS vars
-  // (single source of truth) and publishes a 0..1 progress var.
+  // Shrink the header from its expanded to collapsed height, 1:1 with scroll,
+  // reading the fractions from the CSS vars so they stay the single source of
+  // truth. Also publishes a 0..1 progress var for scaling header content.
   useEffect(() => {
     const el = pageRef.current;
     if (!el) return;
@@ -302,24 +279,15 @@ export default function StatsPage() {
       const cs = getComputedStyle(el);
       const expanded = toPx(cs.getPropertyValue("--stats-header-expanded"));
       const collapsed = toPx(cs.getPropertyValue("--stats-header-collapsed"));
-      const h = overviewRef.current
-        ? expanded
-        : Math.max(collapsed, expanded - window.scrollY);
+      const h = Math.max(collapsed, expanded - window.scrollY);
       el.style.setProperty("--stats-header-h", `${h}px`);
       const range = expanded - collapsed;
-      const progress =
-        overviewRef.current || range <= 0
-          ? 0
-          : Math.min(1, Math.max(0, (expanded - h) / range));
-      el.style.setProperty("--stats-header-progress", `${progress}`);
+      el.style.setProperty(
+        "--stats-header-progress",
+        range > 0 ? `${Math.min(1, Math.max(0, (expanded - h) / range))}` : "0"
+      );
     };
-    applyHeaderRef.current = apply;
     const onScroll = () => {
-      // A genuine list scroll (not a graph-scrub sync) drops out of Overview.
-      if (overviewRef.current && driver.current !== "chart") {
-        overviewRef.current = false;
-        setOverview(false);
-      }
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;
@@ -335,11 +303,6 @@ export default function StatsPage() {
       if (raf) cancelAnimationFrame(raf);
     };
   }, []);
-
-  // Re-apply when the mode toggles so the pin takes effect immediately.
-  useEffect(() => {
-    applyHeaderRef.current?.();
-  }, [overview]);
 
   return (
     <div className={styles.page} ref={pageRef}>
@@ -363,25 +326,6 @@ export default function StatsPage() {
             />
           )}
         </section>
-        <button
-          type="button"
-          className={`${styles.modeToggle}${
-            overview ? ` ${styles.modeToggleOpen}` : ""
-          }`}
-          onClick={toggleMode}
-          aria-label={overview ? "Collapse graph" : "Expand graph"}
-        >
-          <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
-            <path
-              d="M4 6l4 4 4-4"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
       </div>
 
       <section className={styles.dayList}>
