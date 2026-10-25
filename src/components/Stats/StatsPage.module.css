@@ -7,6 +7,11 @@
   --stats-header-collapsed: 34vh;
 }
 
+/* While an album plays, the header grows to a near-full-screen takeover. */
+.playingImmersive {
+  --stats-header-expanded: 90vh;
+}
+
 /* Soft bleed at the bottom edge of the viewport as the list scrolls past. */
 .page::after {
   content: "";
@@ -53,31 +58,27 @@
   background: #14121f;
 }
 
-/* Album-tinted header background: dominant color + blurred cover of the now /
-   last-played album. Crossfades in over the mosaic when the now slot is
-   centered, and out as you scrub into history. */
-.nowBg {
+/* Immersive now-playing takeover: the shared NowPlayingHero's color world fills
+   the 90vh header while an album plays. Crossfades out over the chart as you
+   scrub into history (the now slot leaves center). */
+.nowHero {
   position: absolute;
   inset: 0;
-  z-index: -1;
-  opacity: 0;
-  transition: opacity 0.5s ease;
-  pointer-events: none;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(1.75rem, 5vh, 3.5rem) var(--grid-left);
   overflow: hidden;
-}
-
-.nowBgActive {
+  isolation: isolate;
+  background: var(--hero-color, #14121f);
   opacity: 1;
+  transition: opacity 0.45s ease;
 }
 
-.nowBgImage {
-  position: absolute;
-  inset: -15%;
-  width: 130%;
-  height: 130%;
-  object-fit: cover;
-  filter: blur(44px) saturate(1.25);
-  opacity: 0.55;
+.nowHeroHidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* The current (now/last-played) album's diary row — ties the list to the
