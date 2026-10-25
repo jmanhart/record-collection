@@ -156,22 +156,25 @@ export default function StatsPage() {
   // The currently/last played album — drives the now-playing banner and the
   // album-tinted background when the now slot is centered. (Playing state is
   // sampled when events change; it refreshes on the next activity refetch.)
+  const nowEvent = useMemo(
+    () => events.find((e) => e.type === "listen" && e.record) ?? null,
+    [events]
+  );
   const now = useMemo<NowInfo | null>(() => {
-    const ev = events.find((e) => e.type === "listen" && e.record);
-    if (!ev || !ev.record) return null;
-    const playing = isPlayingEvent(ev, Date.now());
+    if (!nowEvent?.record) return null;
+    const playing = isPlayingEvent(nowEvent, Date.now());
     return {
-      title: ev.record.title,
-      artist: ev.record.artist,
-      cover: ev.record.supabase_image_url || ev.record.coverImage,
-      color: ev.record.dominant_color ?? undefined,
+      title: nowEvent.record.title,
+      artist: nowEvent.record.artist,
+      cover: nowEvent.record.supabase_image_url || nowEvent.record.coverImage,
+      color: nowEvent.record.dominant_color ?? undefined,
       statusLabel: playing ? "Now Playing" : "Last played",
       statusDetail: playing
-        ? `since ${fmtTime(ev.timestamp)}`
-        : dayLabel(ev.dateKey),
+        ? `since ${fmtTime(nowEvent.timestamp)}`
+        : dayLabel(nowEvent.dateKey),
       playing,
     };
-  }, [events]);
+  }, [nowEvent]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -442,10 +445,16 @@ export default function StatsPage() {
                       album.count > 1
                         ? `${fmtTime(album.first)} — ${fmtTime(album.last)}`
                         : fmtTime(album.first);
+                    const isNowEntry =
+                      !!nowEvent &&
+                      day.key === nowEvent.dateKey &&
+                      album.id === nowEvent.releaseId;
                     return (
                       <div
                         key={`${day.key}-${album.id}`}
-                        className={styles.row}
+                        className={`${styles.row}${
+                          isNowEntry ? ` ${styles.nowRow}` : ""
+                        }`}
                         ref={observeRow}
                       >
                         <span className={styles.rail}>
@@ -470,6 +479,15 @@ export default function StatsPage() {
                           </span>
                         )}
                         <span className={styles.entryMeta}>
+                          {isNowEntry ? (
+                            <span
+                              className={`${styles.nowTag}${
+                                now?.playing ? ` ${styles.nowTagPlaying}` : ""
+                              }`}
+                            >
+                              {now?.playing ? "Now Playing" : "Last played"}
+                            </span>
+                          ) : null}
                           <span className={styles.entryTime}>{range}</span>
                           <span className={styles.entryTitle}>
                             {album.record?.title}

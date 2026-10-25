@@ -80,6 +80,31 @@
   opacity: 0.55;
 }
 
+/* The current (now/last-played) album's diary row — ties the list to the
+   header. Subtle tint + a pill tag. */
+.nowRow {
+  border-radius: 10px;
+  background: rgba(79, 124, 187, 0.06);
+}
+
+.nowTag {
+  align-self: flex-start;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(79, 124, 187, 0.14);
+  color: #2f5a93;
+  margin-bottom: 0.2rem;
+}
+
+.nowTagPlaying {
+  background: #4f7cbb;
+  color: #fff;
+}
+
 .controls {
   display: flex;
   align-items: center;
