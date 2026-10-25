@@ -320,9 +320,6 @@ export default function StatsPage() {
       <div className={styles.stickyHeader} ref={stickyRef}>
         <section className={styles.hero} data-stats-hero>
           <StatsHeroBackground albums={heroAlbums} seed={0} />
-          <div className={styles.controls}>
-            <span className={styles.heroHeading}>Listens</span>
-          </div>
           {isLoading ? (
             <p className={styles.status}>Loading…</p>
           ) : totals.listens === 0 ? (

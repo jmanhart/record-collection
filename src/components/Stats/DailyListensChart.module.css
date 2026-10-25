@@ -138,7 +138,7 @@
   width: 100vw;
   margin-left: calc(-1 * var(--grid-left));
   height: 30px;
-  border-top: 1px solid var(--divider);
+  border-top: 1px solid #000;
   border-bottom: 1px solid var(--divider);
   background: rgba(20, 18, 31, 0.35);
 }
