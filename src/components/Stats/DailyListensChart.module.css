@@ -6,6 +6,9 @@
    the center). Rendered light-on-dark over the album mosaic. */
 .chart {
   position: relative;
+  /* Fill the header's flexible height so %-sized bars scale with it. */
+  flex: 1;
+  min-height: 0;
   /* Break out of the hero's gutter so the strip spans the whole header width. */
   width: 100vw;
   margin-left: calc(-1 * var(--grid-left));
@@ -139,12 +142,17 @@
 /* Wrapper so the hash-mark axis hugs the bars (no hero gap between them). */
 .chartWrap {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 /* Hash-mark x-axis panel below the bars: a short, draggable, edge-faded strip
    with light-gray top/bottom borders. Dashes align 1:1 with the bars. */
 .axis {
   position: relative;
+  flex-shrink: 0;
   width: 100vw;
   margin-left: calc(-1 * var(--grid-left));
   height: 30px;
