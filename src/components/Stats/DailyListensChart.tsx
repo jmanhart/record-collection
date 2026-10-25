@@ -39,12 +39,12 @@ const BAR_W = 28;
 const MAX_BAR_PCT = 44;
 // Days with no listens still get a short gray stub so the timeline reads as
 // continuous.
-const EMPTY_COLOR = "rgba(245, 245, 245, 0.26)";
+const EMPTY_COLOR = "var(--bar-empty)";
 // Bars are colored in tiers by distance from the selected (centered) day, each
 // tier a CSS variable (see .chart) so the palette is easy to tweak. CSS
 // transitions animate a bar as it crosses between tiers.
-const NEAR_RANGE = 5; // the 5 bars either side of the selected one
-const MID_RANGE = 10; // the next 5 either side
+const NEAR_RANGE = 10; // the 10 bars either side of the selected one
+const MID_RANGE = 20; // the next 10 either side
 function barColor(dist: number): string {
   if (dist === 0) return "var(--bar-selected)";
   if (dist <= NEAR_RANGE) return "var(--bar-near)";

@@ -18,6 +18,7 @@
   --bar-near: #4f7cbb;
   --bar-mid: #37507a;
   --bar-far: #273a59;
+  --bar-empty: rgba(140, 165, 205, 0.28);
 }
 
 .scroll {
