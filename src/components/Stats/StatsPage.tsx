@@ -4,12 +4,18 @@ import {
   useRef,
   useCallback,
   Fragment,
+  useState,
 } from "react";
 import { useActivity } from "../../hooks/useActivity";
 import { useRecords } from "../../hooks/useRecords";
 import { ViewNav } from "../ViewNav/ViewNav";
 import { StatsHeroBackground } from "./StatsHeroBackground";
-import { DailyListensChart, type ChartHandle } from "./DailyListensChart";
+import {
+  DailyListensChart,
+  NOW_KEY,
+  type ChartHandle,
+  type NowInfo,
+} from "./DailyListensChart";
 import { CollectionByYear } from "./CollectionByYear";
 import { CollectionByDecade } from "./CollectionByDecade";
 import { formatRuntimeCompact } from "../../utils/formatDuration";
@@ -43,6 +49,23 @@ const fmtTime = (iso: string) =>
     hour: "numeric",
     minute: "2-digit",
   });
+
+// "Currently spinning": the freshest listen that hasn't been stopped and whose
+// album runtime still reaches past now (mirrors the timeline's playingNow).
+function isPlayingEvent(
+  ev: {
+    timestamp: string;
+    endedAt?: string | null;
+    record?: { duration_seconds?: number } | null;
+  },
+  nowMs: number
+): boolean {
+  if (ev.endedAt) return false;
+  const duration = ev.record?.duration_seconds;
+  if (!duration) return false;
+  const startMs = new Date(ev.timestamp).getTime();
+  return startMs <= nowMs && startMs + duration * 1000 > nowMs;
+}
 
 export default function StatsPage() {
   const { events, byDay, isLoading } = useActivity();
@@ -130,6 +153,26 @@ export default function StatsPage() {
       }));
   }, [events, records]);
 
+  // The currently/last played album — drives the now-playing banner and the
+  // album-tinted background when the now slot is centered. (Playing state is
+  // sampled when events change; it refreshes on the next activity refetch.)
+  const now = useMemo<NowInfo | null>(() => {
+    const ev = events.find((e) => e.type === "listen" && e.record);
+    if (!ev || !ev.record) return null;
+    const playing = isPlayingEvent(ev, Date.now());
+    return {
+      title: ev.record.title,
+      artist: ev.record.artist,
+      cover: ev.record.supabase_image_url || ev.record.coverImage,
+      color: ev.record.dominant_color ?? undefined,
+      statusLabel: playing ? "Now Playing" : "Last played",
+      statusDetail: playing
+        ? `since ${fmtTime(ev.timestamp)}`
+        : dayLabel(ev.dateKey),
+      playing,
+    };
+  }, [events]);
+
   useEffect(() => {
     const root = document.documentElement;
     for (const [k, v] of Object.entries(HERO_VARS)) root.style.setProperty(k, v);
@@ -151,6 +194,9 @@ export default function StatsPage() {
   const driverTimer = useRef<number | null>(null);
   const focusedKeyRef = useRef<string | null>(null);
   const pageRef = useRef<HTMLDivElement>(null);
+  // Whether the chart is centered on the now slot (vs a historical day) — gates
+  // the album-tinted background crossfade. Opens true (chart starts on now).
+  const [onNowSlot, setOnNowSlot] = useState(true);
 
   const claim = useCallback((who: "list" | "chart") => {
     driver.current = who;
@@ -171,7 +217,7 @@ export default function StatsPage() {
   // Seed the focus on today (the top of the diary) once data is in.
   useEffect(() => {
     if (diary.length && focusedKeyRef.current == null) {
-      focusedKeyRef.current = diary[0].key;
+      focusedKeyRef.current = NOW_KEY;
     }
   }, [diary]);
 
@@ -189,15 +235,22 @@ export default function StatsPage() {
         );
         if (!headers || !headers.length) return;
         const y = anchorY();
-        let cur = headers[0].dataset.dayKey!;
-        for (const h of headers) {
-          if (h.getBoundingClientRect().top - y <= 1) cur = h.dataset.dayKey!;
-          else break;
+        // Above the first day-header = the now slot (top of the diary).
+        let cur: string;
+        if (headers[0].getBoundingClientRect().top - y > 1) {
+          cur = NOW_KEY;
+        } else {
+          cur = headers[0].dataset.dayKey!;
+          for (const h of headers) {
+            if (h.getBoundingClientRect().top - y <= 1) cur = h.dataset.dayKey!;
+            else break;
+          }
         }
         if (cur !== focusedKeyRef.current) {
           claim("list");
           applyFocus(cur);
           chartApi.current?.centerKey(cur);
+          setOnNowSlot(cur === NOW_KEY);
         }
       });
     };
@@ -213,6 +266,14 @@ export default function StatsPage() {
   const handleCenter = useCallback(
     (key: string) => {
       if (driver.current === "list") return;
+      if (key === NOW_KEY) {
+        claim("chart");
+        applyFocus(NOW_KEY);
+        setOnNowSlot(true);
+        window.scrollTo({ top: 0, behavior: "auto" });
+        return;
+      }
+      setOnNowSlot(false);
       // Nearest diary day at or before the centered key (diary is newest-first).
       let dKey: string | null = null;
       for (const d of diary) {
@@ -320,6 +381,19 @@ export default function StatsPage() {
       <div className={styles.stickyHeader} ref={stickyRef}>
         <section className={styles.hero} data-stats-hero>
           <StatsHeroBackground albums={heroAlbums} seed={0} />
+          {now && (
+            <div
+              className={`${styles.nowBg}${
+                onNowSlot ? ` ${styles.nowBgActive}` : ""
+              }`}
+              style={now.color ? { backgroundColor: now.color } : undefined}
+              aria-hidden
+            >
+              {now.cover ? (
+                <img src={now.cover} className={styles.nowBgImage} alt="" />
+              ) : null}
+            </div>
+          )}
           {isLoading ? (
             <p className={styles.status}>Loading…</p>
           ) : totals.listens === 0 ? (
@@ -329,6 +403,7 @@ export default function StatsPage() {
               ref={chartApi}
               byDay={byDay}
               onCenterChange={handleCenter}
+              now={now}
             />
           )}
         </section>

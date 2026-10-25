@@ -53,6 +53,33 @@
   background: #14121f;
 }
 
+/* Album-tinted header background: dominant color + blurred cover of the now /
+   last-played album. Crossfades in over the mosaic when the now slot is
+   centered, and out as you scrub into history. */
+.nowBg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.nowBgActive {
+  opacity: 1;
+}
+
+.nowBgImage {
+  position: absolute;
+  inset: -15%;
+  width: 130%;
+  height: 130%;
+  object-fit: cover;
+  filter: blur(44px) saturate(1.25);
+  opacity: 0.55;
+}
+
 .controls {
   display: flex;
   align-items: center;

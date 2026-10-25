@@ -24,10 +24,29 @@ export interface ChartHandle {
   centerKey: (dateKey: string) => void;
 }
 
+export interface NowInfo {
+  title: string;
+  artist: string;
+  cover?: string;
+  /** Dominant color for the album-tinted header background. */
+  color?: string;
+  /** "Now Playing" | "Last played" */
+  statusLabel: string;
+  /** "since 3:40 PM" | "Oct 11" */
+  statusDetail: string;
+  playing: boolean;
+}
+
+/** Sentinel key for the "now playing" slot at the right end of the chart. */
+export const NOW_KEY = "__now__";
+
 interface Props {
   byDay: Map<string, DayStats>;
-  /** Called with the dateKey under the center line on a *user* scrub only. */
+  /** Called with the dateKey under the center line on a *user* scrub only.
+   *  Emits NOW_KEY when the now-playing slot is centered. */
   onCenterChange?: (dateKey: string) => void;
+  /** The currently/last played album, shown in the now slot's banner. */
+  now?: NowInfo | null;
 }
 
 // Fixed per-day geometry so the chart scrolls; today starts centered under the
@@ -77,13 +96,14 @@ interface DayDatum {
   albums: number;
   listens: number;
   monthStart: boolean;
+  isNow?: boolean;
 }
 
 const barPct = (seconds: number, max: number) =>
   seconds > 0 && max > 0 ? (seconds / max) * MAX_BAR_PCT : 0;
 
 export const DailyListensChart = forwardRef<ChartHandle, Props>(
-  function DailyListensChart({ byDay, onCenterChange }, ref) {
+  function DailyListensChart({ byDay, onCenterChange, now }, ref) {
     const days = useMemo<DayDatum[]>(() => {
       const keys = [...byDay.keys()].sort();
       if (!keys.length) return [];
@@ -105,6 +125,17 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
           monthStart: d.getDate() === 1,
         });
       }
+      // "Now" slot at the right end — the present moment / now-playing marker,
+      // distinct from today's aggregate bar just to its left.
+      out.push({
+        key: NOW_KEY,
+        date: new Date(today),
+        seconds: 0,
+        albums: 0,
+        listens: 0,
+        monthStart: false,
+        isNow: true,
+      });
       return out;
     }, [byDay]);
 
@@ -230,14 +261,8 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
       const chartCenter = rect.left + rect.width / 2;
       const firstCenter =
         first.getBoundingClientRect().left + first.offsetWidth / 2;
-      // Open on the most recent day with listens so it matches the diary's top.
-      let startIdx = days.length - 1;
-      for (let i = days.length - 1; i >= 0; i--) {
-        if (days[i].seconds > 0) {
-          startIdx = i;
-          break;
-        }
-      }
+      // Open on the now slot (right end) so the header shows now-playing.
+      const startIdx = days.length - 1;
       programmatic.current = true;
       sc.scrollLeft += firstCenter + startIdx * SLOT - chartCenter;
       setActive(startIdx);
@@ -322,27 +347,57 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
                   style={{ width: SLOT }}
                   onClick={() => centerIndex(i)}
                 >
-                  <div
-                    className={styles.bar}
-                    style={{
-                      width: BAR_W,
-                      height: `${barPct(day.seconds, max)}%`,
-                      background:
-                        day.seconds > 0
-                          ? barColor(Math.abs(i - active))
-                          : EMPTY_COLOR,
-                    }}
-                  />
+                  {day.isNow ? (
+                    <span
+                      className={`${styles.nowNode}${
+                        now?.playing ? ` ${styles.nowNodePlaying}` : ""
+                      }`}
+                      aria-hidden
+                    />
+                  ) : (
+                    <div
+                      className={styles.bar}
+                      style={{
+                        width: BAR_W,
+                        height: `${barPct(day.seconds, max)}%`,
+                        background:
+                          day.seconds > 0
+                            ? barColor(Math.abs(i - active))
+                            : EMPTY_COLOR,
+                      }}
+                    />
+                  )}
                 </div>
               ))}
             </div>
           </div>
-          {/* Centered day metric: the focused day's date, listening time, and
-              album count, lined up above the center bar. Always visible. */}
-          <div className={styles.metric}>
-            <span className={styles.metricDate}>{activeLabel}</span>
-            <span className={styles.metricStats}>{activeStats}</span>
-          </div>
+          {/* Center content: the now-playing banner when the now slot is
+              centered, otherwise the scrubbed day's metric. */}
+          {activeDay.isNow && now ? (
+            <div className={styles.nowBanner}>
+              {now.cover ? (
+                <img className={styles.nowCover} src={now.cover} alt="" />
+              ) : null}
+              <div className={styles.nowText}>
+                <span className={styles.nowStatus}>
+                  {now.statusLabel}
+                  {now.statusDetail ? (
+                    <span className={styles.nowStatusDetail}>
+                      {" · "}
+                      {now.statusDetail}
+                    </span>
+                  ) : null}
+                </span>
+                <span className={styles.nowTitle}>{now.title}</span>
+                <span className={styles.nowArtist}>{now.artist}</span>
+              </div>
+            </div>
+          ) : (
+            <div className={styles.metric}>
+              <span className={styles.metricDate}>{activeLabel}</span>
+              <span className={styles.metricStats}>{activeStats}</span>
+            </div>
+          )}
           {/* Center line connects the metric down to the bar under it. */}
           <span className={styles.centerLine} />
         </div>
@@ -366,7 +421,14 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
                   style={{ width: SLOT }}
                   onClick={() => centerIndex(i)}
                 >
-                  {day.monthStart ? (
+                  {day.isNow ? (
+                    <span
+                      className={`${styles.nowTick}${
+                        now?.playing ? ` ${styles.nowTickPlaying}` : ""
+                      }`}
+                      aria-hidden
+                    />
+                  ) : day.monthStart ? (
                     <span className={styles.monthLetter}>
                       {day.date.toLocaleDateString("en-US", { month: "short" })}
                     </span>
