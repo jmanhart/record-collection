@@ -70,16 +70,15 @@
   cursor: pointer;
 }
 
-/* Short month-boundary line at the top of the 1st-of-month column. */
+/* Short month divider rising from the chart's base at the month boundary. */
 .monthStart::before {
   content: "";
   position: absolute;
-  left: 50%;
-  top: 0;
-  transform: translateX(-50%);
+  left: 0;
+  bottom: 0;
   width: 1px;
   height: 2.5rem;
-  background: rgba(245, 245, 245, 0.5);
+  background: rgba(245, 245, 245, 0.4);
   pointer-events: none;
 }
 
@@ -208,6 +207,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
   cursor: pointer;
 }
 
@@ -225,6 +225,10 @@
 }
 
 .monthLetter {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translate(-50%, -50%);
   font-size: 0.6rem;
   font-weight: 600;
   line-height: 1;
