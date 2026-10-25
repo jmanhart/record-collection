@@ -124,7 +124,7 @@
 }
 
 .metricDate {
-  font-size: 1.7rem;
+  font-size: calc(1.7rem - 0.55rem * var(--stats-header-progress, 0));
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--hero-text);
@@ -132,7 +132,7 @@
 }
 
 .metricStats {
-  font-size: 1rem;
+  font-size: calc(1rem - 0.2rem * var(--stats-header-progress, 0));
   font-weight: 500;
   color: var(--hero-text);
   opacity: 0.85;
