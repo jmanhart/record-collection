@@ -5,17 +5,19 @@ import {
   useCallback,
   Fragment,
   useState,
+  type CSSProperties,
 } from "react";
 import { useActivity } from "../../hooks/useActivity";
 import { useRecords } from "../../hooks/useRecords";
 import { ViewNav } from "../ViewNav/ViewNav";
 import { StatsHeroBackground } from "./StatsHeroBackground";
+import { DailyListensChart, NOW_KEY, type ChartHandle } from "./DailyListensChart";
+import { NowPlayingHero } from "../common/NowPlayingHero/NowPlayingHero";
 import {
-  DailyListensChart,
-  NOW_KEY,
-  type ChartHandle,
-  type NowInfo,
-} from "./DailyListensChart";
+  heroPalette,
+  heroCssVars,
+  heroRootVars,
+} from "../../utils/heroPalette";
 import { CollectionByYear } from "./CollectionByYear";
 import { CollectionByDecade } from "./CollectionByDecade";
 import { formatRuntimeCompact } from "../../utils/formatDuration";
@@ -160,35 +162,41 @@ export default function StatsPage() {
     () => events.find((e) => e.type === "listen" && e.record) ?? null,
     [events]
   );
-  const now = useMemo<NowInfo | null>(() => {
-    if (!nowEvent?.record) return null;
-    const playing = isPlayingEvent(nowEvent, Date.now());
-    return {
-      title: nowEvent.record.title,
-      artist: nowEvent.record.artist,
-      cover: nowEvent.record.supabase_image_url || nowEvent.record.coverImage,
-      color: nowEvent.record.dominant_color ?? undefined,
-      statusLabel: playing ? "Now Playing" : "Last played",
-      statusDetail: playing
-        ? `since ${fmtTime(nowEvent.timestamp)}`
-        : dayLabel(nowEvent.dateKey),
-      playing,
-    };
-  }, [nowEvent]);
-  const playing = now?.playing ?? false;
+  const playing = useMemo(
+    () => (nowEvent ? isPlayingEvent(nowEvent, Date.now()) : false),
+    [nowEvent]
+  );
+  // The playing album's color world — drives the immersive hero + :root tint.
+  const palette = useMemo(
+    () => heroPalette(nowEvent?.record?.dominant_color),
+    [nowEvent]
+  );
+  // Lifetime plays of the now-playing release, for the hero's "N listens" pill.
+  const nowPlays = useMemo(
+    () =>
+      nowEvent
+        ? events.filter(
+            (e) => e.type === "listen" && e.releaseId === nowEvent.releaseId
+          ).length
+        : 0,
+    [events, nowEvent]
+  );
   // Mirror into a ref so the scroll handler (bound once) reads the live value.
   const playingRef = useRef(false);
   playingRef.current = playing;
 
   useEffect(() => {
     const root = document.documentElement;
-    for (const [k, v] of Object.entries(HERO_VARS)) root.style.setProperty(k, v);
+    // While an album plays, tint the fixed ViewNav to its cover palette;
+    // otherwise the light-on-dark mosaic defaults.
+    const vars = playing && palette ? heroRootVars(palette) : HERO_VARS;
+    for (const [k, v] of Object.entries(vars)) root.style.setProperty(k, v);
     document.body.classList.add("nav-over-hero");
     return () => {
-      for (const k of Object.keys(HERO_VARS)) root.style.removeProperty(k);
+      for (const k of Object.keys(vars)) root.style.removeProperty(k);
       document.body.classList.remove("nav-over-hero");
     };
-  }, []);
+  }, [playing, palette]);
 
   // --- Two-way sync between the diary list and the chart -------------------
   // The day at the anchor (just under the sticky header) is the focus. Scrolling
@@ -382,26 +390,43 @@ export default function StatsPage() {
       window.removeEventListener("resize", apply);
       if (raf) cancelAnimationFrame(raf);
     };
-  }, []);
+  }, [playing]);
 
   return (
-    <div className={styles.page} ref={pageRef}>
+    <div
+      className={`${styles.page}${playing ? ` ${styles.playingImmersive}` : ""}`}
+      ref={pageRef}
+    >
       <ViewNav />
 
       <div className={styles.stickyHeader} ref={stickyRef}>
         <section className={styles.hero} data-stats-hero>
           <StatsHeroBackground albums={heroAlbums} seed={0} />
-          {now?.playing && (
+          {playing && nowEvent?.record && (
             <div
-              className={`${styles.nowBg}${
-                onNowSlot ? ` ${styles.nowBgActive}` : ""
+              className={`${styles.nowHero}${
+                onNowSlot ? "" : ` ${styles.nowHeroHidden}`
               }`}
-              style={now.color ? { backgroundColor: now.color } : undefined}
-              aria-hidden
+              style={
+                palette
+                  ? // --hero-bar overridden to the chart blue so the equalizer
+                    // matches the chart strip rather than the album hue.
+                    ({
+                      ...heroCssVars(palette),
+                      "--hero-bar": "#7fbaff",
+                    } as CSSProperties)
+                  : undefined
+              }
             >
-              {now.cover ? (
-                <img src={now.cover} className={styles.nowBgImage} alt="" />
-              ) : null}
+              <NowPlayingHero
+                record={nowEvent.record}
+                playing
+                statusLabel="Now Playing"
+                statusDetail={`since ${fmtTime(nowEvent.timestamp)}`}
+                plays={nowPlays}
+                ordinal={nowPlays === 1 ? 1 : 0}
+                equalizerFullBleed
+              />
             </div>
           )}
           {isLoading ? (
@@ -413,7 +438,7 @@ export default function StatsPage() {
               ref={chartApi}
               byDay={byDay}
               onCenterChange={handleCenter}
-              now={now}
+              playing={playing}
             />
           )}
         </section>

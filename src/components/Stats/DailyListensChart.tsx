@@ -24,19 +24,6 @@ export interface ChartHandle {
   centerKey: (dateKey: string) => void;
 }
 
-export interface NowInfo {
-  title: string;
-  artist: string;
-  cover?: string;
-  /** Dominant color for the album-tinted header background. */
-  color?: string;
-  /** "Now Playing" | "Last played" */
-  statusLabel: string;
-  /** "since 3:40 PM" | "Oct 11" */
-  statusDetail: string;
-  playing: boolean;
-}
-
 /** Sentinel key for the "now playing" slot at the right end of the chart. */
 export const NOW_KEY = "__now__";
 
@@ -45,8 +32,9 @@ interface Props {
   /** Called with the dateKey under the center line on a *user* scrub only.
    *  Emits NOW_KEY when the now-playing slot is centered. */
   onCenterChange?: (dateKey: string) => void;
-  /** The currently/last played album, shown in the now slot's banner. */
-  now?: NowInfo | null;
+  /** True while an album is playing — adds the now slot and pushes the bars
+   *  left. The now-playing display itself is the parent's NowPlayingHero. */
+  playing?: boolean;
 }
 
 // Fixed per-day geometry so the chart scrolls; today starts centered under the
@@ -107,8 +95,7 @@ const barPct = (seconds: number, max: number) =>
   seconds > 0 && max > 0 ? (seconds / max) * MAX_BAR_PCT : 0;
 
 export const DailyListensChart = forwardRef<ChartHandle, Props>(
-  function DailyListensChart({ byDay, onCenterChange, now }, ref) {
-    const playing = !!now?.playing;
+  function DailyListensChart({ byDay, onCenterChange, playing = false }, ref) {
     const days = useMemo<DayDatum[]>(() => {
       const keys = [...byDay.keys()].sort();
       if (!keys.length) return [];
@@ -376,7 +363,7 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
                   {day.isNow ? (
                     <span
                       className={`${styles.nowNode}${
-                        now?.playing ? ` ${styles.nowNodePlaying}` : ""
+                        playing ? ` ${styles.nowNodePlaying}` : ""
                       }`}
                       aria-hidden
                     />
@@ -397,28 +384,9 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
               ))}
             </div>
           </div>
-          {/* Center content: the now-playing banner when the now slot is
-              centered, otherwise the scrubbed day's metric. */}
-          {activeDay.isNow && now ? (
-            <div className={styles.nowBanner}>
-              {now.cover ? (
-                <img className={styles.nowCover} src={now.cover} alt="" />
-              ) : null}
-              <div className={styles.nowText}>
-                <span className={styles.nowStatus}>
-                  {now.statusLabel}
-                  {now.statusDetail ? (
-                    <span className={styles.nowStatusDetail}>
-                      {" · "}
-                      {now.statusDetail}
-                    </span>
-                  ) : null}
-                </span>
-                <span className={styles.nowTitle}>{now.title}</span>
-                <span className={styles.nowArtist}>{now.artist}</span>
-              </div>
-            </div>
-          ) : (
+          {/* The now slot's display is the parent's NowPlayingHero overlay;
+              here we only show the scrubbed day's metric. */}
+          {activeDay.isNow ? null : (
             <div className={styles.metric}>
               <span className={styles.metricDate}>{activeLabel}</span>
               <span className={styles.metricStats}>{activeStats}</span>
@@ -454,7 +422,7 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
                   {day.isNow ? (
                     <span
                       className={`${styles.nowTick}${
-                        now?.playing ? ` ${styles.nowTickPlaying}` : ""
+                        playing ? ` ${styles.nowTickPlaying}` : ""
                       }`}
                       aria-hidden
                     />
