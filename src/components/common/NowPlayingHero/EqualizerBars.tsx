@@ -16,14 +16,16 @@ function rand(seed: number): number {
 interface EqualizerBarsProps {
   /** A touch livelier when the record is actually playing. */
   active?: boolean;
+  /** Span the full hero width (stats) instead of hugging the album's edge. */
+  fullBleed?: boolean;
 }
 
 /**
- * Subtle equalizer pinned to the bottom of the hero, flush with the album's
- * left edge: a row of 4px bars that bob independently like a level meter.
- * Animated with Framer Motion; static at a low height under reduced motion.
+ * Subtle equalizer pinned to the bottom of the hero: a row of 4px bars that bob
+ * independently like a level meter. Animated with Framer Motion; static at a
+ * low height under reduced motion.
  */
-export function EqualizerBars({ active = false }: EqualizerBarsProps) {
+export function EqualizerBars({ active = false, fullBleed = false }: EqualizerBarsProps) {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const [count, setCount] = useState(48);
@@ -50,7 +52,11 @@ export function EqualizerBars({ active = false }: EqualizerBarsProps) {
   );
 
   return (
-    <div className={styles.bars} ref={ref} aria-hidden>
+    <div
+      className={`${styles.bars}${fullBleed ? ` ${styles.fullBleed}` : ""}`}
+      ref={ref}
+      aria-hidden
+    >
       {bars.map((bar, i) => (
         <motion.span
           key={i}

@@ -14,6 +14,12 @@
   overflow: hidden;
 }
 
+/* Full-bleed: span the whole hero width, matching the stats chart strip. */
+.fullBleed {
+  left: 0;
+  right: 0;
+}
+
 .bar {
   flex: 0 0 4px;
   width: 4px;
