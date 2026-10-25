@@ -263,13 +263,17 @@ export default function StatsPage() {
     if (el?.complete) el.classList.add(styles.coverLoaded);
   }, []);
 
-  // Shrink the header from its expanded to collapsed height, 1:1 with scroll,
-  // reading the fractions from the CSS vars so they stay the single source of
-  // truth. Also publishes a 0..1 progress var for scaling header content.
+  // Collapse the header as you scroll the LIST — but accumulate only genuine
+  // list scroll. A graph scrub (driver === "chart") moves the list via the sync
+  // yet must NOT collapse the header. `collapse` is also clamped to the scroll
+  // position, so the header never leaves a gap above the list and scrubbing back
+  // toward the top re-expands it. Fractions come from the CSS vars.
   useEffect(() => {
     const el = pageRef.current;
     if (!el) return;
     let raf = 0;
+    let collapse = 0;
+    let lastY = window.scrollY;
     const toPx = (v: string) => {
       const n = parseFloat(v);
       if (Number.isNaN(n)) return 0;
@@ -279,12 +283,17 @@ export default function StatsPage() {
       const cs = getComputedStyle(el);
       const expanded = toPx(cs.getPropertyValue("--stats-header-expanded"));
       const collapsed = toPx(cs.getPropertyValue("--stats-header-collapsed"));
-      const h = Math.max(collapsed, expanded - window.scrollY);
-      el.style.setProperty("--stats-header-h", `${h}px`);
-      const range = expanded - collapsed;
+      const range = Math.max(0, expanded - collapsed);
+      const y = window.scrollY;
+      const delta = y - lastY;
+      lastY = y;
+      // Only a real list scroll changes the collapse; a graph scrub does not.
+      if (driver.current !== "chart") collapse += delta;
+      collapse = Math.max(0, Math.min(collapse, range, y));
+      el.style.setProperty("--stats-header-h", `${expanded - collapse}px`);
       el.style.setProperty(
         "--stats-header-progress",
-        range > 0 ? `${Math.min(1, Math.max(0, (expanded - h) / range))}` : "0"
+        range > 0 ? `${collapse / range}` : "0"
       );
     };
     const onScroll = () => {
