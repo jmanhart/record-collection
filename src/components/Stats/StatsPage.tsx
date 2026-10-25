@@ -150,6 +150,7 @@ export default function StatsPage() {
   const driver = useRef<"list" | "chart" | null>(null);
   const driverTimer = useRef<number | null>(null);
   const focusedKeyRef = useRef<string | null>(null);
+  const pageRef = useRef<HTMLDivElement>(null);
 
   const claim = useCallback((who: "list" | "chart") => {
     driver.current = who;
@@ -262,8 +263,49 @@ export default function StatsPage() {
     if (el?.complete) el.classList.add(styles.coverLoaded);
   }, []);
 
+  // Shrink the header from its expanded to collapsed height, 1:1 with scroll,
+  // reading the fractions from the CSS vars so they stay the single source of
+  // truth. Also publishes a 0..1 progress var for scaling header content.
+  useEffect(() => {
+    const el = pageRef.current;
+    if (!el) return;
+    let raf = 0;
+    const toPx = (v: string) => {
+      const n = parseFloat(v);
+      if (Number.isNaN(n)) return 0;
+      return v.includes("vh") ? (n / 100) * window.innerHeight : n;
+    };
+    const apply = () => {
+      const cs = getComputedStyle(el);
+      const expanded = toPx(cs.getPropertyValue("--stats-header-expanded"));
+      const collapsed = toPx(cs.getPropertyValue("--stats-header-collapsed"));
+      const h = Math.max(collapsed, expanded - window.scrollY);
+      el.style.setProperty("--stats-header-h", `${h}px`);
+      const range = expanded - collapsed;
+      el.style.setProperty(
+        "--stats-header-progress",
+        range > 0 ? `${Math.min(1, Math.max(0, (expanded - h) / range))}` : "0"
+      );
+    };
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        apply();
+      });
+    };
+    apply();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", apply);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", apply);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   return (
-    <div className={styles.page}>
+    <div className={styles.page} ref={pageRef}>
       <ViewNav />
 
       <div className={styles.stickyHeader} ref={stickyRef}>
