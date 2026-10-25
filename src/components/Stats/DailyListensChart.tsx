@@ -319,9 +319,7 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
                 <div
                   key={day.key}
                   ref={i === 0 ? firstColRef : undefined}
-                  className={`${styles.col}${
-                    day.monthStart ? ` ${styles.monthStart}` : ""
-                  }`}
+                  className={styles.col}
                   style={{ width: SLOT }}
                   onClick={() => centerIndex(i)}
                 >
@@ -371,7 +369,7 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
                 >
                   {day.monthStart ? (
                     <span className={styles.monthLetter}>
-                      {day.date.toLocaleDateString("en-US", { month: "narrow" })}
+                      {day.date.toLocaleDateString("en-US", { month: "short" })}
                     </span>
                   ) : (
                     <span
