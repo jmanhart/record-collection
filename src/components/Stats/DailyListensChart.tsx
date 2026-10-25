@@ -53,6 +53,10 @@ interface Props {
 // fixed center line, and the bar under that line drives the tooltip.
 const SLOT = 32;
 const BAR_W = 28;
+// How far the bar strip is pushed left (fraction of viewport width) while an
+// album is playing, so the centered banner dominates. Scrubbing pulls the bars
+// back into view.
+const NOW_GAP_FRAC = 0.32;
 // Tallest bar as a % of the chart height, so bars scale as the header grows or
 // shrinks. Empty days fall back to .bar's min-height for a tiny stub.
 const MAX_BAR_PCT = 44;
@@ -104,6 +108,7 @@ const barPct = (seconds: number, max: number) =>
 
 export const DailyListensChart = forwardRef<ChartHandle, Props>(
   function DailyListensChart({ byDay, onCenterChange, now }, ref) {
+    const playing = !!now?.playing;
     const days = useMemo<DayDatum[]>(() => {
       const keys = [...byDay.keys()].sort();
       if (!keys.length) return [];
@@ -125,19 +130,22 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
           monthStart: d.getDate() === 1,
         });
       }
-      // "Now" slot at the right end — the present moment / now-playing marker,
-      // distinct from today's aggregate bar just to its left.
-      out.push({
-        key: NOW_KEY,
-        date: new Date(today),
-        seconds: 0,
-        albums: 0,
-        listens: 0,
-        monthStart: false,
-        isNow: true,
-      });
+      // "Now" slot at the right end — only while an album is actually playing,
+      // so the banner takes center stage with the bars pushed left. Past
+      // listens show the standard chart (no now slot).
+      if (playing) {
+        out.push({
+          key: NOW_KEY,
+          date: new Date(today),
+          seconds: 0,
+          albums: 0,
+          listens: 0,
+          monthStart: false,
+          isNow: true,
+        });
+      }
       return out;
-    }, [byDay]);
+    }, [byDay, playing]);
 
     const max = useMemo(
       () => days.reduce((m, d) => Math.max(m, d.seconds), 0),
@@ -209,7 +217,10 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
       const chartCenter = rect.left + rect.width / 2;
       const firstCenter =
         first.getBoundingClientRect().left + first.offsetWidth / 2;
-      animateScroll(sc.scrollLeft + (firstCenter + idx * SLOT - chartCenter));
+      const gap = days[idx]?.isNow ? window.innerWidth * NOW_GAP_FRAC : 0;
+      animateScroll(
+        sc.scrollLeft + (firstCenter + idx * SLOT + gap - chartCenter)
+      );
     };
 
     useImperativeHandle(
@@ -235,7 +246,8 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
       const firstCenter =
         first.getBoundingClientRect().left + first.offsetWidth / 2;
       const start = sc.scrollLeft;
-      const dist = firstCenter + i * SLOT - chartCenter;
+      const gap = days[i]?.isNow ? window.innerWidth * NOW_GAP_FRAC : 0;
+      const dist = firstCenter + i * SLOT + gap - chartCenter;
       if (Math.abs(dist) < 1) return;
       sc.style.scrollSnapType = "none";
       const t0 = performance.now();
@@ -261,10 +273,20 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
       const chartCenter = rect.left + rect.width / 2;
       const firstCenter =
         first.getBoundingClientRect().left + first.offsetWidth / 2;
-      // Open on the now slot (right end) so the header shows now-playing.
-      const startIdx = days.length - 1;
+      // When playing, open on the now slot (right end, bars pushed left) so the
+      // banner leads. Otherwise open on the most recent listened day.
+      let startIdx = days.length - 1;
+      if (!playing) {
+        for (let i = days.length - 1; i >= 0; i--) {
+          if (days[i].seconds > 0) {
+            startIdx = i;
+            break;
+          }
+        }
+      }
+      const gap = days[startIdx]?.isNow ? window.innerWidth * NOW_GAP_FRAC : 0;
       programmatic.current = true;
-      sc.scrollLeft += firstCenter + startIdx * SLOT - chartCenter;
+      sc.scrollLeft += firstCenter + startIdx * SLOT + gap - chartCenter;
       setActive(startIdx);
       window.setTimeout(() => {
         programmatic.current = false;
@@ -344,7 +366,11 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
                   key={day.key}
                   ref={i === 0 ? firstColRef : undefined}
                   className={styles.col}
-                  style={{ width: SLOT }}
+                  style={
+                    day.isNow
+                      ? { width: SLOT, marginLeft: `${NOW_GAP_FRAC * 100}vw` }
+                      : { width: SLOT }
+                  }
                   onClick={() => centerIndex(i)}
                 >
                   {day.isNow ? (
@@ -418,7 +444,11 @@ export const DailyListensChart = forwardRef<ChartHandle, Props>(
                 <div
                   key={day.key}
                   className={styles.tickCol}
-                  style={{ width: SLOT }}
+                  style={
+                    day.isNow
+                      ? { width: SLOT, marginLeft: `${NOW_GAP_FRAC * 100}vw` }
+                      : { width: SLOT }
+                  }
                   onClick={() => centerIndex(i)}
                 >
                   {day.isNow ? (

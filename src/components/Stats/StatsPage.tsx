@@ -175,6 +175,10 @@ export default function StatsPage() {
       playing,
     };
   }, [nowEvent]);
+  const playing = now?.playing ?? false;
+  // Mirror into a ref so the scroll handler (bound once) reads the live value.
+  const playingRef = useRef(false);
+  playingRef.current = playing;
 
   useEffect(() => {
     const root = document.documentElement;
@@ -220,9 +224,9 @@ export default function StatsPage() {
   // Seed the focus on today (the top of the diary) once data is in.
   useEffect(() => {
     if (diary.length && focusedKeyRef.current == null) {
-      focusedKeyRef.current = NOW_KEY;
+      focusedKeyRef.current = playing ? NOW_KEY : diary[0].key;
     }
-  }, [diary]);
+  }, [diary, playing]);
 
   // Diary -> chart: on page scroll, find the day crossing the anchor and center
   // the chart on it (silently).
@@ -240,7 +244,10 @@ export default function StatsPage() {
         const y = anchorY();
         // Above the first day-header = the now slot (top of the diary).
         let cur: string;
-        if (headers[0].getBoundingClientRect().top - y > 1) {
+        if (
+          playingRef.current &&
+          headers[0].getBoundingClientRect().top - y > 1
+        ) {
           cur = NOW_KEY;
         } else {
           cur = headers[0].dataset.dayKey!;
@@ -384,7 +391,7 @@ export default function StatsPage() {
       <div className={styles.stickyHeader} ref={stickyRef}>
         <section className={styles.hero} data-stats-hero>
           <StatsHeroBackground albums={heroAlbums} seed={0} />
-          {now && (
+          {now?.playing && (
             <div
               className={`${styles.nowBg}${
                 onNowSlot ? ` ${styles.nowBgActive}` : ""
@@ -446,6 +453,7 @@ export default function StatsPage() {
                         ? `${fmtTime(album.first)} — ${fmtTime(album.last)}`
                         : fmtTime(album.first);
                     const isNowEntry =
+                      playing &&
                       !!nowEvent &&
                       day.key === nowEvent.dateKey &&
                       album.id === nowEvent.releaseId;
@@ -481,11 +489,9 @@ export default function StatsPage() {
                         <span className={styles.entryMeta}>
                           {isNowEntry ? (
                             <span
-                              className={`${styles.nowTag}${
-                                now?.playing ? ` ${styles.nowTagPlaying}` : ""
-                              }`}
+                              className={`${styles.nowTag} ${styles.nowTagPlaying}`}
                             >
-                              {now?.playing ? "Now Playing" : "Last played"}
+                              Now Playing
                             </span>
                           ) : null}
                           <span className={styles.entryTime}>{range}</span>
