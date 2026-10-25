@@ -461,8 +461,8 @@
 }
 
 .dot {
-  /* Centered on the album cover (5rem) rather than the first text line. */
-  top: 2.5rem;
+  /* Aligned with the top edge of the album cover. */
+  top: 0;
   width: 9px;
   height: 9px;
   background: var(--text-secondary);
